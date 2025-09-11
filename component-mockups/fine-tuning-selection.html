@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fine-Tuning Data Selection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #323130;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #605e5c;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .selection-info {
+            background: #e3f2fd;
+            border: 1px solid #1976d2;
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .selection-info i {
+            color: #1976d2;
+            font-size: 20px;
+        }
+
+        .selection-info .text {
+            color: #1565c0;
+            font-weight: 600;
+        }
+
+        .selection-counter {
+            background: #1976d2;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .samples-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .sample-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .sample-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .sample-card.selected {
+            border-color: #0078d4;
+            box-shadow: 0 4px 16px rgba(0, 120, 212, 0.2);
+        }
+
+        .sample-card.selected::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 24px;
+            height: 24px;
+            background: #0078d4;
+            border-radius: 50%;
+            z-index: 10;
+        }
+
+        .sample-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 11;
+        }
+
+        .sample-header {
+            background: #f8f9fa;
+            padding: 16px;
+            border-bottom: 1px solid #e1dfdd;
+        }
+
+        .sample-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #323130;
+            margin-bottom: 4px;
+        }
+
+        .sample-type {
+            font-size: 12px;
+            color: #605e5c;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sample-chat {
+            padding: 16px;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            align-items: flex-start;
+        }
+
+        .chat-message:last-child {
+            margin-bottom: 0;
+        }
+
+        .message-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+            flex-shrink: 0;
+            font-weight: 600;
+        }
+
+        .message-avatar.user {
+            background: #0078d4;
+        }
+
+        .message-avatar.assistant {
+            background: #00d4aa;
+        }
+
+        .message-bubble {
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.4;
+            max-width: calc(100% - 32px);
+        }
+
+        .chat-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .chat-message.user .message-bubble {
+            background: #e3f2fd;
+            color: #1565c0;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-message.assistant .message-bubble {
+            background: #f3f2f1;
+            color: #323130;
+            border-bottom-left-radius: 4px;
+        }
+
+        .quality-indicators {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f3f2f1;
+        }
+
+        .quality-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .quality-badge.polite {
+            background: #e8f5e8;
+            color: #0d7377;
+        }
+
+        .quality-badge.clear {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .quality-badge.neutral {
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+
+        .quality-badge.poor {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-info {
+            flex: 1;
+        }
+
+        .action-info h3 {
+            color: #323130;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .action-info p {
+            color: #605e5c;
+            font-size: 14px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background: #f3f2f1;
+            color: #323130;
+            border: 1px solid #e1dfdd;
+        }
+
+        .btn-secondary:hover {
+            background: #e1dfdd;
+        }
+
+        .btn-primary {
+            background: #0078d4;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #106ebe;
+        }
+
+        .btn-primary:disabled {
+            background: #c8c6c4;
+            cursor: not-allowed;
+        }
+
+        .selected-count {
+            font-weight: 600;
+            color: #0078d4;
+        }
+
+        @media (max-width: 1200px) {
+            .samples-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .samples-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-panel {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-brain"></i> Fine-Tuning Data Selection</h1>
+            <p>Select 3 chat examples to include in your fine-tuning dataset. Choose conversations that demonstrate the politeness and clarity you want your model to learn.</p>
+            
+            <div class="selection-info">
+                <i class="fas fa-info-circle"></i>
+                <span class="text">Select conversations that show good examples of polite and clear customer service responses</span>
+                <div class="selection-counter">
+                    <span id="selectedCount">0</span> / 3 selected
+                </div>
+            </div>
+        </div>
+
+        <div class="samples-grid" id="samplesGrid">
+            <!-- Sample cards will be generated here -->
+        </div>
+
+        <div class="action-panel">
+            <div class="action-info">
+                <h3>Ready to Fine-Tune?</h3>
+                <p>You've selected <span class="selected-count" id="selectedCountText">0</span> of 3 required examples. Choose examples that best demonstrate the behavior you want your model to learn.</p>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-secondary">
+                    <i class="fas fa-undo"></i>
+                    Reset Selection
+                </button>
+                <button class="btn btn-primary" id="submitBtn" disabled>
+                    <i class="fas fa-rocket"></i>
+                    Start Fine-Tuning
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for fine-tuning selection
+        const chatSamples = [
+            {
+                id: 1,
+                title: "Order Delay Inquiry",
+                type: "Customer Support",
+                politeness: "high",
+                clarity: "high",
+                conversation: [
+                    { sender: "user", text: "Hi, my order is late. Where is it?" },
+                    { sender: "assistant", text: "I sincerely apologize for the delay with your order. Let me check the tracking information for you right away and provide you with an updated delivery estimate. Could you please share your order number?" }
+                ]
+            },
+            {
+                id: 2,
+                title: "Refund Request",
+                type: "Customer Support",
+                politeness: "medium",
+                clarity: "high",
+                conversation: [
+                    { sender: "user", text: "I want my money back for this broken item." },
+                    { sender: "assistant", text: "I understand your frustration with receiving a damaged item. I'll process your refund request immediately. Please provide your order number and I'll ensure you receive a full refund within 3-5 business days." }
+                ]
+            },
+            {
+                id: 3,
+                title: "Account Access Issue",
+                type: "Technical Support",
+                politeness: "low",
+                clarity: "medium",
+                conversation: [
+                    { sender: "user", text: "Can't log into my account. This is ridiculous!" },
+                    { sender: "assistant", text: "Reset your password using the forgot password link. If that doesn't work, clear your browser cache." }
+                ]
+            },
+            {
+                id: 4,
+                title: "Product Information",
+                type: "Sales Support",
+                politeness: "high",
+                clarity: "high",
+                conversation: [
+                    { sender: "user", text: "Can you tell me more about the premium subscription?" },
+                    { sender: "assistant", text: "I'd be happy to explain our premium subscription! It includes advanced features like priority support, unlimited storage, and exclusive content. Would you like me to walk you through the specific benefits that might interest you most?" }
+                ]
+            },
+            {
+                id: 5,
+                title: "Billing Question",
+                type: "Customer Support",
+                politeness: "medium",
+                clarity: "low",
+                conversation: [
+                    { sender: "user", text: "Why was I charged twice this month?" },
+                    { sender: "assistant", text: "There might be various reasons for this. Sometimes it happens. I can look into it. What's your account info?" }
+                ]
+            },
+            {
+                id: 6,
+                title: "Service Complaint",
+                type: "Customer Support",
+                politeness: "high",
+                clarity: "high",
+                conversation: [
+                    { sender: "user", text: "Your service has been terrible lately. I'm considering canceling." },
+                    { sender: "assistant", text: "I'm truly sorry to hear about your disappointing experience with our service. Your feedback is invaluable, and I want to make this right. Could you help me understand the specific issues you've encountered so I can address them personally and improve your experience?" }
+                ]
+            },
+            {
+                id: 7,
+                title: "Feature Request",
+                type: "Product Support",
+                politeness: "low",
+                clarity: "high",
+                conversation: [
+                    { sender: "user", text: "When will you add dark mode? Everyone wants this!" },
+                    { sender: "assistant", text: "Dark mode is on our roadmap. We'll announce updates when available. Thanks for the feedback." }
+                ]
+            },
+            {
+                id: 8,
+                title: "Shipping Inquiry",
+                type: "Customer Support",
+                politeness: "high",
+                clarity: "medium",
+                conversation: [
+                    { sender: "user", text: "I need my package delivered faster. Can you help?" },
+                    { sender: "assistant", text: "Of course! I'd love to help you get your package sooner. Let me check what expedited shipping options are available for your order. I'll also look into any potential upgrades we can offer at no extra cost." }
+                ]
+            },
+            {
+                id: 9,
+                title: "Technical Glitch",
+                type: "Technical Support",
+                politeness: "medium",
+                clarity: "medium",
+                conversation: [
+                    { sender: "user", text: "The app keeps crashing when I try to upload photos." },
+                    { sender: "assistant", text: "I understand how frustrating app crashes can be. Let's troubleshoot this together. First, try updating the app to the latest version. If the issue persists, please restart your device and try again." }
+                ]
+            }
+        ];
+
+        let selectedSamples = [];
+        const maxSelection = 3;
+
+        // Initialize the application
+        function initApp() {
+            renderSamples();
+            updateSelectionCounter();
+        }
+
+        // Render sample cards
+        function renderSamples() {
+            const grid = document.getElementById('samplesGrid');
+            grid.innerHTML = chatSamples.map(sample => createSampleCard(sample)).join('');
+        }
+
+        // Create a sample card
+        function createSampleCard(sample) {
+            const isSelected = selectedSamples.includes(sample.id);
+            const politenessClass = sample.politeness === 'high' ? 'polite' : sample.politeness === 'medium' ? 'neutral' : 'poor';
+            const clarityClass = sample.clarity === 'high' ? 'clear' : sample.clarity === 'medium' ? 'neutral' : 'poor';
+            
+            return `
+                <div class="sample-card ${isSelected ? 'selected' : ''}" onclick="toggleSelection(${sample.id})">
+                    <div class="sample-header">
+                        <div class="sample-title">${sample.title}</div>
+                        <div class="sample-type">${sample.type}</div>
+                    </div>
+                    <div class="sample-chat">
+                        ${sample.conversation.map(message => `
+                            <div class="chat-message ${message.sender}">
+                                <div class="message-avatar ${message.sender}">
+                                    ${message.sender === 'user' ? 'U' : 'AI'}
+                                </div>
+                                <div class="message-bubble">${message.text}</div>
+                            </div>
+                        `).join('')}
+                        <div class="quality-indicators">
+                            <div class="quality-badge ${politenessClass}">
+                                ${sample.politeness} politeness
+                            </div>
+                            <div class="quality-badge ${clarityClass}">
+                                ${sample.clarity} clarity
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Toggle sample selection
+        function toggleSelection(sampleId) {
+            const index = selectedSamples.indexOf(sampleId);
+            
+            if (index > -1) {
+                // Deselect
+                selectedSamples.splice(index, 1);
+            } else {
+                // Select (if under limit)
+                if (selectedSamples.length < maxSelection) {
+                    selectedSamples.push(sampleId);
+                } else {
+                    // Optional: Show message that max selection reached
+                    return;
+                }
+            }
+            
+            renderSamples();
+            updateSelectionCounter();
+        }
+
+        // Update selection counter and button state
+        function updateSelectionCounter() {
+            const count = selectedSamples.length;
+            document.getElementById('selectedCount').textContent = count;
+            document.getElementById('selectedCountText').textContent = count;
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = count !== maxSelection;
+        }
+
+        // Reset selection
+        document.querySelector('.btn-secondary').addEventListener('click', () => {
+            selectedSamples = [];
+            renderSamples();
+            updateSelectionCounter();
+        });
+
+        // Submit selection
+        document.getElementById('submitBtn').addEventListener('click', () => {
+            if (selectedSamples.length === maxSelection) {
+                alert(`Fine-tuning will begin with samples: ${selectedSamples.join(', ')}`);
+                // Here you would typically send the selection to your backend
+            }
+        });
+
+        // Initialize the app
+        initApp();
+    </script>
+</body>
+</html>
