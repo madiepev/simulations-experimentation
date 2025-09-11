@@ -1,0 +1,2003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Model Evaluation Lab - Business Case Study</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #323130;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Business Case Selection Screen */
+        .business-case-screen {
+            display: block;
+        }
+
+        .business-case-screen.hidden {
+            display: none;
+        }
+
+        .screen-header {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .screen-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0078d4;
+            margin-bottom: 12px;
+        }
+
+        .screen-subtitle {
+            font-size: 16px;
+            color: #605e5c;
+            max-width: 600px;
+            margin: 0 auto 24px;
+        }
+
+        .business-case-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .business-case-card {
+            background: white;
+            border: 2px solid #e1dfdd;
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .business-case-card:hover {
+            border-color: #0078d4;
+            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .business-case-card.selected {
+            border-color: #0078d4;
+            background: #f0f9ff;
+        }
+
+        .case-icon {
+            font-size: 32px;
+            margin-bottom: 16px;
+            color: #0078d4;
+        }
+
+        .case-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #323130;
+        }
+
+        .case-description {
+            font-size: 14px;
+            color: #605e5c;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .case-challenge {
+            background: #fff8e1;
+            border-left: 4px solid #ffb300;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #e65100;
+        }
+
+        /* Metrics Selection Screen */
+        .metrics-selection-screen {
+            display: none;
+        }
+
+        .metrics-selection-screen.active {
+            display: block;
+        }
+
+        .metrics-instruction {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .instruction-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1565c0;
+            margin-bottom: 12px;
+        }
+
+        .instruction-text {
+            color: #1976d2;
+            font-size: 16px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .metric-card {
+            background: white;
+            border: 2px solid #e1dfdd;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .metric-card:hover {
+            border-color: #0078d4;
+            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.1);
+        }
+
+        .metric-card.selected {
+            border-color: #0078d4;
+            background: #f0f9ff;
+        }
+
+        .metric-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .metric-icon {
+            font-size: 24px;
+            margin-bottom: 12px;
+            color: #0078d4;
+        }
+
+        .metric-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #323130;
+        }
+
+        .metric-description {
+            font-size: 14px;
+            color: #605e5c;
+            line-height: 1.5;
+        }
+
+        .selection-counter {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #0078d4;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .metric-card.selected .selection-counter {
+            display: flex;
+        }
+
+        .selection-summary {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #323130;
+        }
+
+        .selected-metrics {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .selected-metric-tag {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Configuration Selection Screen */
+        .config-selection-screen {
+            display: none;
+        }
+
+        .config-selection-screen.active {
+            display: block;
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e1dfdd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #605e5c;
+        }
+
+        .progress-dot.completed {
+            background: #107c10;
+            color: white;
+        }
+
+        .progress-dot.active {
+            background: #0078d4;
+            color: white;
+        }
+
+        .progress-label {
+            font-size: 14px;
+            color: #605e5c;
+            margin-left: 8px;
+        }
+
+        .progress-arrow {
+            color: #c8c6c4;
+            margin: 0 8px;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .config-card {
+            background: white;
+            border: 2px solid #e1dfdd;
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .config-card:hover {
+            border-color: #0078d4;
+            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .config-card.completed {
+            border-color: #107c10;
+            background: #f3f9f1;
+        }
+
+        .config-card.active {
+            border-color: #0078d4;
+            background: #f0f9ff;
+        }
+
+        .config-status {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .config-status.completed {
+            background: #107c10;
+        }
+
+        .config-status.active {
+            background: #0078d4;
+        }
+
+        .config-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #323130;
+        }
+
+        .config-description {
+            font-size: 14px;
+            color: #605e5c;
+            margin-bottom: 16px;
+        }
+
+        .config-specs {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            color: #323130;
+        }
+
+        .config-metrics {
+            margin-top: 12px;
+            display: none;
+        }
+
+        .config-card.completed .config-metrics {
+            display: block;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: between;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            color: #605e5c;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: #323130;
+        }
+
+        /* Evaluation Screen */
+        .evaluation-screen {
+            display: none;
+        }
+
+        .evaluation-screen.active {
+            display: block;
+        }
+
+        .eval-header {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .eval-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #323130;
+            margin-bottom: 8px;
+        }
+
+        .current-config {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .eval-progress {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: #605e5c;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: #e1dfdd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #0078d4;
+            transition: width 0.3s ease;
+        }
+
+        .conversation-container {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .conversation-header {
+            background: #f8f9fa;
+            padding: 16px 24px;
+            border-bottom: 1px solid #e1dfdd;
+            display: flex;
+            align-items: center;
+            justify-content: between;
+        }
+
+        .conversation-title {
+            font-weight: 600;
+            color: #323130;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .conversation-number {
+            background: #0078d4;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .conversation-body {
+            padding: 24px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .message:last-child {
+            margin-bottom: 0;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .user-avatar {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .ai-avatar {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: #323130;
+        }
+
+        .message-text {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 12px;
+            border-left: 4px solid #e1dfdd;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .user-message .message-text {
+            background: #e3f2fd;
+            border-left-color: #2196f3;
+        }
+
+        .ai-message .message-text {
+            background: #f1f8e9;
+            border-left-color: #4caf50;
+        }
+
+        .rating-section {
+            background: #f8f9fa;
+            border-top: 1px solid #e1dfdd;
+            padding: 24px;
+        }
+
+        .rating-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #323130;
+            text-align: center;
+        }
+
+        .metrics-rating {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .metric-rating {
+            background: white;
+            border: 1px solid #e1dfdd;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .metric-rating-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .metric-rating-icon {
+            color: #0078d4;
+            font-size: 18px;
+        }
+
+        .metric-rating-name {
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .rating-options {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .rating-btn {
+            background: white;
+            border: 2px solid #e1dfdd;
+            border-radius: 8px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            min-width: 80px;
+            font-size: 14px;
+        }
+
+        .rating-btn:hover {
+            border-color: #0078d4;
+            background: #f0f9ff;
+        }
+
+        .rating-btn.selected {
+            border-color: #0078d4;
+            background: #0078d4;
+            color: white;
+        }
+
+        .rating-btn.selected.excellent {
+            background: #107c10;
+            border-color: #107c10;
+        }
+
+        .rating-btn.selected.good {
+            background: #0078d4;
+            border-color: #0078d4;
+        }
+
+        .rating-btn.selected.poor {
+            background: #d13438;
+            border-color: #d13438;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 32px;
+        }
+
+        .btn {
+            background: #0078d4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #106ebe;
+        }
+
+        .btn:disabled {
+            background: #c8c6c4;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #f3f2f1;
+            color: #323130;
+            border: 1px solid #e1dfdd;
+        }
+
+        .btn-secondary:hover {
+            background: #e1dfdd;
+        }
+
+        /* Results Screen */
+        .results-screen {
+            display: none;
+        }
+
+        .results-screen.active {
+            display: block;
+        }
+
+        .results-summary {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .completion-badge {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .results-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #323130;
+        }
+
+        .results-subtitle {
+            font-size: 16px;
+            color: #605e5c;
+            margin-bottom: 24px;
+        }
+
+        .final-comparison {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .comparison-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #323130;
+            text-align: center;
+        }
+
+        .comparison-table {
+            overflow-x: auto;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 200px repeat(var(--metrics-count), 1fr) 100px;
+            gap: 1px;
+            background: #e1dfdd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .comparison-cell {
+            background: white;
+            padding: 16px 12px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .comparison-header {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .config-name {
+            text-align: left;
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .score-cell {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .score-excellent {
+            color: #107c10;
+        }
+
+        .score-good {
+            color: #0078d4;
+        }
+
+        .score-poor {
+            color: #d13438;
+        }
+
+        .best-config {
+            background: #e8f5e8;
+            border: 2px solid #107c10;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 24px 0;
+            text-align: center;
+        }
+
+        .best-config-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 8px;
+        }
+
+        .best-config-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1b5e20;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-content {
+            text-align: center;
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e1dfdd;
+            border-top: 4px solid #0078d4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Business Case Selection Screen -->
+        <div class="business-case-screen" id="businessCaseScreen">
+            <div class="screen-header">
+                <h1 class="screen-title">AI Model Evaluation Lab</h1>
+                <p class="screen-subtitle">
+                    Select a business scenario to evaluate different AI model configurations. 
+                    You'll choose evaluation criteria and compare how well each model performs for your specific use case.
+                </p>
+            </div>
+
+            <div class="business-case-grid">
+                <div class="business-case-card" data-case="customer-service" onclick="selectBusinessCase('customer-service')">
+                    <div class="case-icon"><i class="fas fa-headset"></i></div>
+                    <h3 class="case-title">Customer Support</h3>
+                    <p class="case-description">
+                        Deploy AI assistants to handle customer inquiries, complaints, and support requests. 
+                        Focus on empathy, problem-solving, and maintaining brand voice.
+                    </p>
+                    <div class="case-challenge">
+                        <strong>Challenge:</strong> Balance efficiency with human-like empathy and understanding
+                    </div>
+                </div>
+
+                <div class="business-case-card" data-case="sales-assistant" onclick="selectBusinessCase('sales-assistant')">
+                    <div class="case-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3 class="case-title">Sales Assistant</h3>
+                    <p class="case-description">
+                        AI-powered sales support to qualify leads, answer product questions, and guide prospects through the sales funnel.
+                    </p>
+                    <div class="case-challenge">
+                        <strong>Challenge:</strong> Be persuasive without being pushy, maintain professionalism
+                    </div>
+                </div>
+
+                <div class="business-case-card" data-case="technical-support" onclick="selectBusinessCase('technical-support')">
+                    <div class="case-icon"><i class="fas fa-tools"></i></div>
+                    <h3 class="case-title">Technical Support</h3>
+                    <p class="case-description">
+                        Provide technical troubleshooting, software guidance, and step-by-step problem resolution for users.
+                    </p>
+                    <div class="case-challenge">
+                        <strong>Challenge:</strong> Maintain accuracy while being accessible to non-technical users
+                    </div>
+                </div>
+
+                <div class="business-case-card" data-case="content-creation" onclick="selectBusinessCase('content-creation')">
+                    <div class="case-icon"><i class="fas fa-pen-fancy"></i></div>
+                    <h3 class="case-title">Content Creation</h3>
+                    <p class="case-description">
+                        Generate marketing copy, blog posts, social media content, and other creative materials for brand communication.
+                    </p>
+                    <div class="case-challenge">
+                        <strong>Challenge:</strong> Balance creativity with brand consistency and audience relevance
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        /* Evaluation Screen */
+        .evaluation-screen {
+            display: none;
+        }
+
+        .evaluation-screen.active {
+            display: block;
+        }
+
+        .eval-header {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .eval-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #323130;
+            margin-bottom: 8px;
+        }
+
+        .current-config {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .eval-progress {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: #605e5c;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: #e1dfdd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #0078d4;
+            transition: width 0.3s ease;
+        }
+
+        .instructions-panel {
+            background: #fff8e1;
+            border: 1px solid #ffcc02;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .instructions-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #f57c00;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .instructions-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .instructions-list li {
+            margin-bottom: 12px;
+            padding-left: 24px;
+            position: relative;
+            font-size: 15px;
+            color: #ef6c00;
+            line-height: 1.6;
+        }
+
+        .instructions-list li::before {
+            content: counter(step-counter);
+            counter-increment: step-counter;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #f57c00;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .instructions-list {
+            counter-reset: step-counter;
+        }
+
+        .conversation-container {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .conversation-header {
+            background: #f8f9fa;
+            padding: 16px 24px;
+            border-bottom: 1px solid #e1dfdd;
+            display: flex;
+            align-items: center;
+            justify-content: between;
+        }
+
+        .conversation-title {
+            font-weight: 600;
+            color: #323130;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .conversation-number {
+            background: #0078d4;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .conversation-body {
+            padding: 24px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .message:last-child {
+            margin-bottom: 0;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .user-avatar {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .ai-avatar {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: #323130;
+        }
+
+        .message-text {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 12px;
+            border-left: 4px solid #e1dfdd;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .user-message .message-text {
+            background: #e3f2fd;
+            border-left-color: #2196f3;
+        }
+
+        .ai-message .message-text {
+            background: #f1f8e9;
+            border-left-color: #4caf50;
+        }
+
+        .rating-section {
+            background: #f8f9fa;
+            border-top: 1px solid #e1dfdd;
+            padding: 24px;
+        }
+
+        .rating-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #323130;
+        }
+
+        .rating-options {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        .rating-btn {
+            background: white;
+            border: 2px solid #e1dfdd;
+            border-radius: 8px;
+            padding: 16px 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .rating-btn:hover {
+            border-color: #0078d4;
+            background: #f0f9ff;
+        }
+
+        .rating-btn.selected {
+            border-color: #0078d4;
+            background: #0078d4;
+            color: white;
+        }
+
+        .rating-btn.selected.excellent {
+            background: #107c10;
+            border-color: #107c10;
+        }
+
+        .rating-btn.selected.good {
+            background: #0078d4;
+            border-color: #0078d4;
+        }
+
+        .rating-btn.selected.fair {
+            background: #ff8c00;
+            border-color: #ff8c00;
+        }
+
+        .rating-btn.selected.poor {
+            background: #d13438;
+            border-color: #d13438;
+        }
+
+        .rating-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .rating-label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 32px;
+        }
+
+        .btn {
+            background: #0078d4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #106ebe;
+        }
+
+        .btn:disabled {
+            background: #c8c6c4;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #f3f2f1;
+            color: #323130;
+            border: 1px solid #e1dfdd;
+        }
+
+        .btn-secondary:hover {
+            background: #e1dfdd;
+        }
+
+        /* Results Screen */
+        .results-screen {
+            display: none;
+        }
+
+        .results-screen.active {
+            display: block;
+        }
+
+        .results-summary {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .completion-badge {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .results-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #323130;
+        }
+
+        .results-subtitle {
+            font-size: 16px;
+            color: #605e5c;
+            margin-bottom: 24px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .metric-card {
+            background: #f8f9fa;
+            border: 1px solid #e1dfdd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0078d4;
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: #605e5c;
+            font-weight: 500;
+        }
+
+        .comparison-view {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .comparison-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #323130;
+        }
+
+        .comparison-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            align-items: center;
+        }
+
+        .comparison-row.header {
+            background: #e1dfdd;
+            font-weight: 600;
+        }
+
+        .config-name {
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .comparison-metric {
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .best-score {
+            color: #107c10;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-content {
+            text-align: center;
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e1dfdd;
+            border-top: 4px solid #0078d4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Metrics Selection Screen -->
+        <div class="metrics-selection-screen" id="metricsScreen">
+            <div class="screen-header">
+                <h2 class="screen-title">Choose Evaluation Metrics</h2>
+                <p class="screen-subtitle" id="metricsSubtitle">
+                    Select up to 3 evaluation criteria that are most important for your business case.
+                </p>
+            </div>
+
+            <div class="metrics-instruction">
+                <h3 class="instruction-title">📋 Select Your Evaluation Criteria</h3>
+                <p class="instruction-text">Choose the metrics that matter most for your business scenario. You can select up to 3 criteria to evaluate each AI model configuration.</p>
+            </div>
+
+            <div class="metrics-grid" id="metricsGrid">
+                <!-- Metrics will be populated based on selected business case -->
+            </div>
+
+            <div class="selection-summary" id="selectionSummary" style="display: none;">
+                <h3 class="summary-title">Selected Evaluation Metrics</h3>
+                <div class="selected-metrics" id="selectedMetrics"></div>
+                <p style="font-size: 14px; color: #605e5c; margin: 0;">You'll evaluate each AI model configuration based on these criteria.</p>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="goBackToBusinessCase()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button class="btn" id="proceedToConfigs" onclick="proceedToConfigurations()" disabled>
+                    Continue to Evaluation <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Configuration Selection Screen -->
+        <div class="config-selection-screen" id="configScreen">
+            <div class="screen-header">
+                <h2 class="screen-title">Model Configuration Evaluation</h2>
+                <p class="screen-subtitle">
+                    Evaluate 3 different AI model configurations for your selected business case.
+                </p>
+                
+                <div class="progress-indicator">
+                    <div class="progress-step">
+                        <div class="progress-dot completed">1</div>
+                        <span class="progress-label">Business Case</span>
+                    </div>
+                    <span class="progress-arrow">→</span>
+                    <div class="progress-step">
+                        <div class="progress-dot completed">2</div>
+                        <span class="progress-label">Metrics</span>
+                    </div>
+                    <span class="progress-arrow">→</span>
+                    <div class="progress-step">
+                        <div class="progress-dot active">3</div>
+                        <span class="progress-label">Evaluation</span>
+                    </div>
+                    <span class="progress-arrow">→</span>
+                    <div class="progress-step">
+                        <div class="progress-dot">4</div>
+                        <span class="progress-label">Results</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="config-grid" id="configGrid">
+                <!-- Configurations will be populated dynamically -->
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="goBackToMetrics()">
+                    <i class="fas fa-arrow-left"></i> Back to Metrics
+                </button>
+                <button class="btn" id="viewResults" onclick="showResults()" disabled>
+                    View Results <i class="fas fa-chart-bar"></i>
+                </button>
+            </div>
+        </div>
+        <div class="config-selection" id="configScreen">
+            <div class="screen-header">
+                <h1 class="screen-title">AI Model Evaluation Lab</h1>
+                <p class="screen-subtitle">
+                    Compare different AI model configurations by evaluating their responses to real customer service scenarios. 
+                    Complete evaluations for each configuration to see how model choice and settings affect response quality.
+                </p>
+                <div class="progress-indicator">
+                    <div class="progress-dot completed" id="dot-1"></div>
+                    <div class="progress-dot" id="dot-2"></div>
+                    <div class="progress-dot" id="dot-3"></div>
+                    <div class="progress-dot" id="dot-4"></div>
+                </div>
+            </div>
+
+            <div class="config-grid">
+                <div class="config-card" data-config="gpt4-high" onclick="selectConfig('gpt4-high')">
+                    <div class="config-status completed"><i class="fas fa-check"></i></div>
+                    <h3 class="config-title">GPT-4o High Creativity</h3>
+                    <p class="config-description">Latest model with high temperature for creative, varied responses</p>
+                    <div class="config-specs">
+                        Model: gpt-4o<br>
+                        Temperature: 0.9<br>
+                        Max tokens: 1000
+                    </div>
+                    <div class="config-metrics">
+                        <div class="metric-row">
+                            <span class="metric-label">Avg. Rating:</span>
+                            <span class="metric-value">4.2/5</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Consistency:</span>
+                            <span class="metric-value">3.8/5</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Empathy:</span>
+                            <span class="metric-value">4.6/5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-card" data-config="gpt4-low" onclick="selectConfig('gpt4-low')">
+                    <div class="config-status"></div>
+                    <h3 class="config-title">GPT-4o Conservative</h3>
+                    <p class="config-description">Latest model with low temperature for consistent, reliable responses</p>
+                    <div class="config-specs">
+                        Model: gpt-4o<br>
+                        Temperature: 0.2<br>
+                        Max tokens: 1000
+                    </div>
+                </div>
+
+                <div class="config-card" data-config="gpt35-high" onclick="selectConfig('gpt35-high')">
+                    <div class="config-status"></div>
+                    <h3 class="config-title">GPT-3.5 High Creativity</h3>
+                    <p class="config-description">Cost-effective model with high temperature for varied responses</p>
+                    <div class="config-specs">
+                        Model: gpt-3.5-turbo<br>
+                        Temperature: 0.9<br>
+                        Max tokens: 800
+                    </div>
+                </div>
+
+                <div class="config-card" data-config="gpt35-low" onclick="selectConfig('gpt35-low')">
+                    <div class="config-status"></div>
+                    <h3 class="config-title">GPT-3.5 Conservative</h3>
+                    <p class="config-description">Cost-effective model with low temperature for consistent responses</p>
+                    <div class="config-specs">
+                        Model: gpt-3.5-turbo<br>
+                        Temperature: 0.2<br>
+                        Max tokens: 800
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evaluation Screen -->
+        <div class="evaluation-screen" id="evaluationScreen">
+            <div class="eval-header">
+                <h2 class="eval-title">Model Evaluation</h2>
+                <div class="current-config" id="currentConfigBadge">GPT-4o High Creativity</div>
+                <div class="eval-progress">
+                    <span>Progress:</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 20%"></div>
+                    </div>
+                    <span id="progressText">1 of 5 completed</span>
+                </div>
+            </div>
+
+            <div class="instructions-panel">
+                <h3 class="instructions-title">
+                    <i class="fas fa-graduation-cap"></i>
+                    Evaluation Instructions
+                </h3>
+                <ol class="instructions-list">
+                    <li>Read the customer message and the AI's response carefully</li>
+                    <li>Consider the tone, helpfulness, accuracy, and professionalism of the response</li>
+                    <li>Rate the overall quality using the scale: Excellent, Good, Fair, or Poor</li>
+                    <li>Think about whether the response addresses the customer's needs appropriately</li>
+                    <li>Complete all 5 evaluations to see the configuration summary</li>
+                </ol>
+            </div>
+
+            <div class="conversation-container" id="conversationContainer">
+                <!-- Conversation content will be populated here -->
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="prevBtn" onclick="previousConversation()">
+                    <i class="fas fa-arrow-left"></i> Previous
+                </button>
+                <button class="btn" id="nextBtn" onclick="nextConversation()" disabled>
+                    <i class="fas fa-arrow-right"></i> Next
+                </button>
+                <button class="btn hidden" id="completeBtn" onclick="completeEvaluation()">
+                    <i class="fas fa-check"></i> Complete Evaluation
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="results-screen" id="resultsScreen">
+            <div class="results-summary">
+                <div class="completion-badge">
+                    <i class="fas fa-trophy"></i> Configuration Completed
+                </div>
+                <h2 class="results-title">Evaluation Complete!</h2>
+                <p class="results-subtitle">You've successfully evaluated all 5 conversations for this configuration</p>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="avgRating">4.2</div>
+                        <div class="metric-label">Average Rating</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="excellentCount">2</div>
+                        <div class="metric-label">Excellent</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="goodCount">2</div>
+                        <div class="metric-label">Good</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="fairCount">1</div>
+                        <div class="metric-label">Fair</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="poorCount">0</div>
+                        <div class="metric-label">Poor</div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn" onclick="returnToConfigs()">
+                        <i class="fas fa-arrow-left"></i> Try Another Configuration
+                    </button>
+                    <button class="btn btn-secondary" onclick="viewComparison()">
+                        <i class="fas fa-chart-bar"></i> View Comparison
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Screen -->
+        <div class="comparison-view hidden" id="comparisonScreen">
+            <h2 class="comparison-title">Configuration Comparison</h2>
+            <div class="comparison-grid">
+                <div class="comparison-row header">
+                    <div>Configuration</div>
+                    <div>Avg Rating</div>
+                    <div>Excellent</div>
+                    <div>Good</div>
+                    <div>Consistency</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="config-name">GPT-4o High Creativity</div>
+                    <div class="comparison-metric best-score">4.2</div>
+                    <div class="comparison-metric">40%</div>
+                    <div class="comparison-metric">40%</div>
+                    <div class="comparison-metric">3.8</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="config-name">GPT-4o Conservative</div>
+                    <div class="comparison-metric">4.6</div>
+                    <div class="comparison-metric best-score">60%</div>
+                    <div class="comparison-metric best-score">40%</div>
+                    <div class="comparison-metric best-score">4.8</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="config-name">GPT-3.5 High Creativity</div>
+                    <div class="comparison-metric">3.4</div>
+                    <div class="comparison-metric">20%</div>
+                    <div class="comparison-metric">40%</div>
+                    <div class="comparison-metric">3.2</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="config-name">GPT-3.5 Conservative</div>
+                    <div class="comparison-metric">3.8</div>
+                    <div class="comparison-metric">20%</div>
+                    <div class="comparison-metric">60%</div>
+                    <div class="comparison-metric">4.2</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>Generating AI Response...</h3>
+            <p>Please wait while we process the conversation</p>
+        </div>
+    </div>
+
+    <script>
+        const configurations = {
+            'gpt4-high': {
+                name: 'GPT-4o High Creativity',
+                model: 'gpt-4o',
+                temperature: 0.9,
+                maxTokens: 1000,
+                completed: false,
+                ratings: []
+            },
+            'gpt4-low': {
+                name: 'GPT-4o Conservative', 
+                model: 'gpt-4o',
+                temperature: 0.2,
+                maxTokens: 1000,
+                completed: false,
+                ratings: []
+            },
+            'gpt35-high': {
+                name: 'GPT-3.5 High Creativity',
+                model: 'gpt-3.5-turbo',
+                temperature: 0.9,
+                maxTokens: 800,
+                completed: false,
+                ratings: []
+            },
+            'gpt35-low': {
+                name: 'GPT-3.5 Conservative',
+                model: 'gpt-3.5-turbo', 
+                temperature: 0.2,
+                maxTokens: 800,
+                completed: false,
+                ratings: []
+            }
+        };
+
+        const conversations = [
+            {
+                customer: "I'm really frustrated! I've been trying to return this product for weeks and nobody has helped me. Your customer service is terrible!",
+                ai: {
+                    'gpt4-high': "I sincerely apologize for the frustrating experience you've had with our return process. It's completely unacceptable that you've been waiting weeks without proper assistance. Let me personally ensure this gets resolved today. I'm escalating your case to our senior team and will provide you with a direct contact number. In the meantime, I'm processing an immediate refund and arranging for expedited pickup of the product. You shouldn't have to deal with this level of poor service.",
+                    'gpt4-low': "I apologize for the inconvenience with your return request. I understand your frustration and want to help resolve this immediately. Let me check your account and process your return right away. I'll also ensure you receive a full refund within 2-3 business days. Please provide your order number so I can expedite this process.",
+                    'gpt35-high': "Oh wow, I'm really sorry to hear about this terrible experience! That sounds super frustrating and honestly not acceptable at all. Let me jump on this right now and get things sorted out for you. I'm going to make sure someone from our escalation team reaches out today, and I'll personally track your case. We definitely need to do better!",
+                    'gpt35-low': "I apologize for the delay with your return. I will process your return request immediately and arrange for a refund. Please provide your order number and I will escalate this to ensure it's handled promptly. You can expect resolution within 24 hours."
+                }
+            },
+            {
+                customer: "Hi, I'm trying to set up your software but the installation keeps failing. Can you help me troubleshoot this?",
+                ai: {
+                    'gpt4-high': "I'd be happy to help you troubleshoot this installation issue! Let's work through this systematically. First, could you tell me which operating system you're using and at what point the installation fails? In the meantime, here are a few common solutions: try running the installer as administrator, temporarily disable antivirus software, or clear your temp files. I'll walk you through each step to ensure we get this working perfectly.",
+                    'gpt4-low': "I can help you troubleshoot the installation issue. Please provide the following information: your operating system, error messages you're seeing, and when the installation fails. I'll provide step-by-step instructions to resolve this.",
+                    'gpt35-high': "Oh no! Installation issues are such a pain, but don't worry - we'll get this figured out together! There could be a bunch of different things causing this. Maybe try restarting your computer first, then running as admin? Or it could be a permissions thing. What kind of error are you getting exactly? Let's dig into this!",
+                    'gpt35-low': "I can assist with the installation troubleshooting. Please provide your operating system and any error messages. Common solutions include running as administrator and checking system requirements. I will provide specific steps once I have more details."
+                }
+            },
+            {
+                customer: "What are your business hours and do you offer 24/7 support?",
+                ai: {
+                    'gpt4-high': "Great question! Our support availability varies by the type of help you need. Our live chat and phone support operate Monday through Friday, 8 AM to 8 PM EST, and weekends 10 AM to 6 PM EST. However, our AI assistant (like me!) is available 24/7 for immediate help with common questions, troubleshooting, and account issues. For urgent technical emergencies, we also have an escalation hotline that's staffed around the clock. What type of support are you looking for today?",
+                    'gpt4-low': "Our customer support hours are Monday through Friday, 8 AM to 8 PM EST, and weekends 10 AM to 6 PM EST. AI support is available 24/7 for immediate assistance with common issues. For urgent matters outside business hours, we have an emergency hotline available.",
+                    'gpt35-high': "Good question! So we've got regular human support during business hours - that's Monday to Friday 8 AM to 8 PM, plus weekends 10 AM to 6 PM Eastern time. But the cool thing is that I'm here 24/7! I can help with lots of stuff anytime you need. And if there's something super urgent that I can't handle, we do have emergency contacts available too.",
+                    'gpt35-low': "Our support hours are Monday-Friday 8 AM to 8 PM EST, weekends 10 AM to 6 PM EST. AI support is available 24/7. Emergency support is available for urgent issues outside regular hours."
+                }
+            },
+            {
+                customer: "I love your product but I'm having trouble with the mobile app. It keeps logging me out every few minutes.",
+                ai: {
+                    'gpt4-high': "Thank you so much for the kind words about our product - it really means a lot! I'm sorry to hear about the mobile app logout issues though. This sounds like it could be related to session timeout settings or possibly a caching issue. Let's try a few solutions: first, ensure you have the latest app version, then try logging out completely and back in. If that doesn't work, clearing the app cache or reinstalling might help. Which mobile platform are you using, and have you noticed if this happens with specific actions?",
+                    'gpt4-low': "Thank you for your positive feedback about our product. I'll help resolve the mobile app logout issue. Please try updating the app to the latest version and clearing the app cache. If the problem persists, please let me know your device type and operating system version.",
+                    'gpt35-high': "Aw, thanks for saying you love the product! That totally makes my day! But bummer about the app acting up with the logout thing. That's definitely annoying when you're trying to use it. Have you tried updating the app recently? Sometimes that fixes these weird glitches. Also might want to try force-closing and reopening it, or maybe even delete and reinstall if you're feeling adventurous!",
+                    'gpt35-low': "Thank you for the positive feedback. For the logout issue, please update the mobile app and clear the cache. If the problem continues, reinstall the app or contact technical support with your device details."
+                }
+            },
+            {
+                customer: "Can you explain the differences between your Basic and Premium plans?",
+                ai: {
+                    'gpt4-high': "I'd be happy to break down the differences between our Basic and Premium plans for you! \n\n**Basic Plan ($19/month):**\n• Core features and standard support\n• Up to 5 users\n• 10GB storage\n• Email support\n\n**Premium Plan ($39/month):**\n• All Basic features plus advanced analytics\n• Up to 25 users\n• 100GB storage\n• Priority phone and chat support\n• Advanced integrations\n• Monthly strategy sessions\n\nMost customers find Premium worth it for the enhanced support and analytics. What size team are you looking to support, and are there specific features you're most interested in?",
+                    'gpt4-low': "Here are the key differences between our plans:\n\nBasic Plan ($19/month): Core features, 5 users, 10GB storage, email support\n\nPremium Plan ($39/month): All Basic features plus advanced analytics, 25 users, 100GB storage, priority support, integrations\n\nWhich plan better fits your needs?",
+                    'gpt35-high': "Sure thing! So basically we've got two main options for you. The Basic plan is pretty solid for smaller teams - you get all the core stuff you need for $19 a month. But if you want to level up, Premium is where it's at! For $39 you get way more storage, support for bigger teams, plus some really cool analytics features. Honestly, most people who try Premium end up loving the extra features. What kind of setup are you thinking about?",
+                    'gpt35-low': "Basic Plan: $19/month, 5 users, core features, email support. Premium Plan: $39/month, 25 users, advanced features, priority support, analytics. Premium includes all Basic features plus additional capabilities."
+                }
+            }
+        ];
+
+        let currentConfig = null;
+        let currentConversation = 0;
+        let currentScreen = 'config';
+
+        function selectConfig(configId) {
+            currentConfig = configId;
+            currentConversation = 0;
+            
+            // Show loading
+            showLoading();
+            
+            setTimeout(() => {
+                hideLoading();
+                showEvaluationScreen();
+                loadConversation();
+            }, 1500);
+        }
+
+        function showEvaluationScreen() {
+            document.getElementById('configScreen').classList.add('hidden');
+            document.getElementById('evaluationScreen').classList.add('active');
+            document.getElementById('currentConfigBadge').textContent = configurations[currentConfig].name;
+            currentScreen = 'evaluation';
+        }
+
+        function loadConversation() {
+            const conversation = conversations[currentConversation];
+            const aiResponse = conversation.ai[currentConfig];
+            
+            const container = document.getElementById('conversationContainer');
+            container.innerHTML = `
+                <div class="conversation-header">
+                    <div class="conversation-title">
+                        <div class="conversation-number">${currentConversation + 1}</div>
+                        Conversation ${currentConversation + 1} of 5
+                    </div>
+                </div>
+                <div class="conversation-body">
+                    <div class="message user-message">
+                        <div class="message-avatar user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-sender">Customer</div>
+                            <div class="message-text">${conversation.customer}</div>
+                        </div>
+                    </div>
+                    <div class="message ai-message">
+                        <div class="message-avatar ai-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-sender">AI Assistant (${configurations[currentConfig].model})</div>
+                            <div class="message-text">${aiResponse}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rating-section">
+                    <h4 class="rating-title">How would you rate this AI response?</h4>
+                    <div class="rating-options">
+                        <div class="rating-btn" data-rating="excellent" onclick="selectRating('excellent')">
+                            <div class="rating-icon">⭐</div>
+                            <div class="rating-label">Excellent</div>
+                        </div>
+                        <div class="rating-btn" data-rating="good" onclick="selectRating('good')">
+                            <div class="rating-icon">👍</div>
+                            <div class="rating-label">Good</div>
+                        </div>
+                        <div class="rating-btn" data-rating="fair" onclick="selectRating('fair')">
+                            <div class="rating-icon">👌</div>
+                            <div class="rating-label">Fair</div>
+                        </div>
+                        <div class="rating-btn" data-rating="poor" onclick="selectRating('poor')">
+                            <div class="rating-icon">👎</div>
+                            <div class="rating-label">Poor</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            updateProgress();
+            updateButtons();
+        }
+
+        function selectRating(rating) {
+            // Remove previous selections
+            document.querySelectorAll('.rating-btn').forEach(btn => {
+                btn.classList.remove('selected', 'excellent', 'good', 'fair', 'poor');
+            });
+            
+            // Add selection to clicked button
+            const selectedBtn = document.querySelector(`[data-rating="${rating}"]`);
+            selectedBtn.classList.add('selected', rating);
+            
+            // Store rating
+            configurations[currentConfig].ratings[currentConversation] = rating;
+            
+            // Enable next button
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function nextConversation() {
+            if (currentConversation < conversations.length - 1) {
+                currentConversation++;
+                loadConversation();
+            } else {
+                completeEvaluation();
+            }
+        }
+
+        function previousConversation() {
+            if (currentConversation > 0) {
+                currentConversation--;
+                loadConversation();
+            }
+        }
+
+        function completeEvaluation() {
+            configurations[currentConfig].completed = true;
+            showResultsScreen();
+        }
+
+        function showResultsScreen() {
+            document.getElementById('evaluationScreen').classList.remove('active');
+            document.getElementById('resultsScreen').classList.add('active');
+            
+            // Calculate metrics
+            const ratings = configurations[currentConfig].ratings;
+            const counts = {excellent: 0, good: 0, fair: 0, poor: 0};
+            
+            ratings.forEach(rating => {
+                counts[rating]++;
+            });
+            
+            const avgRating = (counts.excellent * 5 + counts.good * 4 + counts.fair * 3 + counts.poor * 2) / 5;
+            
+            document.getElementById('avgRating').textContent = avgRating.toFixed(1);
+            document.getElementById('excellentCount').textContent = counts.excellent;
+            document.getElementById('goodCount').textContent = counts.good;
+            document.getElementById('fairCount').textContent = counts.fair;
+            document.getElementById('poorCount').textContent = counts.poor;
+            
+            currentScreen = 'results';
+        }
+
+        function returnToConfigs() {
+            document.getElementById('resultsScreen').classList.remove('active');
+            document.getElementById('configScreen').classList.remove('hidden');
+            
+            // Update config card to show completed
+            const configCard = document.querySelector(`[data-config="${currentConfig}"]`);
+            configCard.classList.add('completed');
+            configCard.querySelector('.config-status').innerHTML = '<i class="fas fa-check"></i>';
+            configCard.querySelector('.config-status').classList.add('completed');
+            
+            // Update progress dots
+            const completedConfigs = Object.values(configurations).filter(c => c.completed).length;
+            for (let i = 1; i <= 4; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i <= completedConfigs) {
+                    dot.classList.add('completed');
+                } else if (i === completedConfigs + 1) {
+                    dot.classList.add('active');
+                }
+            }
+            
+            currentScreen = 'config';
+        }
+
+        function viewComparison() {
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('comparisonScreen').classList.remove('hidden');
+        }
+
+        function updateProgress() {
+            const progress = ((currentConversation + 1) / conversations.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `${currentConversation + 1} of ${conversations.length} completed`;
+        }
+
+        function updateButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const completeBtn = document.getElementById('completeBtn');
+            
+            prevBtn.style.display = currentConversation > 0 ? 'flex' : 'none';
+            
+            if (currentConversation === conversations.length - 1) {
+                nextBtn.classList.add('hidden');
+                completeBtn.classList.remove('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+                completeBtn.classList.add('hidden');
+            }
+            
+            nextBtn.disabled = !configurations[currentConfig].ratings[currentConversation];
+            completeBtn.disabled = !configurations[currentConfig].ratings[currentConversation];
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        // Initialize
+        configurations['gpt4-high'].completed = true;
+        configurations['gpt4-high'].ratings = ['excellent', 'good', 'good', 'excellent', 'fair'];
+    </script>
+</body>
+</html>

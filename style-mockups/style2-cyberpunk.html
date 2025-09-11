@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Style 2: Dark Cyberpunk</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* Dark Cyberpunk Style */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            line-height: 1.6;
+            color: #00ff41;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 65, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 50%);
+            animation: cyberpunkGlow 10s ease-in-out infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes cyberpunkGlow {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.7; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            box-shadow: 
+                0 0 50px rgba(0, 255, 65, 0.2),
+                inset 0 0 50px rgba(0, 255, 65, 0.05);
+        }
+
+        /* Progress - Cyberpunk style */
+        .progress-container {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            margin-bottom: 40px;
+            border: 1px solid #00ff41;
+            position: relative;
+        }
+
+        .progress-container::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background: linear-gradient(45deg, #00ff41, #00ffff, #ff00ff, #00ff41);
+            z-index: -1;
+            animation: borderAnimation 3s linear infinite;
+        }
+
+        @keyframes borderAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .progress-bar {
+            background: #1a1a1a;
+            height: 8px;
+            border: 1px solid #00ff41;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #00ff41, #00ffff);
+            height: 100%;
+            width: 25%;
+            animation: progressPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes progressPulse {
+            0%, 100% { box-shadow: 0 0 10px #00ff41; }
+            50% { box-shadow: 0 0 20px #00ff41, 0 0 30px #00ff41; }
+        }
+
+        .phase-indicators {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Orbitron', monospace;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .phase-indicator {
+            background: rgba(0, 255, 65, 0.2);
+            padding: 8px 12px;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .phase-indicator.active {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 20px #00ff41;
+            animation: activeGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes activeGlow {
+            0%, 100% { box-shadow: 0 0 20px #00ff41; }
+            50% { box-shadow: 0 0 30px #00ff41, 0 0 40px #00ff41; }
+        }
+
+        /* Typography */
+        h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 56px;
+            font-weight: 900;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, #00ff41, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { filter: brightness(1) contrast(1); }
+            100% { filter: brightness(1.2) contrast(1.1); }
+        }
+
+        h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 32px;
+            color: #00ffff;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        h3 {
+            font-family: 'Orbitron', monospace;
+            font-size: 20px;
+            color: #ff00ff;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: #00ff41;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        /* Sections */
+        .section {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff41, transparent);
+            animation: scanLine 3s linear infinite;
+        }
+
+        @keyframes scanLine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Checklist - Matrix style */
+        .checklist {
+            list-style: none;
+            margin: 30px 0;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            margin: 10px 0;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .checkbox-item:hover {
+            border-color: #00ff41;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+            transform: translateX(10px);
+        }
+
+        .checkbox-item::before {
+            content: '> ';
+            color: #00ff41;
+            font-weight: bold;
+            margin-right: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .checkbox-item:hover::before {
+            opacity: 1;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff41;
+            appearance: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .checkbox-item input[type="checkbox"]:checked {
+            background: #00ff41;
+            box-shadow: 0 0 15px #00ff41;
+        }
+
+        .checkbox-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            color: #000;
+            font-weight: bold;
+            top: -2px;
+            left: 4px;
+            font-size: 14px;
+        }
+
+        /* Chat simulation - Terminal style */
+        .chat-example {
+            background: #000;
+            border: 2px solid #00ff41;
+            padding: 25px;
+            margin: 20px 0;
+            font-family: 'JetBrains Mono', monospace;
+            position: relative;
+        }
+
+        .chat-example::before {
+            content: '// SIMULATION LOG //';
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: #000;
+            padding: 0 10px;
+            color: #00ff41;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .customer-message,
+        .base-model-response {
+            margin: 15px 0;
+            font-size: 14px;
+            padding: 10px 0;
+        }
+
+        .customer-message {
+            color: #00ffff;
+            border-left: 3px solid #00ffff;
+            padding-left: 15px;
+        }
+
+        .base-model-response {
+            color: #ff6b6b;
+            border-left: 3px solid #ff6b6b;
+            padding-left: 15px;
+        }
+
+        .issue-tag {
+            display: inline-block;
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+            padding: 5px 12px;
+            font-size: 11px;
+            margin: 8px 8px 0 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            animation: errorBlink 2s ease-in-out infinite;
+        }
+
+        @keyframes errorBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Form elements - Cyberpunk style */
+        select, textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff41;
+            color: #00ff41;
+            padding: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            margin: 12px 0;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* Buttons - Cyberpunk style */
+        .nav-button {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff41;
+            color: #00ff41;
+            padding: 15px 30px;
+            font-family: 'Orbitron', monospace;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            margin: 0 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .nav-button:hover::before {
+            left: 100%;
+        }
+
+        .nav-button:hover {
+            border-color: #00ffff;
+            color: #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .nav-button.primary {
+            background: #00ff41;
+            color: #000;
+            border-color: #00ff41;
+            font-weight: bold;
+        }
+
+        .nav-button.primary:hover {
+            background: #00ffff;
+            border-color: #00ffff;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        }
+
+        .start-button {
+            background: linear-gradient(45deg, #00ff41, #00ffff);
+            color: #000;
+            border: none;
+            padding: 20px 50px;
+            font-family: 'Orbitron', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 40px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .start-button:hover::after {
+            transform: translateX(100%);
+        }
+
+        .start-button:hover {
+            box-shadow: 0 0 40px rgba(0, 255, 65, 0.8);
+            transform: translateY(-2px);
+        }
+
+        /* Navigation */
+        .phase-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(0, 255, 65, 0.3);
+        }
+
+        /* Learning objective box */
+        .learning-objective {
+            background: rgba(0, 255, 65, 0.1);
+            border: 2px solid #00ff41;
+            padding: 30px;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .learning-objective::before {
+            content: 'OBJECTIVE';
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: #000;
+            padding: 0 10px;
+            color: #00ff41;
+            font-family: 'Orbitron', monospace;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Use case box */
+        .use-case-box {
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.2), rgba(0, 255, 255, 0.2));
+            border: 2px solid #ff00ff;
+            color: #fff;
+            padding: 40px;
+            margin: 40px 0;
+            position: relative;
+        }
+
+        .use-case-box::before {
+            content: 'MISSION BRIEFING';
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: #000;
+            padding: 0 10px;
+            color: #ff00ff;
+            font-family: 'Orbitron', monospace;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .use-case-box h3 {
+            color: #ff00ff;
+            margin-bottom: 20px;
+        }
+
+        .challenge-details {
+            margin-top: 30px;
+        }
+
+        .detail-item {
+            margin-bottom: 16px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 0, 255, 0.2);
+        }
+
+        .detail-item strong {
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        /* Center content */
+        .start-screen {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Terminal cursor effect */
+        .terminal-cursor::after {
+            content: '█';
+            animation: cursorBlink 1s infinite;
+            color: #00ff41;
+        }
+
+        @keyframes cursorBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Progress -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="phase-indicators">
+                <div class="phase-indicator">Initialize</div>
+                <div class="phase-indicator active">Phase_01</div>
+                <div class="phase-indicator">Phase_02</div>
+                <div class="phase-indicator">Phase_03</div>
+                <div class="phase-indicator">Complete</div>
+            </div>
+        </div>
+
+        <!-- Start Screen Example -->
+        <div class="start-screen">
+            <h1>Fine-Tuning AI Models<span class="terminal-cursor"></span></h1>
+            <p style="font-size: 16px; color: #00ffff; margin-bottom: 40px;">[NEURAL_NETWORK_OPTIMIZATION_PROTOCOL]</p>
+
+            <div class="learning-objective">
+                <h3>Primary Directive</h3>
+                <p>Initialize advanced model optimization protocols to enhance AI response patterns and evaluate performance metrics against baseline parameters</p>
+            </div>
+
+            <div class="use-case-box">
+                <h3>Mission: Deploy Enhanced Communication Interface</h3>
+                <p>Operative assigned to customer service division requires deployment of advanced conversational AI with enhanced social interaction protocols.</p>
+                
+                <div class="challenge-details">
+                    <div class="detail-item">
+                        <strong>Protocol:</strong> Supervised Fine-Tuning Implementation
+                    </div>
+                    <div class="detail-item">
+                        <strong>Objective:</strong> Maintain optimal politeness parameters while preserving functionality
+                    </div>
+                    <div class="detail-item">
+                        <strong>Mission:</strong> Determine enhancement viability through comparative analysis
+                    </div>
+                </div>
+            </div>
+
+            <button class="start-button">Initialize Sequence</button>
+        </div>
+
+        <!-- Phase 1 Example -->
+        <div class="section">
+            <h2>Phase_01: Baseline Analysis</h2>
+            <p>Execute comprehensive evaluation of current AI response patterns and identify optimization targets</p>
+
+            <div class="section">
+                <h3>System Requirements Matrix</h3>
+                <p>Configure primary operational parameters for enhanced conversational interface:</p>
+                
+                <div class="checklist">
+                    <label class="checkbox-item">
+                        <input type="checkbox">
+                        Maintain optimal politeness protocols
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox">
+                        Ensure data integrity and accuracy
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox">
+                        Execute conflict resolution subroutines
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox">
+                        Optimize communication tone algorithms
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox">
+                        Eliminate technical jargon from output
+                    </label>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Baseline Testing Protocol</h3>
+                <div class="chat-example">
+                    <div class="customer-message">
+                        USER_INPUT: "Your product doesn't work and I'm frustrated!"
+                    </div>
+                    <div class="base-model-response">
+                        AI_RESPONSE: "Please check the troubleshooting guide in the documentation."
+                    </div>
+                    <div>
+                        <span class="issue-tag">ERROR: Empathy_missing</span>
+                        <span class="issue-tag">WARNING: Tone_impersonal</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Analysis Protocol</h3>
+                <label>Diagnostic Result - Primary system deficiency:</label>
+                <select>
+                    <option>Select diagnostic result...</option>
+                    <option>Critical: Empathy and politeness protocols offline</option>
+                    <option>Response length exceeds optimal parameters</option>
+                    <option>Technical accuracy compromised</option>
+                </select>
+
+                <label>Optimization Recommendations:</label>
+                <textarea placeholder="Input enhancement protocols and modification suggestions..."></textarea>
+            </div>
+
+            <div class="phase-navigation">
+                <button class="nav-button">← Previous</button>
+                <button class="nav-button primary">Execute Next Phase →</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

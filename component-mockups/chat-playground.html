@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Playground - Interactive Learning</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #323130;
+            line-height: 1.5;
+        }
+
+        .playground-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background: white;
+            border-right: 1px solid #e1dfdd;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e1dfdd;
+            background: #faf9f8;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #323130;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 14px;
+            color: #605e5c;
+        }
+
+        .question-section {
+            padding: 20px;
+            border-bottom: 1px solid #e1dfdd;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #323130;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            border: 1px solid #e1dfdd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .question-card:hover {
+            background: #e6f3ff;
+            border-color: #0078d4;
+        }
+
+        .question-card.selected {
+            background: #cce7ff;
+            border-color: #0078d4;
+            box-shadow: 0 2px 4px rgba(0, 120, 212, 0.2);
+        }
+
+        .question-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #323130;
+        }
+
+        .question-description {
+            font-size: 13px;
+            color: #605e5c;
+        }
+
+        .evaluation-panel {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .evaluation-criteria {
+            background: #fff4ce;
+            border: 1px solid #fde047;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .criteria-title {
+            font-weight: 600;
+            color: #ca8a04;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .criteria-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .criteria-list li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+            font-size: 14px;
+            color: #92400e;
+        }
+
+        .criteria-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #ca8a04;
+            font-weight: bold;
+        }
+
+        /* Main Chat Area */
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        .chat-header {
+            background: #faf9f8;
+            border-bottom: 1px solid #e1dfdd;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #323130;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .azure-logo {
+            color: #0078d4;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            background: #0078d4;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background: #106ebe;
+        }
+
+        .btn-secondary {
+            background: #f3f2f1;
+            color: #323130;
+        }
+
+        .btn-secondary:hover {
+            background: #e1dfdd;
+        }
+
+        .chat-content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .welcome-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #605e5c;
+        }
+
+        .welcome-icon {
+            font-size: 48px;
+            color: #0078d4;
+            margin-bottom: 16px;
+        }
+
+        .welcome-text {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .welcome-subtext {
+            font-size: 14px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            display: none;
+        }
+
+        .chat-messages.active {
+            display: block;
+        }
+
+        .message {
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .user-avatar {
+            background: #e1f5fe;
+            color: #0277bd;
+        }
+
+        .ai-avatar {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .message-content {
+            flex: 1;
+            max-width: calc(100% - 44px);
+        }
+
+        .message-header {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #323130;
+        }
+
+        .message-text {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 3px solid #e1dfdd;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .user-message .message-text {
+            background: #e3f2fd;
+            border-left-color: #2196f3;
+        }
+
+        .ai-message .message-text {
+            background: #f1f8e9;
+            border-left-color: #4caf50;
+        }
+
+        .message-timestamp {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .evaluation-overlay {
+            background: rgba(0, 0, 0, 0.05);
+            border: 2px dashed #0078d4;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .evaluation-prompt {
+            color: #0078d4;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .evaluation-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 12px;
+        }
+
+        .evaluation-details {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .evaluation-details.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .eval-dimension {
+            background: white;
+            border: 1px solid #e1dfdd;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .eval-dimension:last-child {
+            margin-bottom: 0;
+        }
+
+        .eval-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .eval-title {
+            font-weight: 600;
+            color: #323130;
+            flex: 1;
+        }
+
+        .eval-score {
+            background: #0078d4;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .eval-description {
+            font-size: 14px;
+            color: #605e5c;
+            margin-bottom: 8px;
+        }
+
+        .eval-feedback {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #666;
+            border-left: 3px solid #28a745;
+        }
+
+        .eval-feedback.warning {
+            border-left-color: #ffc107;
+            background: #fff8e1;
+        }
+
+        .eval-feedback.error {
+            border-left-color: #dc3545;
+            background: #ffebee;
+        }
+
+        .input-area {
+            border-top: 1px solid #e1dfdd;
+            padding: 16px 24px;
+            background: #faf9f8;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .input-field {
+            flex: 1;
+            min-height: 40px;
+            padding: 12px 16px;
+            border: 1px solid #e1dfdd;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: #0078d4;
+            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+        }
+
+        .send-btn {
+            background: #0078d4;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .send-btn:hover {
+            background: #106ebe;
+        }
+
+        .send-btn:disabled {
+            background: #c8c6c4;
+            cursor: not-allowed;
+        }
+
+        .token-info {
+            font-size: 12px;
+            color: #605e5c;
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        .model-info {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .model-name {
+            font-weight: 600;
+            color: #0369a1;
+        }
+
+        .thinking-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #605e5c;
+            font-style: italic;
+            margin: 16px 0;
+        }
+
+        .thinking-dots {
+            display: inline-flex;
+            gap: 2px;
+        }
+
+        .thinking-dots span {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #605e5c;
+            animation: thinking 1.4s infinite ease-in-out;
+        }
+
+        .thinking-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .thinking-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes thinking {
+            0%, 80%, 100% { opacity: 0.3; }
+            40% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="playground-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Learning Exercise</div>
+                <div class="sidebar-subtitle">Practice evaluating AI responses</div>
+            </div>
+
+            <div class="question-section">
+                <div class="section-title">Select a Scenario</div>
+                
+                <div class="question-card" data-question="customer-complaint">
+                    <div class="question-title">Angry Customer</div>
+                    <div class="question-description">Handle a frustrated customer with a product issue</div>
+                </div>
+
+                <div class="question-card" data-question="technical-support">
+                    <div class="question-title">Technical Support</div>
+                    <div class="question-description">Help a user troubleshoot a software problem</div>
+                </div>
+
+                <div class="question-card" data-question="sales-inquiry">
+                    <div class="question-title">Sales Inquiry</div>
+                    <div class="question-description">Respond to a potential customer's product questions</div>
+                </div>
+
+                <div class="question-card" data-question="time-travel">
+                    <div class="question-title">Creative Writing</div>
+                    <div class="question-description">Write a short story about time travel</div>
+                </div>
+            </div>
+
+            <div class="evaluation-panel">
+                <div class="section-title">Evaluation Criteria</div>
+                
+                <div class="evaluation-criteria">
+                    <div class="criteria-title">
+                        <i class="fas fa-lightbulb"></i>
+                        What to Look For
+                    </div>
+                    <ul class="criteria-list">
+                        <li>Appropriateness of tone and style</li>
+                        <li>Accuracy and relevance of information</li>
+                        <li>Empathy and emotional intelligence</li>
+                        <li>Problem-solving approach</li>
+                        <li>Professional communication standards</li>
+                    </ul>
+                </div>
+
+                <div class="model-info">
+                    <div class="model-name">Azure AI | gpt-4o-nano</div>
+                    <div style="font-size: 12px; color: #605e5c; margin-top: 4px;">
+                        Max tokens: 4096 | Temperature: 0.7
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="chat-main">
+            <div class="chat-header">
+                <div class="chat-title">
+                    <i class="fab fa-microsoft azure-logo"></i>
+                    Chat Playground
+                </div>
+                <div class="chat-actions">
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-code"></i> View code
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-cog"></i> Show setup
+                    </button>
+                </div>
+            </div>
+
+            <div class="chat-content">
+                <div class="welcome-state" id="welcomeState">
+                    <div class="welcome-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="welcome-text">Select a scenario to begin</div>
+                    <div class="welcome-subtext">Choose a question from the sidebar to see how the AI responds</div>
+                </div>
+
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Messages will be populated here -->
+                </div>
+            </div>
+
+            <div class="input-area">
+                <div class="input-container">
+                    <textarea 
+                        class="input-field" 
+                        placeholder="Type your message here... (Shift + Enter for new line)"
+                        rows="1"
+                        id="userInput"
+                    ></textarea>
+                    <button class="send-btn" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        Send
+                    </button>
+                </div>
+                <div class="token-info">2903/262144 tokens to be sent</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const scenarios = {
+            'customer-complaint': {
+                prompt: "I'm really frustrated! I bought your premium software package last week and it keeps crashing every time I try to save my work. I've lost hours of progress multiple times. This is completely unacceptable for something I paid $300 for. I want a full refund immediately!",
+                response: `I'm truly sorry to hear about the frustrating experience you've had with our software. Losing hours of work is incredibly disruptive, and I completely understand your anger about this situation, especially given the investment you've made.
+
+Let me help you resolve this immediately. First, I'd like to process a full refund for you right away - no questions asked. You shouldn't have to deal with unreliable software that you paid for.
+
+Additionally, I want to make sure this doesn't happen to other customers. Could you tell me:
+- What operating system you're using?
+- When exactly the crashes occur (specific actions, file types, etc.)?
+
+I'm escalating this to our development team as a priority issue. In the meantime, I'll also send you a complimentary license for our upcoming version, which has resolved these stability issues.
+
+Again, I sincerely apologize for this poor experience. We'll have your refund processed within 24 hours.`,
+                evaluation: {
+                    empathy: { score: 4.8, feedback: "Excellent acknowledgment of customer frustration and validation of their experience" },
+                    solutions: { score: 4.9, feedback: "Immediate refund offer plus proactive steps to prevent future issues" },
+                    professionalism: { score: 4.7, feedback: "Maintains professional tone while showing genuine concern" },
+                    followup: { score: 4.6, feedback: "Requests specific technical details to help resolve underlying issue", type: "warning" }
+                }
+            },
+            'technical-support': {
+                prompt: "Hi, I'm having trouble logging into my account. Every time I enter my password, it says it's incorrect, but I'm 100% sure I'm typing it correctly. I've tried multiple times and even copied and pasted it. What's going on?",
+                response: `Hello! I understand how frustrating login issues can be, especially when you're confident about your password. Let's troubleshoot this step by step.
+
+Here are a few things to check:
+
+1. **Caps Lock**: Make sure Caps Lock isn't accidentally on, as passwords are case-sensitive
+2. **Browser cache**: Try clearing your browser cache or use an incognito/private window
+3. **Keyboard layout**: If you use multiple keyboard layouts, ensure you're on the correct one
+4. **Password reset**: Even though you're sure about the password, try our "Forgot Password" link - sometimes accounts get temporarily locked for security
+
+If none of these work, I can manually check your account status. Could you provide:
+- The email address associated with your account
+- What browser you're using
+- Any error messages you see (exact wording)
+
+I'm here to help get you back into your account quickly!`,
+                evaluation: {
+                    helpfulness: { score: 4.7, feedback: "Provides systematic troubleshooting approach with clear steps" },
+                    clarity: { score: 4.8, feedback: "Well-organized response with numbered steps and clear explanations" },
+                    empathy: { score: 4.2, feedback: "Acknowledges frustration but could be more empathetic", type: "warning" },
+                    technical: { score: 4.9, feedback: "Covers common causes and provides actionable solutions" }
+                }
+            },
+            'sales-inquiry': {
+                prompt: "I'm considering your enterprise plan for my company. We have about 50 employees and need something that can handle customer support, sales tracking, and project management. Can you tell me about pricing and what's included?",
+                response: `Thank you for your interest in our enterprise solution! For a 50-employee team, our Enterprise Plan would be an excellent fit for your needs.
+
+**What's Included:**
+- Customer Support Hub with ticket management, live chat, and knowledge base
+- Sales CRM with pipeline tracking, lead management, and reporting
+- Project Management with task assignment, timeline tracking, and team collaboration
+- Advanced analytics and custom reporting across all modules
+- Priority support with dedicated account manager
+- SSO integration and advanced security features
+
+**Pricing:**
+- Enterprise Plan: $25/user/month (billed annually)
+- For 50 users: $1,250/month or $15,000/year
+- 15% discount for annual payment: $12,750/year
+
+**Next Steps:**
+I'd love to schedule a personalized demo to show you exactly how this would work for your team. We also offer a 30-day free trial with full access to all features.
+
+Would you like to schedule a demo this week? I can also connect you with some of our current clients in similar-sized companies for references.`,
+                evaluation: {
+                    completeness: { score: 4.9, feedback: "Addresses all aspects of the inquiry comprehensively" },
+                    clarity: { score: 4.8, feedback: "Well-structured with clear sections and pricing breakdown" },
+                    salesmanship: { score: 4.6, feedback: "Good balance of information and sales techniques" },
+                    nextSteps: { score: 4.7, feedback: "Clear call-to-action with multiple options for engagement" }
+                }
+            },
+            'time-travel': {
+                prompt: "Write a short story about a time traveler who accidentally changes a major historical event.",
+                response: `**The Borrowed Cup**
+
+I was told I'd forget the world I left behind when I returned, as if memory itself were a borrowed cup I couldn't keep steady for long. The first rule, they'd said, is never to interfere. The second rule, equally elemental, is never to let the past know your name. I broke both on the same day, in the same minute, in Sarajevo, 1914.
+
+The device hums softly on my wrist—the Loom, they call it, a network of microthreads that slip through time like seams in a worn coat. It doesn't show in the eye, only in breath and heartbeat and the quick tremor in your palms when you resist the urge to brush a fingerprint across a surface you would never touch in your own century. I was a watcher, a historian in a borrowed skin, sworn to watch, to learn, to leave no trace.
+
+Sarajevo is a half-smoked cigarette of a city—smoke curling from chimneys, dust mixing with horsehair and rain, bells faint and far. The arc of the street runs like a question mark through narrow lanes and open squares. In the center, the courtyard of the hospital spouts light from stained glass; around it, the city's pulse loosens its grip on itself, as if time were a string someone might tug a fraction and nothing would hold snap, but everything would still tremble.
+
+I am not meant to be seen, not to be heard, not to touch. The Loom's rule is almost fine-tuned to a whisper: do not alter anything you see, not a word, not a glance, not a coin on the street. If a word is to scatter without you, do not, if it won't. My history lesson stays still where they rest—on my lines where they were, the sleeves of my coat lined with a fabric that doesn't belong to 1914, and my mouth closed in a line that isn't the line of my tongue in that century.
+
+But history, like weather, has its own stubborn weather patterns. It doesn't bend to the will of a careful observer. It has moods. It has debts. It remembers every contact you've ever dared to pretend you didn't notice.
+
+I came here to watch Franz Ferdinand's car pass that morning in late June. An event both so ordinary in its chain of cause and so decisive in its consequence that it has a name all by itself—the spark that lights the fuse, the stone that brings down the mountain, the breath that tips the balance of a century. They wanted me to document it, to settle a debate about whether it was inevitable or chance, whether the web of alliances would have held together another way if one car had taken a different turn.
+
+I found myself on the street corner at the exact moment when everything balanced on the edge of what might happen next, and that's when I saw the young man with the gun, sweating and uncertain, his hand trembling not with resolve but with the terrible weight of choice. And in that split second, I understood something the history books could never tell me: he was afraid. Not angry, not filled with revolutionary fervor, but simply, desperately afraid.
+
+The car was approaching, and I could see the driver starting to slow at the corner where history said he would make the wrong turn. And I—God help me—I touched the young man's shoulder and said, quietly, "There has to be another way."
+
+He looked at me then, this stranger from another time, and something passed between us. Understanding, perhaps. Or just the recognition that we were both, in our own ways, lost. He lowered the gun. The car passed by safely. Franz Ferdinand lived.
+
+And I returned to my own time to find a world I no longer recognized—a world where the Great War never happened, where millions lived who should have died, where the course of the twentieth century had been rewritten by a moment of unexpected mercy.
+
+They say I'll forget, that memory fades like ink in water when you travel the streams of time. But some things, I think, leave marks deeper than memory. Some changes ripple forward and backward both, marking not just the world but the soul of the one who dared to reach across the impossible gulf between what was and what might be.
+
+I remember the weight of that choice, the warmth of human connection across the centuries. And sometimes, in quiet moments, I wonder: which world is real now? The one I helped create, or the one I left behind?
+
+Perhaps both. Perhaps neither. Perhaps that's the real secret of time—not that it's linear or circular, but that it's forgiving, holding space for all the worlds we might have made, all the moments when someone reached out a hand and said, "There has to be another way."`,
+                evaluation: {
+                    creativity: { score: 4.9, feedback: "Highly original take on time travel with philosophical depth" },
+                    narrative: { score: 4.8, feedback: "Strong storytelling with compelling character development" },
+                    style: { score: 4.7, feedback: "Excellent prose with rich imagery and metaphors" },
+                    historical: { score: 4.6, feedback: "Good historical detail and plausible alternative timeline", type: "warning" },
+                    emotional: { score: 4.8, feedback: "Creates strong emotional connection and moral complexity" }
+                }
+            }
+        };
+
+        let currentScenario = null;
+
+        // Question card selection
+        document.querySelectorAll('.question-card').forEach(card => {
+            card.addEventListener('click', () => {
+                // Remove previous selection
+                document.querySelectorAll('.question-card').forEach(c => c.classList.remove('selected'));
+                
+                // Select current card
+                card.classList.add('selected');
+                
+                // Load scenario
+                const questionId = card.getAttribute('data-question');
+                loadScenario(questionId);
+            });
+        });
+
+        function loadScenario(scenarioId) {
+            currentScenario = scenarios[scenarioId];
+            if (!currentScenario) return;
+
+            // Hide welcome state
+            document.getElementById('welcomeState').style.display = 'none';
+            
+            // Show chat messages
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.classList.add('active');
+            
+            // Clear previous messages
+            chatMessages.innerHTML = '';
+
+            // Add user message
+            addMessage('user', 'You', currentScenario.prompt);
+
+            // Add thinking indicator
+            setTimeout(() => {
+                addThinkingIndicator();
+                
+                // Add AI response after delay
+                setTimeout(() => {
+                    removeThinkingIndicator();
+                    addMessage('ai', 'Azure AI Foundry | gpt-4o-nano', currentScenario.response);
+                    
+                    // Add evaluation overlay
+                    setTimeout(() => {
+                        addEvaluationOverlay();
+                    }, 500);
+                }, 2000);
+            }, 500);
+        }
+
+        function addMessage(type, sender, content) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            
+            const avatarClass = type === 'user' ? 'user-avatar' : 'ai-avatar';
+            const avatarIcon = type === 'user' ? 'fas fa-user' : 'fas fa-robot';
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar ${avatarClass}">
+                    <i class="${avatarIcon}"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-header">${sender}</div>
+                    <div class="message-text">${content}</div>
+                    <div class="message-timestamp">${new Date().toLocaleTimeString()}</div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addThinkingIndicator() {
+            const chatMessages = document.getElementById('chatMessages');
+            const thinkingDiv = document.createElement('div');
+            thinkingDiv.className = 'thinking-indicator';
+            thinkingDiv.id = 'thinkingIndicator';
+            thinkingDiv.innerHTML = `
+                <i class="fas fa-robot"></i>
+                Azure AI is thinking
+                <div class="thinking-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+            chatMessages.appendChild(thinkingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeThinkingIndicator() {
+            const indicator = document.getElementById('thinkingIndicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        function addEvaluationOverlay() {
+            const chatMessages = document.getElementById('chatMessages');
+            const overlayDiv = document.createElement('div');
+            overlayDiv.className = 'evaluation-overlay';
+            overlayDiv.innerHTML = `
+                <div class="evaluation-prompt">
+                    <i class="fas fa-clipboard-check"></i> Ready to evaluate this response?
+                </div>
+                <div style="font-size: 14px; color: #666; margin-bottom: 12px;">
+                    Click below to see detailed evaluation criteria and scoring
+                </div>
+                <div class="evaluation-actions">
+                    <button class="btn" onclick="showEvaluation()">
+                        <i class="fas fa-star"></i> Show Evaluation
+                    </button>
+                    <button class="btn btn-secondary" onclick="nextScenario()">
+                        <i class="fas fa-forward"></i> Try Another
+                    </button>
+                </div>
+            `;
+            chatMessages.appendChild(overlayDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showEvaluation() {
+            if (!currentScenario) return;
+
+            const chatMessages = document.getElementById('chatMessages');
+            const evaluationDiv = document.createElement('div');
+            evaluationDiv.className = 'evaluation-details active';
+            
+            let evaluationHTML = '<div style="font-weight: 600; margin-bottom: 16px; color: #0078d4;">📊 Response Evaluation</div>';
+            
+            Object.entries(currentScenario.evaluation).forEach(([key, data]) => {
+                const feedbackClass = data.type === 'warning' ? 'warning' : data.type === 'error' ? 'error' : '';
+                evaluationHTML += `
+                    <div class="eval-dimension">
+                        <div class="eval-header">
+                            <div class="eval-title">${key.charAt(0).toUpperCase() + key.slice(1)}</div>
+                            <div class="eval-score">${data.score}/5.0</div>
+                        </div>
+                        <div class="eval-feedback ${feedbackClass}">
+                            ${data.feedback}
+                        </div>
+                    </div>
+                `;
+            });
+
+            evaluationDiv.innerHTML = evaluationHTML;
+            chatMessages.appendChild(evaluationDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function nextScenario() {
+            // Reset to welcome state
+            document.getElementById('welcomeState').style.display = 'block';
+            document.getElementById('chatMessages').classList.remove('active');
+            document.querySelectorAll('.question-card').forEach(c => c.classList.remove('selected'));
+            currentScenario = null;
+        }
+
+        // Input handling
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        sendBtn.addEventListener('click', sendMessage);
+
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            addMessage('user', 'You', message);
+            userInput.value = '';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                addThinkingIndicator();
+                setTimeout(() => {
+                    removeThinkingIndicator();
+                    addMessage('ai', 'Azure AI Foundry | gpt-4o-nano', 
+                        "Thank you for your message! In a real implementation, this would generate an AI response. For this educational exercise, please select one of the predefined scenarios from the sidebar to see evaluation features.");
+                }, 1500);
+            }, 300);
+        }
+
+        // Auto-resize textarea
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    </script>
+</body>
+</html>

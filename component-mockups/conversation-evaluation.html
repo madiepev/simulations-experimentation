@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversation Evaluation Components</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            padding: 40px 20px;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+        }
+
+        .component {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .component-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #374151;
+        }
+
+        .component-description {
+            color: #6b7280;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        /* Conversation Display */
+        .conversation-container {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .conversation-header {
+            background: #f3f4f6;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 600;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .conversation-body {
+            padding: 20px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .message:last-child {
+            margin-bottom: 0;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .customer-avatar {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .ai-avatar {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .ai-avatar.base-model {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .ai-avatar.fine-tuned {
+            background: #ddd6fe;
+            color: #7c3aed;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-header {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .message-text {
+            background: #f9fafb;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 3px solid #e5e7eb;
+        }
+
+        .customer-message .message-text {
+            border-left-color: #3b82f6;
+        }
+
+        .ai-message .message-text {
+            border-left-color: #10b981;
+        }
+
+        .ai-message.base-model .message-text {
+            border-left-color: #f59e0b;
+        }
+
+        .ai-message.fine-tuned .message-text {
+            border-left-color: #8b5cf6;
+        }
+
+        /* Rating System */
+        .rating-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .rating-dimension {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .rating-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .rating-label {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .rating-score {
+            background: #3b82f6;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .star {
+            color: #d1d5db;
+            cursor: pointer;
+            font-size: 20px;
+            transition: color 0.2s;
+        }
+
+        .star.active {
+            color: #fbbf24;
+        }
+
+        .star:hover {
+            color: #fbbf24;
+        }
+
+        .rating-description {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        /* Comparison Component */
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .model-comparison {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .model-comparison.winner {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .model-header {
+            padding: 16px 20px;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .base-model-header {
+            background: #f59e0b;
+        }
+
+        .fine-tuned-header {
+            background: #8b5cf6;
+        }
+
+        .winner-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .model-response {
+            padding: 20px;
+            background: white;
+        }
+
+        /* Scoring Interface */
+        .scoring-interface {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .scoring-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .score-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .score-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 4px;
+        }
+
+        .score-label {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        /* Interactive Elements */
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-success {
+            background: #10b981;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .evaluation-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            justify-content: center;
+        }
+
+        /* Multi-turn Conversation */
+        .conversation-turn {
+            border-bottom: 1px solid #f3f4f6;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+
+        .conversation-turn:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .turn-number {
+            background: #3b82f6;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        /* Issues Highlighting */
+        .issue-tag {
+            display: inline-block;
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            margin: 4px 4px 4px 0;
+        }
+
+        .improvement-tag {
+            display: inline-block;
+            background: #f0fdf4;
+            color: #16a34a;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            margin: 4px 4px 4px 0;
+        }
+
+        .instructions {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .instructions h4 {
+            color: #1e40af;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-comments"></i> Conversation Evaluation Components</h1>
+
+        <!-- Single Response Evaluation -->
+        <div class="component">
+            <h2 class="component-title">1. Single Response Evaluation</h2>
+            <p class="component-description">Evaluate individual AI responses across multiple dimensions with star ratings and detailed feedback.</p>
+            
+            <div class="instructions">
+                <h4><i class="fas fa-info-circle"></i> Instructions</h4>
+                <p>Rate the AI response on each dimension below. Consider how well it addresses the customer's concern with appropriate tone and helpfulness.</p>
+            </div>
+
+            <div class="conversation-container">
+                <div class="conversation-header">
+                    <i class="fas fa-user"></i> Customer Service Interaction
+                </div>
+                <div class="conversation-body">
+                    <div class="message">
+                        <div class="message-avatar customer-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-header">Customer</div>
+                            <div class="message-text">
+                                "I'm really frustrated! I've been trying to set up your software for hours and nothing is working. The documentation is confusing and I'm about to give up. Can someone actually help me?"
+                            </div>
+                        </div>
+                    </div>
+                    <div class="message ai-message fine-tuned">
+                        <div class="message-avatar ai-avatar fine-tuned">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-header">AI Assistant (Fine-tuned)</div>
+                            <div class="message-text">
+                                "I completely understand your frustration, and I'm truly sorry you've had such a difficult experience with our setup process. Let me personally help you get this resolved right now. Could you tell me which specific step is causing issues? I'll walk you through it step-by-step and make sure everything works perfectly for you."
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rating-container">
+                <div class="rating-dimension">
+                    <div class="rating-header">
+                        <span class="rating-label">Empathy & Emotional Recognition</span>
+                        <span class="rating-score">4.5/5</span>
+                    </div>
+                    <div class="rating-stars" data-dimension="empathy">
+                        <span class="star active" data-rating="1">★</span>
+                        <span class="star active" data-rating="2">★</span>
+                        <span class="star active" data-rating="3">★</span>
+                        <span class="star active" data-rating="4">★</span>
+                        <span class="star" data-rating="5">★</span>
+                    </div>
+                    <div class="rating-description">Acknowledges customer frustration and shows understanding</div>
+                </div>
+
+                <div class="rating-dimension">
+                    <div class="rating-header">
+                        <span class="rating-label">Helpfulness & Solutions</span>
+                        <span class="rating-score">5.0/5</span>
+                    </div>
+                    <div class="rating-stars" data-dimension="helpfulness">
+                        <span class="star active" data-rating="1">★</span>
+                        <span class="star active" data-rating="2">★</span>
+                        <span class="star active" data-rating="3">★</span>
+                        <span class="star active" data-rating="4">★</span>
+                        <span class="star active" data-rating="5">★</span>
+                    </div>
+                    <div class="rating-description">Offers immediate help and asks for specific details</div>
+                </div>
+
+                <div class="rating-dimension">
+                    <div class="rating-header">
+                        <span class="rating-label">Professional Tone</span>
+                        <span class="rating-score">4.8/5</span>
+                    </div>
+                    <div class="rating-stars" data-dimension="professionalism">
+                        <span class="star active" data-rating="1">★</span>
+                        <span class="star active" data-rating="2">★</span>
+                        <span class="star active" data-rating="3">★</span>
+                        <span class="star active" data-rating="4">★</span>
+                        <span class="star active" data-rating="5">★</span>
+                    </div>
+                    <div class="rating-description">Maintains professional yet warm communication style</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Model Comparison -->
+        <div class="component">
+            <h2 class="component-title">2. Side-by-Side Model Comparison</h2>
+            <p class="component-description">Compare responses from base model vs fine-tuned model to evaluate improvement effectiveness.</p>
+            
+            <div class="instructions">
+                <h4><i class="fas fa-balance-scale"></i> Instructions</h4>
+                <p>Review both responses to the same customer query. Click on the response you think is better, or rate specific aspects of each.</p>
+            </div>
+
+            <div class="conversation-container">
+                <div class="conversation-header">
+                    <i class="fas fa-exclamation-triangle"></i> Customer Complaint Scenario
+                </div>
+                <div class="conversation-body">
+                    <div class="message">
+                        <div class="message-avatar customer-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-header">Angry Customer</div>
+                            <div class="message-text">
+                                "This is completely unacceptable! Your product broke after just two days and now I need to return it. I want a full refund immediately and I'm never buying from you again!"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="comparison-container">
+                <div class="model-comparison" onclick="selectModel('base')">
+                    <div class="model-header base-model-header">
+                        <span>Base Model Response</span>
+                    </div>
+                    <div class="model-response">
+                        <p>"Please submit a return request through our website. Include your order number and reason for return. Processing takes 5-7 business days."</p>
+                        <div style="margin-top: 12px;">
+                            <span class="issue-tag">Lacks empathy</span>
+                            <span class="issue-tag">No apology</span>
+                            <span class="issue-tag">Impersonal tone</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="model-comparison winner" onclick="selectModel('finetuned')">
+                    <div class="model-header fine-tuned-header">
+                        <span>Fine-tuned Model Response</span>
+                        <span class="winner-badge">Selected</span>
+                    </div>
+                    <div class="model-response">
+                        <p>"I'm so sorry to hear about this disappointing experience! A product failing after just two days is absolutely not acceptable, and I completely understand your frustration. I'll personally ensure you get a full refund processed immediately - no hassle, no delays. Let me also escalate this to our quality team to prevent this from happening to other customers."</p>
+                        <div style="margin-top: 12px;">
+                            <span class="improvement-tag">Shows empathy</span>
+                            <span class="improvement-tag">Takes ownership</span>
+                            <span class="improvement-tag">Proactive solution</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="scoring-interface">
+                <h4 style="margin-bottom: 16px;">Detailed Comparison Scores</h4>
+                <div class="scoring-grid">
+                    <div class="score-card">
+                        <div class="score-value">2.1</div>
+                        <div class="score-label">Base Model</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="score-value">4.8</div>
+                        <div class="score-label">Fine-tuned Model</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="score-value">+129%</div>
+                        <div class="score-label">Improvement</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="score-value">87%</div>
+                        <div class="score-label">User Preference</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Multi-turn Conversation Evaluation -->
+        <div class="component">
+            <h2 class="component-title">3. Multi-turn Conversation Evaluation</h2>
+            <p class="component-description">Evaluate AI performance across an entire conversation to assess consistency and context maintenance.</p>
+            
+            <div class="instructions">
+                <h4><i class="fas fa-exchange-alt"></i> Instructions</h4>
+                <p>Review this multi-turn conversation and evaluate how well the AI maintains context, consistency, and helpfulness throughout the interaction.</p>
+            </div>
+
+            <div class="conversation-container">
+                <div class="conversation-header">
+                    <i class="fas fa-comments"></i> Extended Customer Support Session
+                </div>
+                <div class="conversation-body">
+                    <div class="conversation-turn">
+                        <div class="turn-number">1</div>
+                        <div class="message">
+                            <div class="message-avatar customer-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-header">Customer</div>
+                                <div class="message-text">
+                                    "Hi, I'm having trouble with my account login. It keeps saying my password is wrong but I'm sure it's correct."
+                                </div>
+                            </div>
+                        </div>
+                        <div class="message ai-message fine-tuned">
+                            <div class="message-avatar ai-avatar fine-tuned">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-header">AI Assistant</div>
+                                <div class="message-text">
+                                    "I'd be happy to help you with your login issue! This can definitely be frustrating. Let's try a few things - first, could you try using the 'Forgot Password' link to reset it? Also, make sure Caps Lock isn't on, as passwords are case-sensitive."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="conversation-turn">
+                        <div class="turn-number">2</div>
+                        <div class="message">
+                            <div class="message-avatar customer-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-header">Customer</div>
+                                <div class="message-text">
+                                    "I tried the password reset but I'm not getting the email. I checked spam too."
+                                </div>
+                            </div>
+                        </div>
+                        <div class="message ai-message fine-tuned">
+                            <div class="message-avatar ai-avatar fine-tuned">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-header">AI Assistant</div>
+                                <div class="message-text">
+                                    "Thanks for checking spam - that was smart thinking! Sometimes emails can take a few minutes to arrive. While we wait, could you double-check the email address associated with your account? You can also try adding our domain to your safe senders list. If we don't see the email in the next 5 minutes, I can manually reset your password for you."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="conversation-turn">
+                        <div class="turn-number">3</div>
+                        <div class="message">
+                            <div class="message-avatar customer-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-header">Customer</div>
+                                <div class="message-text">
+                                    "Actually, I think I might have used a different email address when I signed up. How can I check which email is linked to my account?"
+                                </div>
+                            </div>
+                        </div>
+                        <div class="message ai-message fine-tuned">
+                            <div class="message-avatar ai-avatar fine-tuned">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-header">AI Assistant</div>
+                                <div class="message-text">
+                                    "Ah, that makes perfect sense! Many people have multiple email addresses. I can help you identify which email is linked to your account. Could you provide me with your full name and any email addresses you might have used? I can securely look up your account and tell you which email is registered (I'll only show the first few characters for privacy)."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rating-container">
+                <div class="rating-dimension">
+                    <div class="rating-header">
+                        <span class="rating-label">Context Maintenance</span>
+                        <span class="rating-score">4.7/5</span>
+                    </div>
+                    <div class="rating-stars" data-dimension="context">
+                        <span class="star active" data-rating="1">★</span>
+                        <span class="star active" data-rating="2">★</span>
+                        <span class="star active" data-rating="3">★</span>
+                        <span class="star active" data-rating="4">★</span>
+                        <span class="star active" data-rating="5">★</span>
+                    </div>
+                    <div class="rating-description">Remembers previous attempts and builds on conversation history</div>
+                </div>
+
+                <div class="rating-dimension">
+                    <div class="rating-header">
+                        <span class="rating-label">Solution Progression</span>
+                        <span class="rating-score">4.9/5</span>
+                    </div>
+                    <div class="rating-stars" data-dimension="progression">
+                        <span class="star active" data-rating="1">★</span>
+                        <span class="star active" data-rating="2">★</span>
+                        <span class="star active" data-rating="3">★</span>
+                        <span class="star active" data-rating="4">★</span>
+                        <span class="star active" data-rating="5">★</span>
+                    </div>
+                    <div class="rating-description">Logically progresses through troubleshooting steps</div>
+                </div>
+
+                <div class="rating-dimension">
+                    <div class="rating-header">
+                        <span class="rating-label">Adaptability</span>
+                        <span class="rating-score">4.6/5</span>
+                    </div>
+                    <div class="rating-stars" data-dimension="adaptability">
+                        <span class="star active" data-rating="1">★</span>
+                        <span class="star active" data-rating="2">★</span>
+                        <span class="star active" data-rating="3">★</span>
+                        <span class="star active" data-rating="4">★</span>
+                        <span class="star" data-rating="5">★</span>
+                    </div>
+                    <div class="rating-description">Adapts approach based on new information from customer</div>
+                </div>
+            </div>
+
+            <div class="evaluation-actions">
+                <button class="btn btn-success">
+                    <i class="fas fa-thumbs-up"></i> Approve Conversation
+                </button>
+                <button class="btn btn-secondary">
+                    <i class="fas fa-edit"></i> Suggest Improvements
+                </button>
+                <button class="btn">
+                    <i class="fas fa-forward"></i> Next Conversation
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Star rating functionality
+        document.querySelectorAll('.rating-stars').forEach(container => {
+            const stars = container.querySelectorAll('.star');
+            
+            stars.forEach((star, index) => {
+                star.addEventListener('click', () => {
+                    const rating = index + 1;
+                    const dimension = container.dataset.dimension;
+                    
+                    // Update visual stars
+                    stars.forEach((s, i) => {
+                        s.classList.toggle('active', i < rating);
+                    });
+                    
+                    // Update score display
+                    const scoreElement = container.closest('.rating-dimension').querySelector('.rating-score');
+                    scoreElement.textContent = `${rating}.0/5`;
+                    
+                    console.log(`Rated ${dimension}: ${rating}/5`);
+                });
+                
+                star.addEventListener('mouseenter', () => {
+                    const rating = index + 1;
+                    stars.forEach((s, i) => {
+                        s.style.color = i < rating ? '#fbbf24' : '#d1d5db';
+                    });
+                });
+            });
+            
+            container.addEventListener('mouseleave', () => {
+                stars.forEach(star => {
+                    star.style.color = star.classList.contains('active') ? '#fbbf24' : '#d1d5db';
+                });
+            });
+        });
+
+        // Model selection
+        function selectModel(modelType) {
+            document.querySelectorAll('.model-comparison').forEach(comp => {
+                comp.classList.remove('winner');
+                comp.querySelector('.winner-badge')?.remove();
+            });
+            
+            const selectedModel = document.querySelector(`.model-comparison:nth-child(${modelType === 'base' ? '1' : '2'})`);
+            selectedModel.classList.add('winner');
+            
+            const badge = document.createElement('span');
+            badge.className = 'winner-badge';
+            badge.textContent = 'Selected';
+            selectedModel.querySelector('.model-header').appendChild(badge);
+            
+            console.log(`Selected ${modelType} model`);
+        }
+
+        // Button interactions
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                if (!e.target.closest('.model-comparison')) {
+                    console.log('Button clicked:', button.textContent.trim());
+                }
+            });
+        });
+    </script>
+</body>
+</html>

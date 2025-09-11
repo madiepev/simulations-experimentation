@@ -1,0 +1,1939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Model Evaluation Lab - Business Case Study</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Business Case Selection Screen */
+        .business-case-screen {
+            display: block;
+        }
+
+        .business-case-screen.hidden {
+            display: none;
+        }
+
+        .screen-header {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .screen-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0078d4;
+            margin-bottom: 12px;
+        }
+
+        .screen-subtitle {
+            font-size: 16px;
+            color: #605e5c;
+            max-width: 600px;
+            margin: 0 auto 24px;
+        }
+
+        .business-case-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .business-case-card {
+            background: white;
+            border: 2px solid #e1dfdd;
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .business-case-card:hover {
+            border-color: #0078d4;
+            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .business-case-card.selected {
+            border-color: #0078d4;
+            background: #f0f9ff;
+        }
+
+        .case-icon {
+            font-size: 32px;
+            margin-bottom: 16px;
+            color: #0078d4;
+        }
+
+        .case-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #323130;
+        }
+
+        .case-description {
+            font-size: 14px;
+            color: #605e5c;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .case-challenge {
+            background: #fff8e1;
+            border-left: 4px solid #ffb300;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #e65100;
+        }
+
+        /* Metrics Selection Screen */
+        .metrics-selection-screen {
+            display: none;
+        }
+
+        .metrics-selection-screen.active {
+            display: block;
+        }
+
+        .metrics-instruction {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .instruction-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1565c0;
+            margin-bottom: 12px;
+        }
+
+        .instruction-text {
+            color: #1976d2;
+            font-size: 16px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .metric-card {
+            background: white;
+            border: 2px solid #e1dfdd;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .metric-card:hover {
+            border-color: #0078d4;
+            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.1);
+        }
+
+        .metric-card.selected {
+            border-color: #0078d4;
+            background: #f0f9ff;
+        }
+
+        .metric-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .metric-icon {
+            font-size: 24px;
+            margin-bottom: 12px;
+            color: #0078d4;
+        }
+
+        .metric-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #323130;
+        }
+
+        .metric-description {
+            font-size: 14px;
+            color: #605e5c;
+            line-height: 1.5;
+        }
+
+        .selection-counter {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #0078d4;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .metric-card.selected .selection-counter {
+            display: flex;
+        }
+
+        .selection-summary {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #323130;
+        }
+
+        .selected-metrics {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .selected-metric-tag {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Configuration Selection Screen */
+        .config-selection-screen {
+            display: none;
+        }
+
+        .config-selection-screen.active {
+            display: block;
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e1dfdd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #605e5c;
+        }
+
+        .progress-dot.completed {
+            background: #107c10;
+            color: white;
+        }
+
+        .progress-dot.active {
+            background: #0078d4;
+            color: white;
+        }
+
+        .progress-label {
+            font-size: 14px;
+            color: #605e5c;
+            margin-left: 8px;
+        }
+
+        .progress-arrow {
+            color: #c8c6c4;
+            margin: 0 8px;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .config-card {
+            background: white;
+            border: 2px solid #e1dfdd;
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .config-card:hover {
+            border-color: #0078d4;
+            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .config-card.completed {
+            border-color: #107c10;
+            background: #f3f9f1;
+        }
+
+        .config-card.active {
+            border-color: #0078d4;
+            background: #f0f9ff;
+        }
+
+        .config-status {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .config-status.completed {
+            background: #107c10;
+        }
+
+        .config-status.active {
+            background: #0078d4;
+        }
+
+        .config-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #323130;
+        }
+
+        .config-description {
+            font-size: 14px;
+            color: #605e5c;
+            margin-bottom: 16px;
+        }
+
+        .config-specs {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            color: #323130;
+        }
+
+        .config-metrics {
+            margin-top: 12px;
+            display: none;
+        }
+
+        .config-card.completed .config-metrics {
+            display: block;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            color: #605e5c;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .score-excellent {
+            color: #107c10;
+        }
+
+        .score-good {
+            color: #0078d4;
+        }
+
+        .score-poor {
+            color: #d13438;
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 32px;
+        }
+
+        .btn {
+            background: #0078d4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #106ebe;
+        }
+
+        .btn:disabled {
+            background: #c8c6c4;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #f3f2f1;
+            color: #323130;
+            border: 1px solid #e1dfdd;
+        }
+
+        .btn-secondary:hover {
+            background: #e1dfdd;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Evaluation Screen Styles */
+        .evaluation-screen {
+            display: none;
+        }
+
+        .evaluation-screen.active {
+            display: block;
+        }
+
+        .evaluation-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+
+        .conversation-panel, .rating-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #323130;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .conversation-container {
+            margin-bottom: 24px;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #0078d4;
+        }
+
+        .message.customer {
+            background: #f8f9fa;
+            border-left-color: #6c757d;
+        }
+
+        .message.ai {
+            background: #e3f2fd;
+            border-left-color: #0078d4;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #323130;
+        }
+
+        .message-text {
+            color: #605e5c;
+            line-height: 1.6;
+        }
+
+        .config-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .config-info h4 {
+            margin-bottom: 12px;
+            color: #323130;
+            font-size: 16px;
+        }
+
+        .rating-instruction {
+            color: #605e5c;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .metric-rating {
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e1dfdd;
+        }
+
+        .metric-rating:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .metric-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .rating-scale {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .thumbs-rating {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+        }
+
+        .thumbs-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 16px 20px;
+            border-radius: 12px;
+            transition: all 0.2s;
+            border: 2px solid #e1dfdd;
+            background: white;
+            min-width: 100px;
+        }
+
+        .thumbs-option:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .thumbs-option.selected {
+            border-color: #0078d4;
+            background: #f0f9ff;
+        }
+
+        .thumbs-option.selected.positive {
+            border-color: #107c10;
+            background: #f3f9f1;
+        }
+
+        .thumbs-option.selected.negative {
+            border-color: #d13438;
+            background: #fdf2f2;
+        }
+
+        .thumbs-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            transition: color 0.2s;
+            color: #605e5c;
+        }
+
+        .thumbs-option.selected.positive .thumbs-icon {
+            color: #107c10;
+        }
+
+        .thumbs-option.selected.negative .thumbs-icon {
+            color: #d13438;
+        }
+
+        .thumbs-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .rating-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+            min-width: 60px;
+        }
+
+        .rating-option:hover {
+            background: #f3f2f1;
+        }
+
+        .rating-circle {
+            width: 32px;
+            height: 32px;
+            border: 2px solid #c8c6c4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            font-weight: 600;
+            color: #605e5c;
+        }
+
+        .rating-option.selected .rating-circle {
+            background: #0078d4;
+            border-color: #0078d4;
+            color: white;
+        }
+
+        .rating-label {
+            font-size: 11px;
+            color: #605e5c;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .conversation-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid #e1dfdd;
+        }
+
+        .conversation-counter {
+            font-size: 14px;
+            color: #605e5c;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-buttons .btn {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        /* Results Screen Styles */
+        .results-screen {
+            display: none;
+        }
+
+        .results-screen.active {
+            display: block;
+        }
+
+        .results-content {
+            display: grid;
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+
+        .results-summary, .detailed-results, .insights-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-summary h3, .detailed-results h3, .insights-panel h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #323130;
+        }
+
+        .ranking-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .ranking-card {
+            border: 2px solid #e1dfdd;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .ranking-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .ranking-card.first {
+            border-color: #ffd700;
+            background: linear-gradient(135deg, #fff9c4, #ffffff);
+        }
+
+        .ranking-card.second {
+            border-color: #c0c0c0;
+            background: linear-gradient(135deg, #f5f5f5, #ffffff);
+        }
+
+        .ranking-card.third {
+            border-color: #cd7f32;
+            background: linear-gradient(135deg, #fdf2e9, #ffffff);
+        }
+
+        .ranking-position {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .ranking-card.first .ranking-position {
+            background: #ffd700;
+            color: #333;
+        }
+
+        .ranking-card.second .ranking-position {
+            background: #c0c0c0;
+            color: #333;
+        }
+
+        .ranking-card.third .ranking-position {
+            background: #cd7f32;
+            color: #fff;
+        }
+
+        .ranking-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #323130;
+        }
+
+        .ranking-score {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0078d4;
+            margin-bottom: 8px;
+        }
+
+        .ranking-description {
+            font-size: 14px;
+            color: #605e5c;
+        }
+
+        .results-table {
+            overflow-x: auto;
+        }
+
+        .results-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .results-table th, .results-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e1dfdd;
+        }
+
+        .results-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .score-cell {
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .insights-content {
+            color: #605e5c;
+            line-height: 1.6;
+        }
+
+        .insight-item {
+            margin-bottom: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #0078d4;
+        }
+
+        .insight-title {
+            font-weight: 600;
+            color: #323130;
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .evaluation-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .ranking-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Business Case Selection Screen -->
+        <div class="business-case-screen" id="businessCaseScreen">
+            <div class="screen-header">
+                <h1 class="screen-title">AI Model Evaluation Lab - Business Case Study</h1>
+                <p class="screen-subtitle">
+                    Select a business scenario to evaluate different AI model configurations. 
+                    You'll choose evaluation criteria and compare how well each model performs for your specific use case.
+                </p>
+            </div>
+
+            <div class="business-case-grid">
+                <div class="business-case-card" data-case="customer-service" onclick="selectBusinessCase('customer-service')">
+                    <div class="case-icon"><i class="fas fa-headset"></i></div>
+                    <h3 class="case-title">Customer Support</h3>
+                    <p class="case-description">
+                        Deploy AI assistants to handle customer inquiries, complaints, and support requests. 
+                        Focus on empathy, problem-solving, and maintaining brand voice.
+                    </p>
+                    <div class="case-challenge">
+                        <strong>Challenge:</strong> Balance efficiency with human-like empathy and understanding
+                    </div>
+                </div>
+
+                <div class="business-case-card" data-case="sales-assistant" onclick="selectBusinessCase('sales-assistant')">
+                    <div class="case-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3 class="case-title">Sales Assistant</h3>
+                    <p class="case-description">
+                        AI-powered sales support to qualify leads, answer product questions, and guide prospects through the sales funnel.
+                    </p>
+                    <div class="case-challenge">
+                        <strong>Challenge:</strong> Be persuasive without being pushy, maintain professionalism
+                    </div>
+                </div>
+
+                <div class="business-case-card" data-case="technical-support" onclick="selectBusinessCase('technical-support')">
+                    <div class="case-icon"><i class="fas fa-tools"></i></div>
+                    <h3 class="case-title">Technical Support</h3>
+                    <p class="case-description">
+                        Provide technical troubleshooting, software guidance, and step-by-step problem resolution for users.
+                    </p>
+                    <div class="case-challenge">
+                        <strong>Challenge:</strong> Maintain accuracy while being accessible to non-technical users
+                    </div>
+                </div>
+
+                <div class="business-case-card" data-case="content-creation" onclick="selectBusinessCase('content-creation')">
+                    <div class="case-icon"><i class="fas fa-pen-fancy"></i></div>
+                    <h3 class="case-title">Content Creation</h3>
+                    <p class="case-description">
+                        Generate marketing copy, blog posts, social media content, and other creative materials for brand communication.
+                    </p>
+                    <div class="case-challenge">
+                        <strong>Challenge:</strong> Balance creativity with brand consistency and audience relevance
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics Selection Screen -->
+        <div class="metrics-selection-screen" id="metricsScreen">
+            <div class="screen-header">
+                <h2 class="screen-title">Choose Evaluation Metrics</h2>
+                <p class="screen-subtitle" id="metricsSubtitle">
+                    Select up to 3 evaluation criteria that are most important for your business case.
+                </p>
+            </div>
+
+            <div class="metrics-instruction">
+                <h3 class="instruction-title">📋 Select Your Evaluation Criteria</h3>
+                <p class="instruction-text">Choose the metrics that matter most for your business scenario. You can select up to 3 criteria to evaluate each AI model configuration.</p>
+            </div>
+
+            <div class="metrics-grid" id="metricsGrid">
+                <!-- Metrics will be populated based on selected business case -->
+            </div>
+
+            <div class="selection-summary" id="selectionSummary" style="display: none;">
+                <h3 class="summary-title">Selected Evaluation Metrics</h3>
+                <div class="selected-metrics" id="selectedMetrics"></div>
+                <p style="font-size: 14px; color: #605e5c; margin: 0;">You'll evaluate each AI model configuration based on these criteria.</p>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="goBackToBusinessCase()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button class="btn" id="proceedToConfigs" onclick="proceedToConfigurations()" disabled>
+                    Continue to Evaluation <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Configuration Selection Screen -->
+        <div class="config-selection-screen" id="configScreen">
+            <div class="screen-header">
+                <h2 class="screen-title">Model Configuration Evaluation</h2>
+                <p class="screen-subtitle">
+                    Evaluate 3 different AI model configurations for your selected business case.
+                </p>
+                
+                <div class="progress-indicator">
+                    <div class="progress-step">
+                        <div class="progress-dot completed">1</div>
+                        <span class="progress-label">Business Case</span>
+                    </div>
+                    <span class="progress-arrow">→</span>
+                    <div class="progress-step">
+                        <div class="progress-dot completed">2</div>
+                        <span class="progress-label">Metrics</span>
+                    </div>
+                    <span class="progress-arrow">→</span>
+                    <div class="progress-step">
+                        <div class="progress-dot active">3</div>
+                        <span class="progress-label">Evaluation</span>
+                    </div>
+                    <span class="progress-arrow">→</span>
+                    <div class="progress-step">
+                        <div class="progress-dot">4</div>
+                        <span class="progress-label">Results</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="config-grid" id="configGrid">
+                <!-- Configurations will be populated dynamically -->
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="goBackToMetrics()">
+                    <i class="fas fa-arrow-left"></i> Back to Metrics
+                </button>
+                <button class="btn" id="viewResults" onclick="showResults()" disabled>
+                    View Results <i class="fas fa-chart-bar"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Evaluation Screen -->
+        <div class="evaluation-screen" id="evaluationScreen" style="display: none;">
+            <div class="screen-header">
+                <h2 class="screen-title" id="evaluationTitle">Evaluating Configuration A</h2>
+                <p class="screen-subtitle" id="evaluationSubtitle">
+                    Rate how well this AI configuration handles the conversation based on your selected criteria.
+                </p>
+                
+                <div class="progress-indicator">
+                    <div class="progress-step">
+                        <div class="progress-dot completed">1</div>
+                        <span class="progress-label">Business Case</span>
+                    </div>
+                    <span class="progress-arrow">→</span>
+                    <div class="progress-step">
+                        <div class="progress-dot completed">2</div>
+                        <span class="progress-label">Metrics</span>
+                    </div>
+                    <span class="progress-arrow">→</span>
+                    <div class="progress-step">
+                        <div class="progress-dot active">3</div>
+                        <span class="progress-label">Evaluation</span>
+                    </div>
+                    <span class="progress-arrow">→</span>
+                    <div class="progress-step">
+                        <div class="progress-dot">4</div>
+                        <span class="progress-label">Results</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="evaluation-content">
+                <div class="conversation-panel">
+                    <h3 class="panel-title">Conversation Example</h3>
+                    
+                    <div class="config-info">
+                        <h4>Model Configuration Details</h4>
+                        <div class="config-specs" id="currentConfigSpecs">
+                            <!-- Configuration specs will be populated -->
+                        </div>
+                    </div>
+                    
+                    <div class="conversation-container" id="conversationContainer">
+                        <!-- Conversation messages will be populated -->
+                    </div>
+                </div>
+
+                <div class="rating-panel">
+                    <h3 class="panel-title">Rate the AI Response</h3>
+                    <p class="rating-instruction">For each evaluation criteria, indicate whether the AI response meets your expectations:</p>
+                    
+                    <div class="metrics-rating" id="metricsRating">
+                        <!-- Rating scales will be populated based on selected metrics -->
+                    </div>
+
+                    <div class="conversation-navigation">
+                        <div class="conversation-counter">
+                            Conversation <span id="currentConversation">1</span> of <span id="totalConversations">2</span>
+                        </div>
+                        <div class="nav-buttons">
+                            <button class="btn btn-secondary" id="prevConversation" onclick="previousConversation()" disabled>
+                                <i class="fas fa-arrow-left"></i> Previous
+                            </button>
+                            <button class="btn" id="nextConversation" onclick="nextConversation()">
+                                Next <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="goBackToConfigs()">
+                    <i class="fas fa-arrow-left"></i> Back to Configurations
+                </button>
+                <button class="btn" id="completeEvaluation" onclick="completeCurrentEvaluation()" disabled>
+                    Complete Evaluation <i class="fas fa-check"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="results-screen" id="resultsScreen" style="display: none;">
+            <div class="screen-header">
+                <h2 class="screen-title">Evaluation Results</h2>
+                <p class="screen-subtitle">
+                    Compare how each AI model configuration performed based on your selected criteria.
+                </p>
+                
+                <div class="progress-indicator">
+                    <div class="progress-step">
+                        <div class="progress-dot completed">1</div>
+                        <span class="progress-label">Business Case</span>
+                    </div>
+                    <span class="progress-arrow">→</span>
+                    <div class="progress-step">
+                        <div class="progress-dot completed">2</div>
+                        <span class="progress-label">Metrics</span>
+                    </div>
+                    <span class="progress-arrow">→</span>
+                    <div class="progress-step">
+                        <div class="progress-dot completed">3</div>
+                        <span class="progress-label">Evaluation</span>
+                    </div>
+                    <span class="progress-arrow">→</span>
+                    <div class="progress-step">
+                        <div class="progress-dot completed">4</div>
+                        <span class="progress-label">Results</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-content">
+                <div class="results-summary">
+                    <h3>Overall Rankings</h3>
+                    <div class="ranking-cards" id="rankingCards">
+                        <!-- Ranking cards will be populated -->
+                    </div>
+                </div>
+
+                <div class="detailed-results">
+                    <h3>Detailed Scores</h3>
+                    <div class="results-table" id="resultsTable">
+                        <!-- Detailed results table will be populated -->
+                    </div>
+                </div>
+
+                <div class="insights-panel">
+                    <h3>Key Insights</h3>
+                    <div class="insights-content" id="insightsContent">
+                        <!-- Insights will be populated based on results -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="startNewEvaluation()">
+                    <i class="fas fa-redo"></i> Start New Evaluation
+                </button>
+                <button class="btn" onclick="exportResults()">
+                    Export Results <i class="fas fa-download"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        let currentState = {
+            selectedBusinessCase: null,
+            selectedMetrics: [],
+            evaluationProgress: {
+                completedConfigs: 0,
+                currentConfig: 0,
+                conversationIndex: 0
+            },
+            evaluationData: {},
+            currentEvaluationConfig: null,
+            ratings: {}
+        };
+
+        // Business Case Data
+        const businessCases = {
+            'customer-service': {
+                title: 'Customer Support',
+                icon: 'fas fa-headset',
+                metrics: [
+                    { id: 'empathy', name: 'Empathy & Tone', icon: 'fas fa-heart', description: 'Shows understanding and uses appropriate emotional tone' },
+                    { id: 'accuracy', name: 'Solution Accuracy', icon: 'fas fa-bullseye', description: 'Provides correct and helpful information' },
+                    { id: 'politeness', name: 'Politeness', icon: 'fas fa-smile', description: 'Maintains courteous and respectful communication' },
+                    { id: 'clarity', name: 'Response Clarity', icon: 'fas fa-comments', description: 'Gives clear, easy-to-understand responses' },
+                    { id: 'escalation', name: 'Escalation Handling', icon: 'fas fa-level-up-alt', description: 'Knows when to escalate to human agents' },
+                    { id: 'personalization', name: 'Personalization', icon: 'fas fa-user', description: 'Adapts responses to individual customer needs' }
+                ]
+            },
+            'sales-assistant': {
+                title: 'Sales Assistant',
+                icon: 'fas fa-chart-line',
+                metrics: [
+                    { id: 'persuasiveness', name: 'Persuasiveness', icon: 'fas fa-handshake', description: 'Effectively influences without being pushy' },
+                    { id: 'product-knowledge', name: 'Product Knowledge', icon: 'fas fa-box', description: 'Demonstrates deep understanding of products/services' },
+                    { id: 'objection-handling', name: 'Objection Handling', icon: 'fas fa-shield-alt', description: 'Addresses concerns and overcomes resistance' },
+                    { id: 'professionalism', name: 'Professionalism', icon: 'fas fa-tie', description: 'Maintains professional demeanor and language' },
+                    { id: 'lead-qualification', name: 'Lead Qualification', icon: 'fas fa-search', description: 'Identifies and qualifies potential customers' },
+                    { id: 'urgency', name: 'Creating Urgency', icon: 'fas fa-clock', description: 'Motivates action without high-pressure tactics' }
+                ]
+            },
+            'technical-support': {
+                title: 'Technical Support',
+                icon: 'fas fa-tools',
+                metrics: [
+                    { id: 'technical-accuracy', name: 'Technical Accuracy', icon: 'fas fa-cog', description: 'Provides correct technical information and solutions' },
+                    { id: 'step-by-step', name: 'Clear Instructions', icon: 'fas fa-list-ol', description: 'Breaks down complex procedures into simple steps' },
+                    { id: 'troubleshooting', name: 'Troubleshooting Logic', icon: 'fas fa-wrench', description: 'Follows logical diagnostic processes' },
+                    { id: 'accessibility', name: 'Accessibility', icon: 'fas fa-universal-access', description: 'Explains technical concepts for non-technical users' },
+                    { id: 'safety', name: 'Safety Awareness', icon: 'fas fa-exclamation-triangle', description: 'Warns about potential risks and safety considerations' },
+                    { id: 'follow-up', name: 'Follow-up Questions', icon: 'fas fa-question-circle', description: 'Asks relevant questions to diagnose issues' }
+                ]
+            },
+            'content-creation': {
+                title: 'Content Creation',
+                icon: 'fas fa-pen-fancy',
+                metrics: [
+                    { id: 'creativity', name: 'Creativity', icon: 'fas fa-lightbulb', description: 'Generates original and innovative content ideas' },
+                    { id: 'brand-voice', name: 'Brand Voice', icon: 'fas fa-microphone', description: 'Maintains consistent brand personality and tone' },
+                    { id: 'audience-relevance', name: 'Audience Relevance', icon: 'fas fa-users', description: 'Creates content appropriate for target audience' },
+                    { id: 'engagement', name: 'Engagement Factor', icon: 'fas fa-thumbs-up', description: 'Produces compelling and engaging content' },
+                    { id: 'seo-optimization', name: 'SEO Optimization', icon: 'fas fa-search', description: 'Incorporates relevant keywords and SEO best practices' },
+                    { id: 'call-to-action', name: 'Call-to-Action', icon: 'fas fa-bullhorn', description: 'Includes clear and compelling calls-to-action' }
+                ]
+            }
+        };
+
+        // Model Configuration Data
+        const modelConfigurations = [
+            {
+                id: 'config-1',
+                title: 'Configuration A',
+                description: 'Optimized for accuracy and factual responses',
+                specs: {
+                    'Temperature': '0.3',
+                    'Max Tokens': '150',
+                    'Top-p': '0.8',
+                    'Frequency Penalty': '0.0'
+                }
+            },
+            {
+                id: 'config-2', 
+                title: 'Configuration B',
+                description: 'Balanced approach with moderate creativity',
+                specs: {
+                    'Temperature': '0.7',
+                    'Max Tokens': '200',
+                    'Top-p': '0.9',
+                    'Frequency Penalty': '0.3'
+                }
+            },
+            {
+                id: 'config-3',
+                title: 'Configuration C', 
+                description: 'Creative and conversational responses',
+                specs: {
+                    'Temperature': '0.9',
+                    'Max Tokens': '250',
+                    'Top-p': '0.95',
+                    'Frequency Penalty': '0.5'
+                }
+            }
+        ];
+
+        // Sample conversations for each business case
+        const sampleConversations = {
+            'customer-service': [
+                {
+                    messages: [
+                        { sender: 'Customer', text: "I'm really frustrated. I ordered a product 5 days ago and it still hasn't arrived. This is completely unacceptable!" },
+                        { sender: 'AI Assistant', text: "I completely understand your frustration, and I sincerely apologize for the delay with your order. Let me look into this right away and find a solution for you. Could you please provide me with your order number so I can track exactly what happened?" }
+                    ]
+                },
+                {
+                    messages: [
+                        { sender: 'Customer', text: "Your app keeps crashing every time I try to make a payment. I've tried three times now." },
+                        { sender: 'AI Assistant', text: "I'm sorry you're experiencing this technical issue with our payment system. That must be really frustrating when you're trying to complete a purchase. Let me help you troubleshoot this step by step. First, could you tell me what device and browser you're using?" }
+                    ]
+                }
+            ],
+            'sales-assistant': [
+                {
+                    messages: [
+                        { sender: 'Prospect', text: "I'm interested in your premium plan, but the price seems quite high compared to your competitors." },
+                        { sender: 'AI Assistant', text: "I appreciate you taking the time to compare options - that shows you're making a thoughtful decision. While our premium plan is an investment, let me show you the specific value it provides that sets us apart from competitors. What features are most important for your business needs?" }
+                    ]
+                },
+                {
+                    messages: [
+                        { sender: 'Prospect', text: "I'm not sure if this is the right time for us to upgrade our system." },
+                        { sender: 'AI Assistant', text: "Timing is definitely important for any business decision. Many of our clients initially had similar concerns, but found that waiting actually cost them more in lost efficiency. What specific concerns do you have about the timing? Perhaps I can help address those and show you how others in similar situations have benefited from making the move now." }
+                    ]
+                }
+            ],
+            'technical-support': [
+                {
+                    messages: [
+                        { sender: 'User', text: "My computer won't start up. When I press the power button, nothing happens at all." },
+                        { sender: 'AI Assistant', text: "I understand how concerning it can be when your computer won't start. Let's work through this systematically to identify the issue. First, let's check the basics: Is the power cable firmly connected to both your computer and the wall outlet? Also, could you try a different power outlet to rule out any electrical issues?" }
+                    ]
+                },
+                {
+                    messages: [
+                        { sender: 'User', text: "I accidentally deleted an important file from my desktop. Is there any way to get it back?" },
+                        { sender: 'AI Assistant', text: "Don't panic - there's a good chance we can recover your file! Windows has a built-in recovery feature that might help. First, check your Recycle Bin by double-clicking on it from your desktop. If you see your file there, simply right-click on it and select 'Restore'. If it's not there, we have other recovery options to try." }
+                    ]
+                }
+            ],
+            'content-creation': [
+                {
+                    messages: [
+                        { sender: 'User', text: "I need a social media post for our new eco-friendly product launch. It should appeal to environmentally conscious millennials." },
+                        { sender: 'AI Assistant', text: "🌱 Ready to make a difference with every purchase? Our new eco-friendly line proves that sustainability and style don't have to be mutually exclusive. Crafted from 100% recycled materials, each product saves 2 plastic bottles from landfills. Join the movement toward conscious consumption - because the planet is the only home we've got. #EcoWarriors #SustainableLiving #PlasticFree" }
+                    ]
+                },
+                {
+                    messages: [
+                        { sender: 'User', text: "Write a blog post introduction about remote work productivity tips for our company blog." },
+                        { sender: 'AI Assistant', text: "The remote work revolution is here to stay, but are you truly making the most of your home office setup? While the flexibility of working from anywhere offers incredible opportunities, it also presents unique challenges that can derail even the most motivated professionals. Whether you're a remote work veteran or just starting your work-from-home journey, the strategies we're about to share will transform your productivity and help you reclaim those lost hours between coffee breaks and household distractions." }
+                    ]
+                }
+            ]
+        };
+
+        // Initialize the application
+        function initializeApp() {
+            showScreen('businessCaseScreen');
+        }
+
+        // Business Case Selection
+        function selectBusinessCase(caseId) {
+            // Remove previous selection
+            document.querySelectorAll('.business-case-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Select current card
+            document.querySelector(`[data-case="${caseId}"]`).classList.add('selected');
+            currentState.selectedBusinessCase = caseId;
+            
+            // Enable next step after short delay
+            setTimeout(() => {
+                proceedToMetrics();
+            }, 500);
+        }
+
+        // Proceed to metrics selection
+        function proceedToMetrics() {
+            if (!currentState.selectedBusinessCase) return;
+            
+            const businessCase = businessCases[currentState.selectedBusinessCase];
+            document.getElementById('metricsSubtitle').textContent = 
+                `Select up to 3 evaluation criteria that are most important for ${businessCase.title.toLowerCase()}.`;
+            
+            populateMetrics();
+            showScreen('metricsScreen');
+        }
+
+        // Populate metrics based on selected business case
+        function populateMetrics() {
+            const businessCase = businessCases[currentState.selectedBusinessCase];
+            const metricsGrid = document.getElementById('metricsGrid');
+            
+            metricsGrid.innerHTML = businessCase.metrics.map(metric => `
+                <div class="metric-card" data-metric="${metric.id}" onclick="toggleMetric('${metric.id}')">
+                    <div class="selection-counter">1</div>
+                    <div class="metric-icon"><i class="${metric.icon}"></i></div>
+                    <h4 class="metric-name">${metric.name}</h4>
+                    <p class="metric-description">${metric.description}</p>
+                </div>
+            `).join('');
+        }
+
+        // Toggle metric selection
+        function toggleMetric(metricId) {
+            const card = document.querySelector(`[data-metric="${metricId}"]`);
+            const isSelected = card.classList.contains('selected');
+            
+            if (isSelected) {
+                // Remove selection
+                card.classList.remove('selected');
+                currentState.selectedMetrics = currentState.selectedMetrics.filter(id => id !== metricId);
+            } else if (currentState.selectedMetrics.length < 3) {
+                // Add selection
+                card.classList.add('selected');
+                currentState.selectedMetrics.push(metricId);
+                
+                // Update counter
+                const counter = card.querySelector('.selection-counter');
+                counter.textContent = currentState.selectedMetrics.length;
+            }
+            
+            // Update disabled states and UI
+            updateMetricSelection();
+        }
+
+        // Update metric selection UI
+        function updateMetricSelection() {
+            const cards = document.querySelectorAll('.metric-card');
+            const maxSelected = currentState.selectedMetrics.length >= 3;
+            
+            // Disable/enable cards
+            cards.forEach(card => {
+                const isSelected = card.classList.contains('selected');
+                if (!isSelected && maxSelected) {
+                    card.classList.add('disabled');
+                } else {
+                    card.classList.remove('disabled');
+                }
+            });
+            
+            // Update selection counter numbers
+            currentState.selectedMetrics.forEach((metricId, index) => {
+                const card = document.querySelector(`[data-metric="${metricId}"]`);
+                const counter = card.querySelector('.selection-counter');
+                counter.textContent = index + 1;
+            });
+            
+            // Show/hide summary
+            const summary = document.getElementById('selectionSummary');
+            const proceedBtn = document.getElementById('proceedToConfigs');
+            
+            if (currentState.selectedMetrics.length > 0) {
+                summary.style.display = 'block';
+                updateSelectedMetricsSummary();
+                proceedBtn.disabled = false;
+            } else {
+                summary.style.display = 'none';
+                proceedBtn.disabled = true;
+            }
+        }
+
+        // Update selected metrics summary
+        function updateSelectedMetricsSummary() {
+            const businessCase = businessCases[currentState.selectedBusinessCase];
+            const selectedMetricsContainer = document.getElementById('selectedMetrics');
+            
+            selectedMetricsContainer.innerHTML = currentState.selectedMetrics.map(metricId => {
+                const metric = businessCase.metrics.find(m => m.id === metricId);
+                return `<span class="selected-metric-tag">${metric.name}</span>`;
+            }).join('');
+        }
+
+        // Proceed to configurations
+        function proceedToConfigurations() {
+            if (currentState.selectedMetrics.length === 0) return;
+            
+            populateConfigurations();
+            showScreen('configScreen');
+        }
+
+        // Populate configuration cards
+        function populateConfigurations() {
+            const configGrid = document.getElementById('configGrid');
+            
+            configGrid.innerHTML = modelConfigurations.map((config, index) => `
+                <div class="config-card" data-config="${config.id}" onclick="startEvaluation('${config.id}')">
+                    <div class="config-status" id="status-${config.id}"></div>
+                    <h3 class="config-title">${config.title}</h3>
+                    <p class="config-description">${config.description}</p>
+                    <div class="config-specs">
+                        ${Object.entries(config.specs).map(([key, value]) => 
+                            `${key}: ${value}`
+                        ).join('<br>')}
+                    </div>
+                    <div class="config-metrics" id="metrics-${config.id}">
+                        ${currentState.selectedMetrics.map(metricId => {
+                            const businessCase = businessCases[currentState.selectedBusinessCase];
+                            const metric = businessCase.metrics.find(m => m.id === metricId);
+                            return `
+                                <div class="metric-row">
+                                    <span class="metric-label">${metric.name}:</span>
+                                    <span class="metric-value" id="value-${config.id}-${metricId}">Pending</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `).join('');
+            
+            updateConfigurationStates();
+        }
+
+        // Start evaluation for a specific configuration
+        function startEvaluation(configId) {
+            currentState.currentEvaluationConfig = configId;
+            currentState.evaluationProgress.conversationIndex = 0;
+            
+            // Initialize ratings for this config if not exists
+            if (!currentState.ratings[configId]) {
+                currentState.ratings[configId] = {};
+                currentState.selectedMetrics.forEach(metricId => {
+                    currentState.ratings[configId][metricId] = {};
+                });
+            }
+            
+            showEvaluationScreen();
+        }
+
+        // Show evaluation screen
+        function showEvaluationScreen() {
+            const config = modelConfigurations.find(c => c.id === currentState.currentEvaluationConfig);
+            
+            // Update screen title and subtitle
+            document.getElementById('evaluationTitle').textContent = `Evaluating ${config.title}`;
+            document.getElementById('evaluationSubtitle').textContent = 
+                `Rate how well this AI configuration handles the conversation based on your selected criteria.`;
+            
+            // Populate conversation
+            populateConversation();
+            
+            // Populate config specs
+            document.getElementById('currentConfigSpecs').innerHTML = 
+                Object.entries(config.specs).map(([key, value]) => `${key}: ${value}`).join('<br>');
+            
+            // Populate rating metrics
+            populateRatingMetrics();
+            
+            // Update conversation navigation
+            updateConversationNavigation();
+            
+            // Initialize button state
+            updateEvaluationButtons();
+            
+            showScreen('evaluationScreen');
+        }
+
+        // Populate conversation
+        function populateConversation() {
+            const conversations = sampleConversations[currentState.selectedBusinessCase];
+            const currentConversation = conversations[currentState.evaluationProgress.conversationIndex];
+            
+            const container = document.getElementById('conversationContainer');
+            container.innerHTML = currentConversation.messages.map(message => `
+                <div class="message ${message.sender.toLowerCase().includes('customer') || message.sender.toLowerCase().includes('user') || message.sender.toLowerCase().includes('prospect') ? 'customer' : 'ai'}">
+                    <div class="message-sender">${message.sender}</div>
+                    <div class="message-text">${message.text}</div>
+                </div>
+            `).join('');
+        }
+
+        // Populate rating metrics
+        function populateRatingMetrics() {
+            const businessCase = businessCases[currentState.selectedBusinessCase];
+            const container = document.getElementById('metricsRating');
+            
+            container.innerHTML = currentState.selectedMetrics.map(metricId => {
+                const metric = businessCase.metrics.find(m => m.id === metricId);
+                const currentRating = currentState.ratings[currentState.currentEvaluationConfig]?.[metricId]?.[currentState.evaluationProgress.conversationIndex];
+                const hasRating = currentRating !== undefined && currentRating !== null;
+                
+                return `
+                    <div class="metric-rating">
+                        <div class="metric-label">
+                            <i class="${metric.icon}"></i>
+                            ${metric.name}
+                            ${!hasRating ? '<span style="color: #d13438; margin-left: 8px;">*</span>' : ''}
+                        </div>
+                        <div class="thumbs-rating">
+                            <div class="thumbs-option ${currentRating === 1 ? 'selected positive' : ''}" 
+                                 onclick="setRating('${metricId}', 1)">
+                                <div class="thumbs-icon"><i class="fas fa-thumbs-up"></i></div>
+                                <div class="thumbs-label">Good</div>
+                            </div>
+                            <div class="thumbs-option ${currentRating === 0 ? 'selected negative' : ''}" 
+                                 onclick="setRating('${metricId}', 0)">
+                                <div class="thumbs-icon"><i class="fas fa-thumbs-down"></i></div>
+                                <div class="thumbs-label">Poor</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Get rating label
+        function getRatingLabel(score) {
+            return score === 1 ? 'Good' : 'Poor';
+        }
+
+        // Set rating
+        function setRating(metricId, score) {
+            // Initialize if needed
+            if (!currentState.ratings[currentState.currentEvaluationConfig]) {
+                currentState.ratings[currentState.currentEvaluationConfig] = {};
+            }
+            if (!currentState.ratings[currentState.currentEvaluationConfig][metricId]) {
+                currentState.ratings[currentState.currentEvaluationConfig][metricId] = {};
+            }
+            
+            currentState.ratings[currentState.currentEvaluationConfig][metricId][currentState.evaluationProgress.conversationIndex] = score;
+            
+            // Debug logging
+            console.log('Setting rating:', {
+                configId: currentState.currentEvaluationConfig,
+                metricId: metricId,
+                conversationIndex: currentState.evaluationProgress.conversationIndex,
+                score: score,
+                ratings: currentState.ratings
+            });
+            
+            // Update UI
+            populateRatingMetrics();
+            updateEvaluationButtons();
+        }
+
+        // Update conversation navigation
+        function updateConversationNavigation() {
+            const conversations = sampleConversations[currentState.selectedBusinessCase];
+            const currentIndex = currentState.evaluationProgress.conversationIndex;
+            
+            document.getElementById('currentConversation').textContent = currentIndex + 1;
+            document.getElementById('totalConversations').textContent = conversations.length;
+            
+            // Update navigation buttons
+            const prevBtn = document.getElementById('prevConversation');
+            const nextBtn = document.getElementById('nextConversation');
+            
+            prevBtn.disabled = currentIndex === 0;
+            
+            if (currentIndex === conversations.length - 1) {
+                nextBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'flex';
+            }
+        }
+
+        // Navigation between conversations
+        function previousConversation() {
+            if (currentState.evaluationProgress.conversationIndex > 0) {
+                currentState.evaluationProgress.conversationIndex--;
+                populateConversation();
+                populateRatingMetrics();
+                updateConversationNavigation();
+                updateEvaluationButtons();
+            }
+        }
+
+        function nextConversation() {
+            const conversations = sampleConversations[currentState.selectedBusinessCase];
+            if (currentState.evaluationProgress.conversationIndex < conversations.length - 1) {
+                currentState.evaluationProgress.conversationIndex++;
+                populateConversation();
+                populateRatingMetrics();
+                updateConversationNavigation();
+                updateEvaluationButtons();
+            }
+        }
+
+        // Update evaluation buttons
+        function updateEvaluationButtons() {
+            const completeBtn = document.getElementById('completeEvaluation');
+            const conversations = sampleConversations[currentState.selectedBusinessCase];
+            
+            // Count total and completed ratings
+            let totalRatings = conversations.length * currentState.selectedMetrics.length;
+            let completedRatings = 0;
+            
+            for (let i = 0; i < conversations.length; i++) {
+                for (let metricId of currentState.selectedMetrics) {
+                    const rating = currentState.ratings[currentState.currentEvaluationConfig]?.[metricId]?.[i];
+                    if (rating !== undefined && rating !== null) {
+                        completedRatings++;
+                    }
+                }
+            }
+            
+            const allRated = completedRatings === totalRatings;
+            completeBtn.disabled = !allRated;
+            
+            // Update button text with progress
+            if (allRated) {
+                completeBtn.innerHTML = 'Complete Evaluation <i class="fas fa-check"></i>';
+            } else {
+                completeBtn.innerHTML = `Complete Evaluation (${completedRatings}/${totalRatings}) <i class="fas fa-check"></i>`;
+            }
+            
+            // Debug logging
+            console.log('Rating check:', {
+                configId: currentState.currentEvaluationConfig,
+                completedRatings: completedRatings,
+                totalRatings: totalRatings,
+                allRated: allRated,
+                conversationCount: conversations.length,
+                metricsCount: currentState.selectedMetrics.length
+            });
+        }
+
+        // Complete current evaluation
+        function completeCurrentEvaluation() {
+            const configId = currentState.currentEvaluationConfig;
+            
+            // Calculate average scores for this configuration (convert to percentage)
+            const averageScores = {};
+            currentState.selectedMetrics.forEach(metricId => {
+                const scores = Object.values(currentState.ratings[configId][metricId]);
+                const percentage = (scores.reduce((a, b) => a + b, 0) / scores.length) * 100;
+                averageScores[metricId] = percentage;
+            });
+            
+            // Store evaluation data
+            currentState.evaluationData[configId] = averageScores;
+            currentState.evaluationProgress.completedConfigs++;
+            
+            // Update configuration display
+            updateConfigurationDisplay(configId, averageScores);
+            
+            // Return to configuration screen
+            showScreen('configScreen');
+            
+            // Check if all evaluations are complete
+            if (currentState.evaluationProgress.completedConfigs === modelConfigurations.length) {
+                document.getElementById('viewResults').disabled = false;
+            }
+        }
+
+        // Update configuration display with results
+        function updateConfigurationDisplay(configId, averageScores) {
+            const card = document.querySelector(`[data-config="${configId}"]`);
+            const status = document.getElementById(`status-${configId}`);
+            
+            card.classList.add('completed');
+            status.classList.add('completed');
+            status.innerHTML = '<i class="fas fa-check"></i>';
+            
+            // Update metric values
+            currentState.selectedMetrics.forEach(metricId => {
+                const valueElement = document.getElementById(`value-${configId}-${metricId}`);
+                const score = averageScores[metricId];
+                const scoreClass = score >= 75 ? 'score-excellent' : score >= 50 ? 'score-good' : 'score-poor';
+                valueElement.innerHTML = `<span class="${scoreClass}">${score.toFixed(0)}%</span>`;
+            });
+        }
+
+        // Update configuration states
+        function updateConfigurationStates() {
+            modelConfigurations.forEach(config => {
+                const card = document.querySelector(`[data-config="${config.id}"]`);
+                const status = document.getElementById(`status-${config.id}`);
+                
+                if (currentState.evaluationData[config.id]) {
+                    card.classList.add('completed');
+                    status.classList.add('completed');
+                    status.innerHTML = '<i class="fas fa-check"></i>';
+                } else {
+                    card.classList.remove('completed');
+                    status.classList.remove('completed', 'active');
+                    status.innerHTML = '';
+                }
+            });
+        }
+
+        // Show results screen
+        function showResults() {
+            populateResults();
+            showScreen('resultsScreen');
+        }
+
+        // Populate results screen
+        function populateResults() {
+            // Calculate overall scores and rankings
+            const configScores = modelConfigurations.map(config => {
+                const scores = currentState.evaluationData[config.id];
+                const averageScore = Object.values(scores).reduce((a, b) => a + b, 0) / Object.values(scores).length;
+                return {
+                    config: config,
+                    averageScore: averageScore,
+                    scores: scores
+                };
+            }).sort((a, b) => b.averageScore - a.averageScore);
+            
+            // Populate ranking cards
+            populateRankingCards(configScores);
+            
+            // Populate detailed results table
+            populateResultsTable(configScores);
+            
+            // Populate insights
+            populateInsights(configScores);
+        }
+
+        // Populate ranking cards
+        function populateRankingCards(configScores) {
+            const container = document.getElementById('rankingCards');
+            const positions = ['first', 'second', 'third'];
+            
+            container.innerHTML = configScores.map((item, index) => `
+                <div class="ranking-card ${positions[index]}">
+                    <div class="ranking-position">${index + 1}</div>
+                    <h4 class="ranking-title">${item.config.title}</h4>
+                    <div class="ranking-score">${item.averageScore.toFixed(0)}%</div>
+                    <p class="ranking-description">${item.config.description}</p>
+                </div>
+            `).join('');
+        }
+
+        // Populate results table
+        function populateResultsTable(configScores) {
+            const container = document.getElementById('resultsTable');
+            const businessCase = businessCases[currentState.selectedBusinessCase];
+            
+            const headers = ['Configuration', ...currentState.selectedMetrics.map(metricId => {
+                const metric = businessCase.metrics.find(m => m.id === metricId);
+                return metric.name;
+            }), 'Average'];
+            
+            container.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            ${headers.map(header => `<th>${header}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${configScores.map(item => `
+                            <tr>
+                                <td><strong>${item.config.title}</strong></td>
+                                ${currentState.selectedMetrics.map(metricId => {
+                                    const score = item.scores[metricId];
+                                    const scoreClass = score >= 75 ? 'score-excellent' : score >= 50 ? 'score-good' : 'score-poor';
+                                    return `<td class="score-cell"><span class="${scoreClass}">${score.toFixed(0)}%</span></td>`;
+                                }).join('')}
+                                <td class="score-cell"><strong>${item.averageScore.toFixed(0)}%</strong></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Populate insights
+        function populateInsights(configScores) {
+            const container = document.getElementById('insightsContent');
+            const businessCase = businessCases[currentState.selectedBusinessCase];
+            const winner = configScores[0];
+            const loser = configScores[configScores.length - 1];
+            
+            // Find best and worst performing metrics
+            const metricPerformance = currentState.selectedMetrics.map(metricId => {
+                const metric = businessCase.metrics.find(m => m.id === metricId);
+                const scores = configScores.map(item => item.scores[metricId]);
+                const average = scores.reduce((a, b) => a + b, 0) / scores.length;
+                return { metric, average, scores };
+            });
+            
+            const bestMetric = metricPerformance.reduce((a, b) => a.average > b.average ? a : b);
+            const worstMetric = metricPerformance.reduce((a, b) => a.average < b.average ? a : b);
+            
+            container.innerHTML = `
+                <div class="insight-item">
+                    <div class="insight-title">🏆 Best Performing Configuration</div>
+                    <div>${winner.config.title} achieved the highest overall score of ${winner.averageScore.toFixed(0)}%. This configuration excels in ${businessCase.title.toLowerCase()} scenarios.</div>
+                </div>
+                
+                <div class="insight-item">
+                    <div class="insight-title">📊 Strongest Metric</div>
+                    <div>${bestMetric.metric.name} performed best across all configurations with an average score of ${bestMetric.average.toFixed(0)}%.</div>
+                </div>
+                
+                <div class="insight-item">
+                    <div class="insight-title">🎯 Area for Improvement</div>
+                    <div>${worstMetric.metric.name} showed the most room for improvement with an average score of ${worstMetric.average.toFixed(0)}% across all configurations.</div>
+                </div>
+                
+                <div class="insight-item">
+                    <div class="insight-title">💡 Recommendation</div>
+                    <div>For ${businessCase.title.toLowerCase()} use cases, consider using ${winner.config.title} which demonstrated superior performance in your selected evaluation criteria.</div>
+                </div>
+            `;
+        }
+
+        // Additional navigation functions
+        function goBackToConfigs() {
+            showScreen('configScreen');
+        }
+
+        function startNewEvaluation() {
+            // Reset state
+            currentState = {
+                selectedBusinessCase: null,
+                selectedMetrics: [],
+                evaluationProgress: {
+                    completedConfigs: 0,
+                    currentConfig: 0,
+                    conversationIndex: 0
+                },
+                evaluationData: {},
+                currentEvaluationConfig: null,
+                ratings: {}
+            };
+            
+            showScreen('businessCaseScreen');
+        }
+
+        function exportResults() {
+            const results = {
+                businessCase: currentState.selectedBusinessCase,
+                selectedMetrics: currentState.selectedMetrics,
+                evaluationData: currentState.evaluationData,
+                timestamp: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(results, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `ai-evaluation-results-${Date.now()}.json`;
+            link.click();
+        }
+
+        // Navigation functions
+        function goBackToBusinessCase() {
+            currentState.selectedMetrics = [];
+            showScreen('businessCaseScreen');
+        }
+
+        function goBackToMetrics() {
+            showScreen('metricsScreen');
+        }
+
+        function showResults() {
+            populateResults();
+            showScreen('resultsScreen');
+        }
+
+        // Utility functions
+        function showScreen(screenId) {
+            hideAllScreens();
+            document.getElementById(screenId).style.display = 'block';
+        }
+
+        function hideAllScreens() {
+            const screens = ['businessCaseScreen', 'metricsScreen', 'configScreen'];
+            screens.forEach(screenId => {
+                const screen = document.getElementById(screenId);
+                if (screen) screen.style.display = 'none';
+            });
+        }
+
+        // Initialize the application when page loads
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+theme: jekyll-theme-minimal
+title: Fine-Tuning AI Models Interactive Exercise
+description: Learn the process of fine-tuning AI models with Azure AI Foundry through an interactive simulation
+show_downloads: false
+google_analytics: 
+
+# GitHub Pages configuration
+plugins:
+  - jekyll-relative-links
+relative_links:
+  enabled: true
+  collections: true
+include:
+  - README.md

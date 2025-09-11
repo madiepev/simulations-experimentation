@@ -1,0 +1,85 @@
+{
+  "exercise": {
+    "title": "Fine-Tuning AI Models",
+    "description": "A practical simulation to enhance your AI expertise",
+    "version": "1.0.0"
+  },
+  "themes": {
+    "minimalist": {
+      "name": "Minimalist Clean",
+      "description": "Clean, professional design focused on content readability",
+      "cssFile": "minimalist.css",
+      "fontFamily": "Inter",
+      "primaryColor": "#2563eb"
+    },
+    "cyberpunk": {
+      "name": "Cyberpunk Dark",
+      "description": "Dark futuristic design with neon accents and sci-fi atmosphere", 
+      "cssFile": "cyberpunk.css",
+      "fontFamily": "JetBrains Mono, Orbitron",
+      "primaryColor": "#00ff88"
+    }
+  },
+  "content": {
+    "phases": [
+      {
+        "id": "intro",
+        "title": "Introduction",
+        "file": "intro.md",
+        "phase": 0
+      },
+      {
+        "id": "phase1",
+        "title": "Evaluate Base Model",
+        "file": "phase1.md", 
+        "phase": 1
+      },
+      {
+        "id": "phase2",
+        "title": "Dataset Preparation",
+        "file": "phase2.md",
+        "phase": 2
+      },
+      {
+        "id": "phase3", 
+        "title": "Fine-Tuning Workflow",
+        "file": "phase3.md",
+        "phase": 3
+      },
+      {
+        "id": "phase4",
+        "title": "Model Comparison",
+        "file": "phase4.md",
+        "phase": 4
+      }
+    ]
+  },
+  "components": {
+    "instructions": {
+      "icon": "clipboard-list",
+      "className": "instructions"
+    },
+    "information": {
+      "defaultIcon": "info-circle",
+      "className": "information-panel"
+    },
+    "selection": {
+      "className": "selection-task",
+      "supportMultiple": true
+    },
+    "ranking": {
+      "className": "ranking-task",
+      "supportDragDrop": true
+    },
+    "form": {
+      "className": "form-section",
+      "supportValidation": true
+    }
+  },
+  "settings": {
+    "defaultTheme": "minimalist",
+    "enableThemeSwitcher": true,
+    "autoSave": true,
+    "showProgress": true
+  }
+}

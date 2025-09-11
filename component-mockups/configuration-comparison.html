@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Configuration Comparison Lab</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0078d4;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #605e5c;
+            font-size: 16px;
+        }
+
+        /* Progress Overview */
+        .progress-overview {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #323130;
+        }
+
+        .config-progress {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .config-indicator {
+            flex: 1;
+            height: 16px;
+            border-radius: 8px;
+            background: #e1dfdd;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border: 2px solid transparent;
+            font-size: 14px;
+            font-weight: 600;
+            color: #605e5c;
+            min-height: 44px;
+        }
+
+        .config-indicator.completed {
+            background: #107c10;
+            color: white;
+            border-color: #0d5d0d;
+        }
+
+        .config-indicator.active {
+            background: #0078d4;
+            color: white;
+            border-color: #106ebe;
+        }
+
+        .config-indicator:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .config-indicator::after {
+            display: none;
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #605e5c;
+        }
+
+        .progress-stats .completed-count {
+            color: #107c10;
+            font-weight: 600;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 450px 1fr;
+            gap: 24px;
+            height: 800px;
+        }
+
+        /* Backend Configuration Panel */
+        .backend-panel {
+            background: #1e1e1e;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .backend-header {
+            background: #2d2d2d;
+            padding: 16px 20px;
+            border-bottom: 1px solid #404040;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .backend-icon {
+            color: #00d4aa;
+            font-size: 18px;
+        }
+
+        .backend-title {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .config-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .config-section {
+            margin-bottom: 24px;
+        }
+
+        .config-section h3 {
+            color: #00d4aa;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #404040;
+        }
+
+        .config-item:last-child {
+            border-bottom: none;
+        }
+
+        .config-label {
+            color: #cccccc;
+            font-size: 14px;
+        }
+
+        .config-value {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Consolas', monospace;
+        }
+
+        .system-prompt {
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 6px;
+            padding: 12px;
+            color: #cccccc;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Frontend App Panel */
+        .frontend-panel {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            height: 800px;
+        }
+
+        .app-frame {
+            background: #f8f9fa;
+            padding: 12px;
+            border-bottom: 1px solid #e1dfdd;
+        }
+
+        .app-header {
+            background: white;
+            border: 1px solid #e1dfdd;
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .app-controls {
+            display: flex;
+            gap: 6px;
+        }
+
+        .app-control {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .app-control.close {
+            background: #ff5f57;
+        }
+
+        .app-control.minimize {
+            background: #ffbd2e;
+        }
+
+        .app-control.maximize {
+            background: #28ca42;
+        }
+
+        .app-title {
+            flex: 1;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .app-badge {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .chat-container {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-message.assistant {
+            max-width: 80%;
+        }
+
+        .chat-message.user {
+            flex-direction: row-reverse;
+            align-self: flex-end;
+            margin-left: auto;
+            margin-right: 0;
+            max-width: 80%;
+            width: fit-content;
+            justify-content: flex-end;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .message-avatar.user {
+            background: #0078d4;
+        }
+
+        .message-avatar.assistant {
+            background: #00d4aa;
+        }
+
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .chat-message.user .message-bubble {
+            background: #0078d4;
+            color: white;
+            border-bottom-right-radius: 4px;
+            margin-right: 0;
+            margin-left: 12px;
+            max-width: none;
+        }
+
+        .chat-message.assistant .message-bubble {
+            background: #f3f2f1;
+            color: #323130;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #605e5c;
+            margin-top: 4px;
+        }
+
+        /* Rating Panel */
+        .rating-panel {
+            background: #f8f9fa;
+            border-top: 1px solid #e1dfdd;
+            padding: 16px;
+            flex-shrink: 0;
+        }
+
+        .rating-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #323130;
+        }
+
+        .rating-question {
+            margin-bottom: 12px;
+        }
+
+        .rating-label {
+            font-size: 14px;
+            color: #605e5c;
+            margin-bottom: 6px;
+        }
+
+        .rating-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .rating-option {
+            flex: 1;
+            background: white;
+            border: 2px solid #e1dfdd;
+            border-radius: 8px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .rating-option:hover {
+            border-color: #0078d4;
+            transform: translateY(-1px);
+        }
+
+        .rating-option.selected {
+            border-color: #0078d4;
+            background: #f0f9ff;
+        }
+
+        .rating-option.selected.excellent {
+            border-color: #107c10;
+            background: #f3f9f1;
+        }
+
+        .rating-option.selected.poor {
+            border-color: #d13438;
+            background: #fdf2f2;
+        }
+
+        .rating-icon {
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+
+        .rating-option.excellent .rating-icon {
+            color: #107c10;
+        }
+
+        .rating-option.good .rating-icon {
+            color: #0078d4;
+        }
+
+        .rating-option.poor .rating-icon {
+            color: #d13438;
+        }
+
+        .rating-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            justify-content: center;
+        }
+
+        .btn {
+            background: #0078d4;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: #106ebe;
+        }
+
+        .btn:disabled {
+            background: #c8c6c4;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #f3f2f1;
+            color: #323130;
+            border: 1px solid #e1dfdd;
+        }
+
+        .btn-secondary:hover {
+            background: #e1dfdd;
+        }
+
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+                height: auto;
+            }
+            
+            .backend-panel {
+                height: 500px;
+            }
+            
+            .frontend-panel {
+                height: 700px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI Configuration Comparison Lab</h1>
+            <p>Compare different AI model configurations and see how they affect conversation responses. Rate each configuration based on quality and appropriateness.</p>
+        </div>
+
+        <div class="progress-overview">
+            <div class="progress-title">Configuration Progress</div>
+            <div class="config-progress" id="configProgress">
+                <div class="config-indicator active" onclick="selectConfig(0)">Configuration A</div>
+                <div class="config-indicator" onclick="selectConfig(1)">Configuration B</div>
+                <div class="config-indicator" onclick="selectConfig(2)">Configuration C</div>
+                <div class="config-indicator" onclick="selectConfig(3)">Configuration D</div>
+            </div>
+            <div class="progress-stats">
+                <span>Progress: <span class="completed-count" id="completedCount">0</span> of 4 configurations evaluated</span>
+                <span id="currentConfigName">Currently viewing: Configuration A</span>
+            </div>
+        </div>
+
+        <div class="main-layout">
+            <!-- Backend Configuration Panel -->
+            <div class="backend-panel">
+                <div class="backend-header">
+                    <i class="fas fa-cog backend-icon"></i>
+                    <span class="backend-title">Backend Configuration</span>
+                </div>
+
+                <div class="config-content" id="configContent">
+                    <!-- Configuration details will be populated here -->
+                </div>
+            </div>
+
+            <!-- Frontend App Panel -->
+            <div class="frontend-panel">
+                <div class="app-frame">
+                    <div class="app-header">
+                        <div class="app-controls">
+                            <div class="app-control close"></div>
+                            <div class="app-control minimize"></div>
+                            <div class="app-control maximize"></div>
+                        </div>
+                        <div class="app-title">Customer Support Chat</div>
+                        <div class="app-badge" id="configBadge">Config A</div>
+                    </div>
+                </div>
+
+                <div class="chat-container" id="chatContainer">
+                    <!-- Chat messages will be populated here -->
+                </div>
+
+                <div class="rating-panel">
+                    <div class="rating-title">Rate this Configuration</div>
+                    
+                    <div class="rating-question">
+                        <div class="rating-label">Is the AI's response polite and respectful?</div>
+                        <div class="rating-options">
+                            <div class="rating-option poor" onclick="setRating('politeness', 'poor')">
+                                <div class="rating-icon"><i class="fas fa-thumbs-down"></i></div>
+                                <div class="rating-text">Poor</div>
+                            </div>
+                            <div class="rating-option good" onclick="setRating('politeness', 'good')">
+                                <div class="rating-icon"><i class="fas fa-thumbs-up"></i></div>
+                                <div class="rating-text">Good</div>
+                            </div>
+                            <div class="rating-option excellent" onclick="setRating('politeness', 'excellent')">
+                                <div class="rating-icon"><i class="fas fa-star"></i></div>
+                                <div class="rating-text">Excellent</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rating-question">
+                        <div class="rating-label">Is the AI's response clear and easy to understand?</div>
+                        <div class="rating-options">
+                            <div class="rating-option poor" onclick="setRating('clarity', 'poor')">
+                                <div class="rating-icon"><i class="fas fa-thumbs-down"></i></div>
+                                <div class="rating-text">Poor</div>
+                            </div>
+                            <div class="rating-option good" onclick="setRating('clarity', 'good')">
+                                <div class="rating-icon"><i class="fas fa-thumbs-up"></i></div>
+                                <div class="rating-text">Good</div>
+                            </div>
+                            <div class="rating-option excellent" onclick="setRating('clarity', 'excellent')">
+                                <div class="rating-icon"><i class="fas fa-star"></i></div>
+                                <div class="rating-text">Excellent</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" id="prevConfig" onclick="prevConfig()">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <button class="btn" id="submitRating" onclick="submitRating()" disabled>
+                            Submit Rating <i class="fas fa-check"></i>
+                        </button>
+                        <button class="btn btn-secondary" onclick="nextConfig()">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        let currentState = {
+            activeConfig: 0,
+            ratings: {},
+            completedConfigs: []
+        };
+
+        // Configuration Data
+        const configurations = [
+            {
+                id: 'config-a',
+                name: 'Configuration A',
+                description: 'Conservative & Reliable',
+                parameters: {
+                    'Temperature': '0.3',
+                    'Max Tokens': '150',
+                    'Top-p': '0.8',
+                    'Frequency Penalty': '0.0',
+                    'Presence Penalty': '0.0'
+                },
+                systemPrompt: `You are a helpful customer support assistant. You should:
+- Be polite and professional at all times
+- Provide accurate information about products and services
+- Escalate complex issues to human agents when appropriate
+- Keep responses concise and to the point
+- Always ask follow-up questions to better understand customer needs`,
+                conversation: [
+                    {
+                        sender: 'user',
+                        text: "Hi, I'm having trouble with my recent order. It was supposed to arrive yesterday but I haven't received it yet.",
+                        time: '2:30 PM'
+                    },
+                    {
+                        sender: 'assistant',
+                        text: "I apologize for the delay with your order. I'd be happy to help you track it down. Could you please provide me with your order number so I can look into this for you?",
+                        time: '2:30 PM'
+                    }
+                ]
+            },
+            {
+                id: 'config-b',
+                name: 'Configuration B',
+                description: 'Balanced & Conversational',
+                parameters: {
+                    'Temperature': '0.7',
+                    'Max Tokens': '200',
+                    'Top-p': '0.9',
+                    'Frequency Penalty': '0.3',
+                    'Presence Penalty': '0.1'
+                },
+                systemPrompt: `You are a friendly and empathetic customer support assistant. You should:
+- Show genuine concern for customer issues
+- Use a warm, conversational tone
+- Provide detailed explanations when helpful
+- Acknowledge customer frustration and validate their feelings
+- Offer multiple solutions when possible
+- Be proactive in suggesting additional help`,
+                conversation: [
+                    {
+                        sender: 'user',
+                        text: "Hi, I'm having trouble with my recent order. It was supposed to arrive yesterday but I haven't received it yet.",
+                        time: '2:30 PM'
+                    },
+                    {
+                        sender: 'assistant',
+                        text: "Oh no, I'm really sorry to hear that your order didn't arrive as expected! I completely understand how frustrating that must be, especially when you're counting on receiving it on time. Let me help you get to the bottom of this right away. Could you share your order number with me? I'll track it down and see exactly what's happening with your delivery.",
+                        time: '2:30 PM'
+                    }
+                ]
+            },
+            {
+                id: 'config-c',
+                name: 'Configuration C',
+                description: 'Creative & Engaging',
+                parameters: {
+                    'Temperature': '0.9',
+                    'Max Tokens': '250',
+                    'Top-p': '0.95',
+                    'Frequency Penalty': '0.5',
+                    'Presence Penalty': '0.3'
+                },
+                systemPrompt: `You are an enthusiastic and creative customer support assistant. You should:
+- Use engaging and personalized language
+- Show personality while remaining professional
+- Think outside the box for creative solutions
+- Use metaphors or analogies when they help explain things
+- Be memorable and build rapport with customers
+- Surprise and delight customers when appropriate`,
+                conversation: [
+                    {
+                        sender: 'user',
+                        text: "Hi, I'm having trouble with my recent order. It was supposed to arrive yesterday but I haven't received it yet.",
+                        time: '2:30 PM'
+                    },
+                    {
+                        sender: 'assistant',
+                        text: "Oh my! It sounds like your package decided to take a little detour on its journey to you! 📦✈️ Don't worry though - I'm like a detective when it comes to tracking down missing orders, and I'm on the case! Think of me as your personal package-hunting superhero. Let's solve this mystery together! Could you share your order number with me? I'll put on my detective hat and figure out exactly where your package wandered off to. We'll have this sorted out faster than you can say 'express delivery'! 🕵️‍♀️",
+                        time: '2:30 PM'
+                    }
+                ]
+            },
+            {
+                id: 'config-d',
+                name: 'Configuration D',
+                description: 'Technical & Precise',
+                parameters: {
+                    'Temperature': '0.2',
+                    'Max Tokens': '180',
+                    'Top-p': '0.7',
+                    'Frequency Penalty': '0.1',
+                    'Presence Penalty': '0.0'
+                },
+                systemPrompt: `You are a precise and efficient customer support assistant. You should:
+- Focus on factual information and clear processes
+- Use structured responses with numbered steps when appropriate
+- Minimize emotional language and focus on solutions
+- Be direct and efficient in communication
+- Provide specific timeframes and expectations
+- Reference policies and procedures when relevant`,
+                conversation: [
+                    {
+                        sender: 'user',
+                        text: "Hi, I'm having trouble with my recent order. It was supposed to arrive yesterday but I haven't received it yet.",
+                        time: '2:30 PM'
+                    },
+                    {
+                        sender: 'assistant',
+                        text: "I can assist you with tracking your delayed order. To process your inquiry efficiently, please provide your order number. Once I have this information, I will: 1) Check the current shipping status, 2) Identify any delivery exceptions, 3) Provide you with an updated delivery estimate, and 4) Offer appropriate resolution options based on our shipping policy.",
+                        time: '2:30 PM'
+                    }
+                ]
+            }
+        ];
+
+        // Initialize the application
+        function initializeApp() {
+            selectConfig(0);
+            updateProgress();
+        }
+
+        // Select configuration
+        function selectConfig(index) {
+            currentState.activeConfig = index;
+            
+            // Update progress indicators
+            document.querySelectorAll('.config-indicator').forEach((indicator, i) => {
+                indicator.classList.remove('active');
+                if (i === index) {
+                    indicator.classList.add('active');
+                }
+            });
+            
+            // Update button states
+            updateNavigationButtons();
+            
+            // Update content
+            updateConfigContent();
+            updateChatContent();
+            updateCurrentConfigName();
+            updateRatingState();
+        }
+
+        // Update navigation button states
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevConfig');
+            const nextBtn = document.querySelector('button[onclick="nextConfig()"]');
+            
+            // Enable/disable buttons based on current position
+            // Note: We allow cycling, so buttons are always enabled
+            // But you could disable them at boundaries if preferred
+            prevBtn.disabled = false;
+            nextBtn.disabled = false;
+        }
+
+        // Update configuration content
+        function updateConfigContent() {
+            const config = configurations[currentState.activeConfig];
+            const container = document.getElementById('configContent');
+            
+            container.innerHTML = `
+                <div class="config-section">
+                    <h3>Model Parameters</h3>
+                    ${Object.entries(config.parameters).map(([key, value]) => `
+                        <div class="config-item">
+                            <span class="config-label">${key}</span>
+                            <span class="config-value">${value}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="config-section">
+                    <h3>System Prompt</h3>
+                    <div class="system-prompt">${config.systemPrompt}</div>
+                </div>
+            `;
+        }
+
+        // Update chat content
+        function updateChatContent() {
+            const config = configurations[currentState.activeConfig];
+            const container = document.getElementById('chatContainer');
+            const badge = document.getElementById('configBadge');
+            
+            badge.textContent = config.name.split(' ')[1]; // Just the letter
+            
+            container.innerHTML = config.conversation.map(message => `
+                <div class="chat-message ${message.sender}">
+                    <div class="message-avatar ${message.sender}">
+                        ${message.sender === 'user' ? 'U' : 'AI'}
+                    </div>
+                    <div>
+                        <div class="message-bubble">${message.text}</div>
+                        <div class="message-time">${message.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update current config name
+        function updateCurrentConfigName() {
+            const config = configurations[currentState.activeConfig];
+            document.getElementById('currentConfigName').textContent = 
+                `Currently viewing: ${config.name} (${config.description})`;
+        }
+
+        // Set rating
+        function setRating(metric, value) {
+            if (!currentState.ratings[currentState.activeConfig]) {
+                currentState.ratings[currentState.activeConfig] = {};
+            }
+            
+            currentState.ratings[currentState.activeConfig][metric] = value;
+            
+            // Update UI for the specific metric
+            document.querySelectorAll('.rating-question').forEach((question, index) => {
+                const questionMetric = index === 0 ? 'politeness' : 'clarity';
+                if (questionMetric === metric) {
+                    question.querySelectorAll('.rating-option').forEach(option => {
+                        option.classList.remove('selected');
+                    });
+                    question.querySelector(`.rating-option.${value}`).classList.add('selected');
+                }
+            });
+            
+            // Check if both questions are answered
+            const config = currentState.ratings[currentState.activeConfig];
+            const bothAnswered = config && config.politeness && config.clarity;
+            document.getElementById('submitRating').disabled = !bothAnswered;
+        }
+
+        // Submit rating
+        function submitRating() {
+            const configIndex = currentState.activeConfig;
+            
+            if (!currentState.completedConfigs.includes(configIndex)) {
+                currentState.completedConfigs.push(configIndex);
+                
+                // Update progress indicator
+                document.querySelectorAll('.config-indicator')[configIndex].classList.add('completed');
+                updateProgress();
+            }
+            
+            // Move to next configuration if available
+            if (configIndex < configurations.length - 1) {
+                setTimeout(() => {
+                    selectConfig(configIndex + 1);
+                }, 500);
+            } else {
+                // Show completion message
+                alert('🎉 Great job! You\'ve evaluated all configurations. Review the results to see how different settings affect AI responses.');
+            }
+        }
+
+        // Next configuration
+        function nextConfig() {
+            const nextIndex = (currentState.activeConfig + 1) % configurations.length;
+            selectConfig(nextIndex);
+        }
+
+        // Previous configuration
+        function prevConfig() {
+            const prevIndex = currentState.activeConfig === 0 ? 
+                configurations.length - 1 : 
+                currentState.activeConfig - 1;
+            selectConfig(prevIndex);
+        }
+
+        // Update progress
+        function updateProgress() {
+            document.getElementById('completedCount').textContent = currentState.completedConfigs.length;
+        }
+
+        // Update rating state
+        function updateRatingState() {
+            const configIndex = currentState.activeConfig;
+            const ratings = currentState.ratings[configIndex];
+            
+            // Reset all rating UI
+            document.querySelectorAll('.rating-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Update politeness rating
+            if (ratings?.politeness) {
+                const politenessQuestion = document.querySelectorAll('.rating-question')[0];
+                politenessQuestion.querySelector(`.rating-option.${ratings.politeness}`).classList.add('selected');
+            }
+            
+            // Update clarity rating
+            if (ratings?.clarity) {
+                const clarityQuestion = document.querySelectorAll('.rating-question')[1];
+                clarityQuestion.querySelector(`.rating-option.${ratings.clarity}`).classList.add('selected');
+            }
+            
+            // Enable submit button only if both questions are answered
+            const bothAnswered = ratings?.politeness && ratings?.clarity;
+            document.getElementById('submitRating').disabled = !bothAnswered;
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>

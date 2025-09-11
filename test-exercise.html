@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fine-Tuning Exercise - Test</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Default to minimalist theme -->
+    <link id="theme-css" rel="stylesheet" href="styles/minimalist.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Progress Container -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+            </div>
+            <div class="phase-indicators" id="phase-indicators">
+                <div class="phase-indicator active" data-phase="0">
+                    <i class="fas fa-flag"></i>
+                    Setup
+                </div>
+                <div class="phase-indicator" data-phase="1">
+                    <i class="fas fa-search"></i>
+                    Evaluate
+                </div>
+                <div class="phase-indicator" data-phase="2">
+                    <i class="fas fa-database"></i>
+                    Prepare
+                </div>
+                <div class="phase-indicator" data-phase="3">
+                    <i class="fas fa-cogs"></i>
+                    Train
+                </div>
+                <div class="phase-indicator" data-phase="4">
+                    <i class="fas fa-balance-scale"></i>
+                    Compare
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div id="content-area">
+            <!-- Introduction Phase -->
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title">Fine-Tuning AI Models</h1>
+                    <p class="card-subtitle">A practical simulation to enhance your AI expertise</p>
+                </div>
+
+                <div class="instructions">
+                    <h3><i class="fas fa-bullseye"></i> Learning Objective</h3>
+                    <p>Master the complete process of fine-tuning AI models and learn to evaluate whether a fine-tuned model delivers superior performance compared to baseline models.</p>
+                    
+                    <p>You'll gain practical experience with:</p>
+                    <ul>
+                        <li>Evaluating base model performance</li>
+                        <li>Preparing training datasets for fine-tuning</li>
+                        <li>Implementing supervised fine-tuning workflows</li>
+                        <li>Comparing model performance before and after fine-tuning</li>
+                    </ul>
+                </div>
+
+                <div class="information-panel">
+                    <div class="information-header">
+                        <i class="fas fa-flag information-icon"></i>
+                        <h3>Mission: Polite Chatbot Development</h3>
+                    </div>
+                    <p>You've been tasked with developing a customer service chatbot that maintains exceptional politeness while delivering helpful, accurate responses. The current base model sometimes responds with curt or impersonal messages.</p>
+                    
+                    <p><strong>Mission Parameters:</strong></p>
+                    <ul>
+                        <li><strong>Target:</strong> Polite Customer Service Bot</li>
+                        <li><strong>Method:</strong> Supervised Fine-Tuning (SFT)</li>
+                        <li><strong>Challenge:</strong> Balance politeness with functionality</li>
+                        <li><strong>Goal:</strong> Evaluate fine-tuning effectiveness</li>
+                    </ul>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" id="prev-btn" disabled>
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button class="btn btn-primary" id="next-btn">
+                        Begin Exercise <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Switcher -->
+    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; gap: 10px;">
+        <button id="theme-minimalist" class="btn btn-secondary" style="padding: 8px 16px; font-size: 12px;">
+            Minimalist
+        </button>
+        <button id="theme-cyberpunk" class="btn btn-secondary" style="padding: 8px 16px; font-size: 12px;">
+            Cyberpunk
+        </button>
+    </div>
+
+    <script>
+        // Sample content for different phases
+        const phaseContent = {
+            0: {
+                title: "Fine-Tuning AI Models",
+                subtitle: "A practical simulation to enhance your AI expertise",
+                content: `
+                    <div class="instructions">
+                        <h3><i class="fas fa-bullseye"></i> Learning Objective</h3>
+                        <p>Master the complete process of fine-tuning AI models and learn to evaluate whether a fine-tuned model delivers superior performance compared to baseline models.</p>
+                        
+                        <p>You'll gain practical experience with:</p>
+                        <ul>
+                            <li>Evaluating base model performance</li>
+                            <li>Preparing training datasets for fine-tuning</li>
+                            <li>Implementing supervised fine-tuning workflows</li>
+                            <li>Comparing model performance before and after fine-tuning</li>
+                        </ul>
+                    </div>
+
+                    <div class="information-panel">
+                        <div class="information-header">
+                            <i class="fas fa-flag information-icon"></i>
+                            <h3>Mission: Polite Chatbot Development</h3>
+                        </div>
+                        <p>You've been tasked with developing a customer service chatbot that maintains exceptional politeness while delivering helpful, accurate responses.</p>
+                        
+                        <p><strong>Mission Parameters:</strong></p>
+                        <ul>
+                            <li><strong>Target:</strong> Polite Customer Service Bot</li>
+                            <li><strong>Method:</strong> Supervised Fine-Tuning (SFT)</li>
+                            <li><strong>Challenge:</strong> Balance politeness with functionality</li>
+                            <li><strong>Goal:</strong> Evaluate fine-tuning effectiveness</li>
+                        </ul>
+                    </div>
+                `
+            },
+            1: {
+                title: "Phase 1: Evaluate the Base Model",
+                subtitle: "Analyze baseline capabilities and identify areas for improvement",
+                content: `
+                    <div class="instructions">
+                        <h3><i class="fas fa-clipboard-list"></i> Instructions</h3>
+                        <p>In this phase, you'll evaluate the current base model to understand its strengths and weaknesses. Your goal is to identify specific areas where the model needs improvement.</p>
+                        
+                        <p><strong>Your Tasks:</strong></p>
+                        <ol>
+                            <li>Define key requirements for a polite chatbot</li>
+                            <li>Analyze example conversations</li>
+                            <li>Identify problematic response patterns</li>
+                            <li>Document improvement opportunities</li>
+                        </ol>
+                    </div>
+
+                    <div class="selection-task">
+                        <h3>Select Key Requirements</h3>
+                        <p>Select all key requirements for our polite chatbot:</p>
+                        <div class="selection-options">
+                            <label class="selection-option" data-option="0">
+                                <div class="selection-checkbox">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span>Maintain politeness in all customer interactions</span>
+                            </label>
+                            <label class="selection-option" data-option="1">
+                                <div class="selection-checkbox">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span>Provide accurate and helpful information</span>
+                            </label>
+                            <label class="selection-option" data-option="2">
+                                <div class="selection-checkbox">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span>Handle customer complaints with grace and empathy</span>
+                            </label>
+                            <label class="selection-option" data-option="3">
+                                <div class="selection-checkbox">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span>Use appropriate tone and professional language</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="information-panel">
+                        <div class="information-header">
+                            <i class="fas fa-comments information-icon"></i>
+                            <h3>Current Model Performance</h3>
+                        </div>
+                        <p><strong>Customer:</strong> "Your product doesn't work and I'm frustrated!"</p>
+                        <p><strong>Current AI:</strong> "Please check the troubleshooting guide in the documentation."</p>
+                        <p><strong>Issues:</strong> Lacks empathy, impersonal tone, no emotional acknowledgment</p>
+                    </div>
+                `
+            },
+            2: {
+                title: "Phase 2: Dataset Preparation",
+                subtitle: "Curate and structure training data for supervised fine-tuning",
+                content: `
+                    <div class="instructions">
+                        <h3><i class="fas fa-clipboard-list"></i> Instructions</h3>
+                        <p>Now that you've identified areas for improvement, it's time to prepare the training dataset. Quality data is crucial for successful fine-tuning.</p>
+                    </div>
+
+                    <div class="ranking-task">
+                        <h3>Prioritize Data Categories</h3>
+                        <p>Drag and drop to prioritize these data categories from most important (top) to least important (bottom):</p>
+                        <div class="ranking-container">
+                            <div class="ranking-source">
+                                <h4>Available Categories</h4>
+                                <div class="ranking-item" draggable="true" data-item="0">
+                                    <div class="ranking-item-content">Empathetic responses to customer frustration</div>
+                                </div>
+                                <div class="ranking-item" draggable="true" data-item="1">
+                                    <div class="ranking-item-content">Professional handling of product complaints</div>
+                                </div>
+                                <div class="ranking-item" draggable="true" data-item="2">
+                                    <div class="ranking-item-content">Clear explanations of technical concepts</div>
+                                </div>
+                                <div class="ranking-item" draggable="true" data-item="3">
+                                    <div class="ranking-item-content">Proactive follow-up and additional assistance</div>
+                                </div>
+                            </div>
+                            <div class="ranking-target">
+                                <h4>Priority Order</h4>
+                                <p style="color: #666; font-size: 14px; margin-top: 20px;">Drop items here in order of importance</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            3: {
+                title: "Phase 3: Fine-Tuning Workflow",
+                subtitle: "Configure and execute the supervised fine-tuning process",
+                content: `
+                    <div class="instructions">
+                        <h3><i class="fas fa-clipboard-list"></i> Instructions</h3>
+                        <p>With your dataset prepared, it's time to execute the fine-tuning process. This involves configuring hyperparameters and monitoring the training.</p>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Training Configuration</h3>
+                        <div class="form-group">
+                            <label class="form-label">Learning Rate</label>
+                            <select class="form-select">
+                                <option>1e-5 (Conservative)</option>
+                                <option selected>3e-5 (Recommended)</option>
+                                <option>5e-5 (Aggressive)</option>
+                                <option>1e-4 (Very Aggressive)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Batch Size</label>
+                            <select class="form-select">
+                                <option>4 (Small/Limited GPU)</option>
+                                <option selected>8 (Balanced)</option>
+                                <option>16 (Standard)</option>
+                                <option>32 (Large GPU)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Number of Epochs</label>
+                            <select class="form-select">
+                                <option>1-2 (Minimal fine-tuning)</option>
+                                <option selected>3-5 (Standard)</option>
+                                <option>6-10 (Extensive)</option>
+                                <option>10+ (Deep specialization)</option>
+                            </select>
+                        </div>
+                    </div>
+                `
+            },
+            4: {
+                title: "Phase 4: Model Comparison and Evaluation",
+                subtitle: "Assess fine-tuned model performance against baseline",
+                content: `
+                    <div class="instructions">
+                        <h3><i class="fas fa-clipboard-list"></i> Instructions</h3>
+                        <p>The final phase involves comprehensive evaluation of your fine-tuned model compared to the original base model.</p>
+                    </div>
+
+                    <div class="information-panel">
+                        <div class="information-header">
+                            <i class="fas fa-balance-scale information-icon"></i>
+                            <h3>Response Comparison</h3>
+                        </div>
+                        <p><strong>Customer Input:</strong> "I'm really upset! Your product broke after just one week!"</p>
+                        
+                        <p><strong>Base Model:</strong><br>
+                        "Check the warranty information in your product documentation."</p>
+                        
+                        <p><strong>Fine-Tuned Model:</strong><br>
+                        "I'm so sorry to hear about this frustrating experience! A product failing after just one week is definitely not acceptable. Let me personally help you with a fast-track warranty replacement right away."</p>
+                    </div>
+
+                    <div class="selection-task">
+                        <h3>Rate the Improvements</h3>
+                        <div class="selection-options">
+                            <label class="selection-option" data-option="0">
+                                <div class="selection-checkbox">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span>More empathetic acknowledgment of customer emotions</span>
+                            </label>
+                            <label class="selection-option" data-option="1">
+                                <div class="selection-checkbox">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span>Increased use of apologetic and understanding language</span>
+                            </label>
+                            <label class="selection-option" data-option="2">
+                                <div class="selection-checkbox">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span>Proactive offering of solutions and assistance</span>
+                            </label>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        class ExerciseTest {
+            constructor() {
+                this.currentPhase = 0;
+                this.totalPhases = 5;
+                this.setupEventListeners();
+                this.updateDisplay();
+            }
+
+            setupEventListeners() {
+                // Navigation
+                document.getElementById('prev-btn').addEventListener('click', () => this.previousPhase());
+                document.getElementById('next-btn').addEventListener('click', () => this.nextPhase());
+                
+                // Theme switching
+                document.getElementById('theme-minimalist').addEventListener('click', () => this.switchTheme('minimalist'));
+                document.getElementById('theme-cyberpunk').addEventListener('click', () => this.switchTheme('cyberpunk'));
+            }
+
+            switchTheme(theme) {
+                const themeCSS = document.getElementById('theme-css');
+                themeCSS.href = `styles/${theme}.css`;
+                
+                // Update button states
+                document.getElementById('theme-minimalist').className = theme === 'minimalist' ? 'btn btn-primary' : 'btn btn-secondary';
+                document.getElementById('theme-cyberpunk').className = theme === 'cyberpunk' ? 'btn btn-primary' : 'btn btn-secondary';
+                
+                // Re-setup interactions after theme change
+                setTimeout(() => this.setupInteractions(), 100);
+            }
+
+            updateDisplay() {
+                this.updateProgress();
+                this.updatePhaseIndicators();
+                this.updateContent();
+                this.updateNavigation();
+                this.setupInteractions();
+            }
+
+            updateProgress() {
+                const progressFill = document.getElementById('progress-fill');
+                const percentage = (this.currentPhase / (this.totalPhases - 1)) * 100;
+                progressFill.style.width = percentage + '%';
+            }
+
+            updatePhaseIndicators() {
+                const indicators = document.querySelectorAll('.phase-indicator');
+                indicators.forEach((indicator, index) => {
+                    indicator.className = 'phase-indicator';
+                    if (index < this.currentPhase) {
+                        indicator.classList.add('completed');
+                    } else if (index === this.currentPhase) {
+                        indicator.classList.add('active');
+                    }
+                });
+            }
+
+            updateContent() {
+                const contentArea = document.getElementById('content-area');
+                const phase = phaseContent[this.currentPhase];
+                
+                contentArea.innerHTML = `
+                    <div class="card">
+                        <div class="card-header">
+                            <h1 class="card-title">${phase.title}</h1>
+                            <p class="card-subtitle">${phase.subtitle}</p>
+                        </div>
+                        ${phase.content}
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" id="prev-btn" ${this.currentPhase === 0 ? 'disabled' : ''}>
+                                <i class="fas fa-arrow-left"></i> Previous
+                            </button>
+                            <button class="btn btn-primary" id="next-btn" ${this.currentPhase === this.totalPhases - 1 ? 'disabled' : ''}>
+                                ${this.currentPhase === this.totalPhases - 1 ? 'Complete Exercise' : 'Next Phase'} 
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            updateNavigation() {
+                // Re-attach event listeners to new buttons
+                document.getElementById('prev-btn').addEventListener('click', () => this.previousPhase());
+                document.getElementById('next-btn').addEventListener('click', () => this.nextPhase());
+            }
+
+            setupInteractions() {
+                // Selection interactions
+                document.querySelectorAll('.selection-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        option.classList.toggle('selected');
+                    });
+                });
+
+                // Drag and drop for ranking
+                this.setupDragAndDrop();
+            }
+
+            setupDragAndDrop() {
+                const rankingItems = document.querySelectorAll('.ranking-item');
+                const rankingTarget = document.querySelector('.ranking-target');
+                
+                rankingItems.forEach(item => {
+                    item.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', e.target.dataset.item);
+                        e.target.classList.add('dragging');
+                    });
+                    
+                    item.addEventListener('dragend', (e) => {
+                        e.target.classList.remove('dragging');
+                    });
+                });
+                
+                if (rankingTarget) {
+                    rankingTarget.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                    });
+                    
+                    rankingTarget.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        const itemId = e.dataTransfer.getData('text/plain');
+                        const item = document.querySelector(`[data-item="${itemId}"]`);
+                        if (item) {
+                            rankingTarget.appendChild(item);
+                        }
+                    });
+                }
+            }
+
+            previousPhase() {
+                if (this.currentPhase > 0) {
+                    this.currentPhase--;
+                    this.updateDisplay();
+                }
+            }
+
+            nextPhase() {
+                if (this.currentPhase < this.totalPhases - 1) {
+                    this.currentPhase++;
+                    this.updateDisplay();
+                }
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new ExerciseTest();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Style 1: Minimalist Clean</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Minimalist Clean Style */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.7;
+            color: #1a1a1a;
+            background: #fafafa;
+            font-weight: 400;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 40px;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 40px rgba(0,0,0,0.04);
+        }
+
+        /* Progress - Ultra minimal */
+        .progress-container {
+            margin-bottom: 80px;
+        }
+
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e8e8e8;
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.active {
+            background: #000;
+            transform: scale(1.5);
+        }
+
+        .progress-dot.completed {
+            background: #666;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            font-weight: 300;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 48px;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+            color: #000;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 40px;
+            color: #333;
+        }
+
+        h3 {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: #000;
+        }
+
+        p {
+            margin-bottom: 24px;
+            color: #555;
+            font-size: 16px;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 60px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 60px;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        /* Checklist - Minimal */
+        .checklist {
+            list-style: none;
+            margin: 30px 0;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #f8f8f8;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            background: #fafafa;
+            margin: 0 -20px;
+            padding: 16px 20px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 16px;
+            width: 18px;
+            height: 18px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .checkbox-item input[type="checkbox"]:checked {
+            background: #000;
+            border-color: #000;
+            position: relative;
+        }
+
+        .checkbox-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 12px;
+            top: -1px;
+            left: 3px;
+        }
+
+        /* Chat simulation - Clean */
+        .chat-example {
+            background: #f9f9f9;
+            border-left: 3px solid #000;
+            padding: 24px;
+            margin: 20px 0;
+            border-radius: 0;
+        }
+
+        .customer-message,
+        .base-model-response {
+            margin: 12px 0;
+            font-size: 15px;
+        }
+
+        .customer-message {
+            color: #000;
+            font-weight: 500;
+        }
+
+        .base-model-response {
+            color: #666;
+            font-style: italic;
+        }
+
+        .issue-tag {
+            display: inline-block;
+            background: #f0f0f0;
+            color: #666;
+            padding: 4px 12px;
+            font-size: 12px;
+            margin: 8px 8px 0 0;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Form elements */
+        select, textarea {
+            width: 100%;
+            border: 1px solid #e0e0e0;
+            padding: 16px;
+            font-family: inherit;
+            font-size: 15px;
+            background: white;
+            border-radius: 0;
+            margin: 12px 0;
+        }
+
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: #000;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* Buttons - Ultra minimal */
+        .nav-button {
+            background: none;
+            border: 1px solid #ddd;
+            padding: 16px 32px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 8px;
+        }
+
+        .nav-button.primary {
+            background: #000;
+            color: white;
+            border-color: #000;
+        }
+
+        .nav-button:hover {
+            background: #f5f5f5;
+        }
+
+        .nav-button.primary:hover {
+            background: #333;
+        }
+
+        .nav-button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .start-button {
+            background: #000;
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 40px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .start-button:hover {
+            background: #333;
+        }
+
+        /* Navigation */
+        .phase-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        /* Learning objective box */
+        .learning-objective {
+            background: #f9f9f9;
+            padding: 40px;
+            margin: 40px 0;
+            border-left: 3px solid #000;
+        }
+
+        .learning-objective h3 {
+            margin-bottom: 16px;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        /* Use case box */
+        .use-case-box {
+            background: #000;
+            color: white;
+            padding: 40px;
+            margin: 40px 0;
+        }
+
+        .use-case-box h3 {
+            color: white;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .challenge-details {
+            margin-top: 30px;
+        }
+
+        .detail-item {
+            margin-bottom: 16px;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .detail-item strong {
+            font-weight: 500;
+        }
+
+        /* Center content */
+        .start-screen {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Progress -->
+        <div class="progress-container">
+            <div class="progress-dots">
+                <div class="progress-dot completed"></div>
+                <div class="progress-dot active"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+            </div>
+            <div class="progress-text">Phase 1 of 4</div>
+        </div>
+
+        <!-- Start Screen Example -->
+        <div class="start-screen">
+            <h1>Fine-Tuning AI Models</h1>
+            <p style="font-size: 18px; color: #666; margin-bottom: 40px;">A practical simulation</p>
+
+            <div class="learning-objective">
+                <h3>Learning Objective</h3>
+                <p>Understand the process to fine-tune a model and evaluate whether a fine-tuned model performs better than a base model</p>
+            </div>
+
+            <div class="use-case-box">
+                <h3>Your Challenge: Polite Chatbot Development</h3>
+                <p>You work for a customer service company that needs a chatbot capable of handling customer inquiries with exceptional politeness and helpfulness.</p>
+                
+                <div class="challenge-details">
+                    <div class="detail-item">
+                        <strong>Scenario:</strong> Building a polite chatbot with Supervised Fine-Tuning
+                    </div>
+                    <div class="detail-item">
+                        <strong>Challenge:</strong> Creating a chatbot that maintains politeness while being helpful
+                    </div>
+                    <div class="detail-item">
+                        <strong>Your Task:</strong> Determine if fine-tuning can improve the model's politeness
+                    </div>
+                </div>
+            </div>
+
+            <button class="start-button">Begin Exercise</button>
+        </div>
+
+        <!-- Phase 1 Example -->
+        <div class="section">
+            <h2>Evaluate the Base Model</h2>
+            <p>Understand baseline model capabilities and identify specific limitations</p>
+
+            <div class="section">
+                <h3>Requirements Definition</h3>
+                <p>Based on the use case, what are the key requirements for our polite chatbot?</p>
+                
+                <div class="checklist">
+                    <label class="checkbox-item">
+                        <input type="checkbox">
+                        Maintain politeness in all responses
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox">
+                        Provide accurate information
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox">
+                        Handle customer complaints gracefully
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox">
+                        Use appropriate tone and language
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox">
+                        Avoid technical jargon
+                    </label>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Base Model Testing</h3>
+                <div class="chat-example">
+                    <div class="customer-message">
+                        Customer: "Your product doesn't work and I'm frustrated!"
+                    </div>
+                    <div class="base-model-response">
+                        Base Model: "Please check the troubleshooting guide in the documentation."
+                    </div>
+                    <div>
+                        <span class="issue-tag">Lacks empathy</span>
+                        <span class="issue-tag">Impersonal tone</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Reflection Questions</h3>
+                <label>What issues do you notice with the base model responses?</label>
+                <select>
+                    <option>Select an answer...</option>
+                    <option>Responses lack empathy and politeness</option>
+                    <option>Responses are too long</option>
+                    <option>Responses are technically incorrect</option>
+                </select>
+
+                <label>How could these responses be improved?</label>
+                <textarea placeholder="Enter your thoughts on how to improve the responses..."></textarea>
+            </div>
+
+            <div class="phase-navigation">
+                <button class="nav-button">Back</button>
+                <button class="nav-button primary">Next Phase</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

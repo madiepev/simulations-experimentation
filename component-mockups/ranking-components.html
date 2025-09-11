@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking Component Mockup</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            padding: 40px 20px;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+        }
+
+        .component {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .component-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #374151;
+        }
+
+        .component-description {
+            color: #6b7280;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        /* Basic Ranking Component */
+        .ranking-container {
+            display: flex;
+            gap: 30px;
+            min-height: 400px;
+        }
+
+        .ranking-source, .ranking-target {
+            flex: 1;
+            background: #f8fafc;
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .ranking-target {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .ranking-header {
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #374151;
+            font-size: 1.1rem;
+        }
+
+        .ranking-item {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: grab;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .ranking-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .ranking-item.dragging {
+            opacity: 0.6;
+            transform: rotate(3deg);
+        }
+
+        .ranking-item-number {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+
+        .ranking-item-content {
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .ranking-item-description {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+
+        /* Numbered Ranking Variant */
+        .numbered-ranking {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 600px;
+        }
+
+        .numbered-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: grab;
+            transition: all 0.2s ease;
+        }
+
+        .numbered-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .rank-number {
+            background: #10b981;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        /* Priority Matrix Variant */
+        .priority-matrix {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .priority-quadrant {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 200px;
+            position: relative;
+        }
+
+        .priority-quadrant.high-impact-high-effort {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .priority-quadrant.high-impact-low-effort {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .priority-quadrant.low-impact-high-effort {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .priority-quadrant.low-impact-low-effort {
+            border-color: #6b7280;
+            background: rgba(107, 114, 128, 0.05);
+        }
+
+        .quadrant-label {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .priority-item {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 8px;
+            cursor: grab;
+            font-size: 14px;
+        }
+
+        /* Interactive Elements */
+        .reset-btn {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        .reset-btn:hover {
+            background: #4b5563;
+        }
+
+        .instructions {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .instructions h4 {
+            color: #1e40af;
+            margin-bottom: 8px;
+        }
+
+        .drop-hint {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #9ca3af;
+            font-style: italic;
+            pointer-events: none;
+        }
+
+        .ranking-target:empty .drop-hint {
+            display: block;
+        }
+
+        .ranking-target:not(:empty) .drop-hint {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-sort"></i> Ranking Component Mockups</h1>
+
+        <!-- Basic Ranking Component -->
+        <div class="component">
+            <h2 class="component-title">1. Basic Drag & Drop Ranking</h2>
+            <p class="component-description">Standard two-column layout where users drag items from source to target area in their preferred order.</p>
+            
+            <div class="instructions">
+                <h4><i class="fas fa-info-circle"></i> Instructions</h4>
+                <p>Drag the fine-tuning steps from the left panel to the right panel in the correct order for the training workflow.</p>
+            </div>
+
+            <div class="ranking-container">
+                <div class="ranking-source">
+                    <div class="ranking-header">Available Steps</div>
+                    <div class="ranking-item" draggable="true" data-item="1">
+                        <div class="ranking-item-content">Prepare Training Data</div>
+                        <div class="ranking-item-description">Clean and format your conversation datasets</div>
+                    </div>
+                    <div class="ranking-item" draggable="true" data-item="2">
+                        <div class="ranking-item-content">Configure Hyperparameters</div>
+                        <div class="ranking-item-description">Set learning rate, batch size, and epochs</div>
+                    </div>
+                    <div class="ranking-item" draggable="true" data-item="3">
+                        <div class="ranking-item-content">Load Base Model</div>
+                        <div class="ranking-item-description">Initialize the pre-trained foundation model</div>
+                    </div>
+                    <div class="ranking-item" draggable="true" data-item="4">
+                        <div class="ranking-item-content">Monitor Training Progress</div>
+                        <div class="ranking-item-description">Track loss curves and validation metrics</div>
+                    </div>
+                    <div class="ranking-item" draggable="true" data-item="5">
+                        <div class="ranking-item-content">Evaluate Final Model</div>
+                        <div class="ranking-item-description">Test performance against baseline</div>
+                    </div>
+                </div>
+                <div class="ranking-target" id="target1">
+                    <div class="ranking-header">Correct Workflow Order</div>
+                    <div class="drop-hint">Drop items here in correct sequence</div>
+                </div>
+            </div>
+            <button class="reset-btn" onclick="resetRanking('target1')">Reset</button>
+        </div>
+
+        <!-- Numbered Priority Ranking -->
+        <div class="component">
+            <h2 class="component-title">2. Numbered Priority Ranking</h2>
+            <p class="component-description">Vertical list where items automatically get numbered based on their position. Good for priority or importance rankings.</p>
+            
+            <div class="instructions">
+                <h4><i class="fas fa-list-ol"></i> Instructions</h4>
+                <p>Drag to reorder these dataset quality factors by importance (most important at top).</p>
+            </div>
+
+            <div class="numbered-ranking" id="numbered-ranking">
+                <div class="numbered-item" draggable="true" data-item="accuracy">
+                    <div class="rank-number">1</div>
+                    <div>
+                        <div class="ranking-item-content">Response Accuracy</div>
+                        <div class="ranking-item-description">Factually correct and appropriate responses</div>
+                    </div>
+                </div>
+                <div class="numbered-item" draggable="true" data-item="diversity">
+                    <div class="rank-number">2</div>
+                    <div>
+                        <div class="ranking-item-content">Scenario Diversity</div>
+                        <div class="ranking-item-description">Wide range of conversation types and contexts</div>
+                    </div>
+                </div>
+                <div class="numbered-item" draggable="true" data-item="consistency">
+                    <div class="rank-number">3</div>
+                    <div>
+                        <div class="ranking-item-content">Style Consistency</div>
+                        <div class="ranking-item-description">Uniform tone and approach across examples</div>
+                    </div>
+                </div>
+                <div class="numbered-item" draggable="true" data-item="volume">
+                    <div class="rank-number">4</div>
+                    <div>
+                        <div class="ranking-item-content">Dataset Volume</div>
+                        <div class="ranking-item-description">Sufficient quantity of training examples</div>
+                    </div>
+                </div>
+            </div>
+            <button class="reset-btn" onclick="resetNumberedRanking()">Reset</button>
+        </div>
+
+        <!-- Priority Matrix -->
+        <div class="component">
+            <h2 class="component-title">3. Priority Matrix (2x2 Grid)</h2>
+            <p class="component-description">Eisenhower matrix style where items are categorized by two dimensions (impact vs effort, importance vs urgency, etc.)</p>
+            
+            <div class="instructions">
+                <h4><i class="fas fa-th"></i> Instructions</h4>
+                <p>Drag each improvement task into the appropriate quadrant based on impact and implementation effort.</p>
+            </div>
+
+            <div style="text-align: center; margin: 20px 0; font-weight: 600; color: #374151;">
+                <div style="margin-bottom: 10px;">← Low Effort&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;High Effort →</div>
+            </div>
+
+            <div class="priority-matrix">
+                <div class="priority-quadrant high-impact-low-effort">
+                    <div class="quadrant-label">🚀 Quick Wins (High Impact, Low Effort)</div>
+                </div>
+                <div class="priority-quadrant high-impact-high-effort">
+                    <div class="quadrant-label">📈 Major Projects (High Impact, High Effort)</div>
+                </div>
+                <div class="priority-quadrant low-impact-low-effort">
+                    <div class="quadrant-label">🔧 Fill-ins (Low Impact, Low Effort)</div>
+                </div>
+                <div class="priority-quadrant low-impact-high-effort">
+                    <div class="quadrant-label">❌ Avoid (Low Impact, High Effort)</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <div class="ranking-header">Available Tasks</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    <div class="priority-item" draggable="true" data-item="prompts">Improve prompts</div>
+                    <div class="priority-item" draggable="true" data-item="dataset">Expand dataset</div>
+                    <div class="priority-item" draggable="true" data-item="architecture">Change architecture</div>
+                    <div class="priority-item" draggable="true" data-item="hyperparams">Tune hyperparameters</div>
+                    <div class="priority-item" draggable="true" data-item="evaluation">Add eval metrics</div>
+                    <div class="priority-item" draggable="true" data-item="preprocessing">Data preprocessing</div>
+                </div>
+            </div>
+            <button class="reset-btn" onclick="resetMatrix()">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        // Global drag and drop functionality
+        let draggedElement = null;
+
+        document.addEventListener('dragstart', function(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+        });
+
+        document.addEventListener('dragend', function(e) {
+            e.target.classList.remove('dragging');
+            draggedElement = null;
+        });
+
+        document.addEventListener('dragover', function(e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('drop', function(e) {
+            e.preventDefault();
+            
+            if (draggedElement && e.target.classList.contains('ranking-target')) {
+                e.target.appendChild(draggedElement);
+            } else if (draggedElement && e.target.classList.contains('priority-quadrant')) {
+                e.target.appendChild(draggedElement);
+            } else if (draggedElement && e.target.closest('.numbered-ranking')) {
+                const container = e.target.closest('.numbered-ranking');
+                const afterElement = getDragAfterElement(container, e.clientY);
+                if (afterElement == null) {
+                    container.appendChild(draggedElement);
+                } else {
+                    container.insertBefore(draggedElement, afterElement);
+                }
+                updateNumberedRanking();
+            }
+        });
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.numbered-item:not(.dragging)')];
+            
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        function updateNumberedRanking() {
+            const items = document.querySelectorAll('#numbered-ranking .numbered-item');
+            items.forEach((item, index) => {
+                const numberElement = item.querySelector('.rank-number');
+                numberElement.textContent = index + 1;
+            });
+        }
+
+        function resetRanking(targetId) {
+            const target = document.getElementById(targetId);
+            const source = target.previousElementSibling;
+            const items = target.querySelectorAll('.ranking-item');
+            
+            items.forEach(item => {
+                source.appendChild(item);
+            });
+        }
+
+        function resetNumberedRanking() {
+            // Reset to original order (this is a simplified reset)
+            location.reload();
+        }
+
+        function resetMatrix() {
+            const tasks = document.querySelectorAll('.priority-item');
+            const container = document.querySelector('.priority-matrix').nextElementSibling;
+            
+            tasks.forEach(task => {
+                container.appendChild(task);
+            });
+        }
+    </script>
+</body>
+</html>

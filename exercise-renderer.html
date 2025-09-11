@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise Renderer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Style will be dynamically loaded -->
+    <link id="theme-css" rel="stylesheet" href="../styles/minimalist.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Progress Container -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="phase-indicators" id="phase-indicators">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div id="content-area">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <script>
+        class ExerciseRenderer {
+            constructor() {
+                this.currentPhase = 0;
+                this.totalPhases = 5; // intro, phase1, phase2, phase3, phase4
+                this.content = {};
+                this.styleTheme = 'minimalist'; // default theme
+                
+                this.initializeRenderer();
+            }
+
+            async initializeRenderer() {
+                await this.loadContent();
+                this.setupPhaseIndicators();
+                this.renderCurrentPhase();
+                this.setupEventListeners();
+            }
+
+            async loadContent() {
+                const phases = ['intro', 'phase1', 'phase2', 'phase3', 'phase4'];
+                
+                for (const phase of phases) {
+                    try {
+                        const response = await fetch(`../content/fine-tuning-exercise/${phase}.md`);
+                        const markdown = await response.text();
+                        this.content[phase] = this.parseMarkdownContent(markdown);
+                    } catch (error) {
+                        console.error(`Failed to load ${phase}:`, error);
+                    }
+                }
+            }
+
+            parseMarkdownContent(markdown) {
+                const lines = markdown.split('\\n');
+                let frontMatter = {};
+                let content = '';
+                let inFrontMatter = false;
+                let frontMatterEnd = false;
+
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    
+                    if (line === '---' && i === 0) {
+                        inFrontMatter = true;
+                        continue;
+                    }
+                    
+                    if (line === '---' && inFrontMatter) {
+                        inFrontMatter = false;
+                        frontMatterEnd = true;
+                        continue;
+                    }
+                    
+                    if (inFrontMatter) {
+                        const [key, ...valueParts] = line.split(':');
+                        if (key && valueParts.length) {
+                            frontMatter[key.trim()] = valueParts.join(':').trim().replace(/^["']|["']$/g, '');
+                        }
+                    } else if (frontMatterEnd) {
+                        content += line + '\\n';
+                    }
+                }
+
+                return { frontMatter, content };
+            }
+
+            setupPhaseIndicators() {
+                const indicators = document.getElementById('phase-indicators');
+                const phases = [
+                    { name: 'Setup', icon: 'flag' },
+                    { name: 'Evaluate', icon: 'search' },
+                    { name: 'Prepare', icon: 'database' },
+                    { name: 'Train', icon: 'cogs' },
+                    { name: 'Compare', icon: 'balance-scale' }
+                ];
+
+                indicators.innerHTML = phases.map((phase, index) => `
+                    <div class="phase-indicator ${index < this.currentPhase ? 'completed' : index === this.currentPhase ? 'active' : ''}" 
+                         data-phase="${index}">
+                        <i class="fas fa-${phase.icon}"></i>
+                        ${phase.name}
+                    </div>
+                `).join('');
+            }
+
+            updateProgress() {
+                const progressFill = document.getElementById('progress-fill');
+                const percentage = (this.currentPhase / (this.totalPhases - 1)) * 100;
+                progressFill.style.width = `${percentage}%`;
+                
+                this.setupPhaseIndicators();
+            }
+
+            renderCurrentPhase() {
+                const phases = ['intro', 'phase1', 'phase2', 'phase3', 'phase4'];
+                const phaseKey = phases[this.currentPhase];
+                const phaseData = this.content[phaseKey];
+                
+                if (!phaseData) return;
+
+                const contentArea = document.getElementById('content-area');
+                contentArea.innerHTML = this.renderContent(phaseData);
+                
+                this.updateProgress();
+                this.setupComponentInteractions();
+            }
+
+            renderContent(phaseData) {
+                const { frontMatter, content } = phaseData;
+                let html = '';
+
+                // Render title card
+                html += `
+                    <div class="card">
+                        <div class="card-header">
+                            <h1 class="card-title">${frontMatter.title || ''}</h1>
+                            <p class="card-subtitle">${frontMatter.subtitle || ''}</p>
+                        </div>
+                `;
+
+                // Process content and render components
+                html += this.processContentComponents(content);
+                
+                // Add navigation
+                html += this.renderNavigation();
+                
+                html += '</div>';
+                
+                return html;
+            }
+
+            processContentComponents(content) {
+                let html = '';
+                const sections = content.split('## ').filter(section => section.trim());
+                
+                sections.forEach(section => {
+                    const lines = section.split('\\n');
+                    const title = lines[0];
+                    const body = lines.slice(1).join('\\n');
+                    
+                    // Check for component markers
+                    if (body.includes('{type: instructions}')) {
+                        html += this.renderInstructions(title, body);
+                    } else if (body.includes('{type: information')) {
+                        html += this.renderInformation(title, body);
+                    } else if (body.includes('{type: selection')) {
+                        html += this.renderSelection(title, body);
+                    } else if (body.includes('{type: ranking')) {
+                        html += this.renderRanking(title, body);
+                    } else if (body.includes('{type: form}')) {
+                        html += this.renderForm(title, body);
+                    } else {
+                        html += this.renderGenericSection(title, body);
+                    }
+                });
+                
+                return html;
+            }
+
+            renderInstructions(title, content) {
+                return `
+                    <div class="instructions">
+                        <h3><i class="fas fa-clipboard-list"></i> ${title}</h3>
+                        ${this.markdownToHtml(content.replace(/{type: instructions}/, ''))}
+                    </div>
+                `;
+            }
+
+            renderInformation(title, content) {
+                const iconMatch = content.match(/icon: "([^"]+)"/);
+                const icon = iconMatch ? iconMatch[1] : 'info-circle';
+                
+                return `
+                    <div class="information-panel">
+                        <div class="information-header">
+                            <i class="fas fa-${icon} information-icon"></i>
+                            <h3>${title}</h3>
+                        </div>
+                        ${this.markdownToHtml(content.replace(/{type: information[^}]*}/, ''))}
+                    </div>
+                `;
+            }
+
+            renderSelection(title, content) {
+                const isMultiple = content.includes('multiple: true');
+                const lines = content.split('\\n').filter(line => line.trim().startsWith('- '));
+                
+                let html = `
+                    <div class="selection-task">
+                        <h3>${title}</h3>
+                        <div class="selection-options">
+                `;
+                
+                lines.forEach((line, index) => {
+                    const text = line.replace(/^- /, '').trim();
+                    html += `
+                        <label class="selection-option" data-option="${index}">
+                            <div class="selection-checkbox">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <span>${text}</span>
+                        </label>
+                    `;
+                });
+                
+                html += '</div></div>';
+                return html;
+            }
+
+            renderRanking(title, content) {
+                const itemsMatch = content.match(/```([\\s\\S]*?)```/);
+                if (!itemsMatch) return '';
+                
+                const items = itemsMatch[1].split('\\n').filter(item => item.trim());
+                
+                let html = `
+                    <div class="ranking-task">
+                        <h3>${title}</h3>
+                        <div class="ranking-container">
+                            <div class="ranking-source">
+                                <h4>Available Items</h4>
+                `;
+                
+                items.forEach((item, index) => {
+                    html += `
+                        <div class="ranking-item" draggable="true" data-item="${index}">
+                            <div class="ranking-item-content">${item.trim()}</div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                            </div>
+                            <div class="ranking-target">
+                                <h4>Correct Order</h4>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                return html;
+            }
+
+            renderForm(title, content) {
+                return `
+                    <div class="form-section">
+                        <h3>${title}</h3>
+                        ${this.markdownToHtml(content.replace(/{type: form}/, ''))}
+                    </div>
+                `;
+            }
+
+            renderGenericSection(title, content) {
+                return `
+                    <div class="content-section">
+                        <h3>${title}</h3>
+                        ${this.markdownToHtml(content)}
+                    </div>
+                `;
+            }
+
+            renderNavigation() {
+                return `
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" id="prev-btn" ${this.currentPhase === 0 ? 'disabled' : ''}>
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <button class="btn btn-primary" id="next-btn" ${this.currentPhase === this.totalPhases - 1 ? 'disabled' : ''}>
+                            ${this.currentPhase === this.totalPhases - 1 ? 'Complete' : 'Next'} 
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                `;
+            }
+
+            markdownToHtml(markdown) {
+                return markdown
+                    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                    .replace(/^- (.+)$/gm, '<li>$1</li>')
+                    .replace(/((?:<li>.*<\/li>\s*)+)/g, '<ul>$1</ul>')
+                    .replace(/\n\n/g, '</p><p>')
+                    .replace(/^(.+)$/gm, '<p>$1</p>')
+                    .replace(/<p><\/p>/g, '');
+            }
+
+            setupComponentInteractions() {
+                // Selection components
+                document.querySelectorAll('.selection-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        option.classList.toggle('selected');
+                    });
+                });
+
+                // Ranking components (drag and drop)
+                this.setupDragAndDrop();
+
+                // Navigation
+                const prevBtn = document.getElementById('prev-btn');
+                const nextBtn = document.getElementById('next-btn');
+                
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', () => this.previousPhase());
+                }
+                
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => this.nextPhase());
+                }
+            }
+
+            setupDragAndDrop() {
+                const rankingItems = document.querySelectorAll('.ranking-item');
+                const rankingTarget = document.querySelector('.ranking-target');
+                
+                rankingItems.forEach(item => {
+                    item.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', e.target.dataset.item);
+                        e.target.classList.add('dragging');
+                    });
+                    
+                    item.addEventListener('dragend', (e) => {
+                        e.target.classList.remove('dragging');
+                    });
+                });
+                
+                if (rankingTarget) {
+                    rankingTarget.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                    });
+                    
+                    rankingTarget.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        const itemId = e.dataTransfer.getData('text/plain');
+                        const item = document.querySelector(`[data-item="${itemId}"]`);
+                        if (item) {
+                            rankingTarget.appendChild(item);
+                        }
+                    });
+                }
+            }
+
+            setupEventListeners() {
+                // Theme switcher
+                const themeButtons = document.querySelectorAll('[data-theme]');
+                themeButtons.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.switchTheme(e.target.dataset.theme);
+                    });
+                });
+            }
+
+            switchTheme(theme) {
+                this.styleTheme = theme;
+                const themeCSS = document.getElementById('theme-css');
+                themeCSS.href = `../styles/${theme}.css`;
+                
+                // Re-render to apply theme-specific components
+                this.renderCurrentPhase();
+            }
+
+            previousPhase() {
+                if (this.currentPhase > 0) {
+                    this.currentPhase--;
+                    this.renderCurrentPhase();
+                }
+            }
+
+            nextPhase() {
+                if (this.currentPhase < this.totalPhases - 1) {
+                    this.currentPhase++;
+                    this.renderCurrentPhase();
+                }
+            }
+        }
+
+        // Initialize the exercise renderer when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new ExerciseRenderer();
+        });
+    </script>
+
+    <!-- Theme Switcher (for demo purposes) -->
+    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        <button data-theme="minimalist" style="margin: 5px; padding: 10px;">Minimalist</button>
+        <button data-theme="cyberpunk" style="margin: 5px; padding: 10px;">Cyberpunk</button>
+    </div>
+</body>
+</html>

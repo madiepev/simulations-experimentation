@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Style 3: Modern Cards</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Modern Card-Based Style */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Progress - Modern card style */
+        .progress-container {
+            background: white;
+            padding: 25px 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            height: 8px;
+            border-radius: 50px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            width: 25%;
+            border-radius: 50px;
+            transition: width 0.8s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .phase-indicators {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+        }
+
+        .phase-indicator {
+            background: #f7fafc;
+            padding: 12px 16px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: #a0aec0;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .phase-indicator.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .phase-indicator.completed {
+            background: #48bb78;
+            color: white;
+        }
+
+        /* Card System */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: white;
+            font-size: 24px;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            font-size: 32px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        h3 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: #718096;
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #718096;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        /* Interactive Cards */
+        .checklist {
+            display: grid;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .checkbox-card {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .checkbox-card:hover {
+            border-color: #667eea;
+            background: #edf2f7;
+            transform: translateX(5px);
+        }
+
+        .checkbox-card.checked {
+            border-color: #48bb78;
+            background: #f0fff4;
+        }
+
+        .checkbox-custom {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-card.checked .checkbox-custom {
+            background: #48bb78;
+            border-color: #48bb78;
+            color: white;
+        }
+
+        .checkbox-card input[type="checkbox"] {
+            display: none;
+        }
+
+        /* Chat Cards */
+        .chat-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 25px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-content {
+            padding: 25px;
+        }
+
+        .message-bubble {
+            background: #f7fafc;
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin: 15px 0;
+            position: relative;
+            border-left: 4px solid #667eea;
+        }
+
+        .message-bubble.customer {
+            background: #ebf8ff;
+            border-left-color: #3182ce;
+        }
+
+        .message-bubble.bot {
+            background: #fff5f5;
+            border-left-color: #e53e3e;
+        }
+
+        .message-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .issue-badges {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .issue-badge {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Form Cards */
+        .form-card {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-select, .form-textarea {
+            width: 100%;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-family: inherit;
+            font-size: 16px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* Button Cards */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .start-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-family: inherit;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 15px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .start-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Special Cards */
+        .learning-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 20px;
+            padding: 35px;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .learning-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px;
+            z-index: -1;
+        }
+
+        .mission-card {
+            background: linear-gradient(135deg, #1a202c, #2d3748);
+            color: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mission-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .mission-details {
+            margin-top: 25px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #a0aec0;
+            min-width: 120px;
+        }
+
+        .detail-value {
+            color: white;
+        }
+
+        /* Center content */
+        .start-screen {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Responsive grid */
+        @media (max-width: 768px) {
+            .phase-indicators {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .card {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Progress -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="phase-indicators">
+                <div class="phase-indicator completed">
+                    <i class="fas fa-check"></i> Setup
+                </div>
+                <div class="phase-indicator active">
+                    <i class="fas fa-play"></i> Phase 1
+                </div>
+                <div class="phase-indicator">
+                    <i class="fas fa-database"></i> Phase 2
+                </div>
+                <div class="phase-indicator">
+                    <i class="fas fa-cogs"></i> Phase 3
+                </div>
+                <div class="phase-indicator">
+                    <i class="fas fa-trophy"></i> Complete
+                </div>
+            </div>
+        </div>
+
+        <!-- Start Screen Example -->
+        <div class="start-screen">
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h1>Fine-Tuning AI Models</h1>
+                <p class="subtitle">A practical simulation to enhance your AI expertise</p>
+
+                <div class="learning-card">
+                    <h3><i class="fas fa-bullseye"></i> Learning Objective</h3>
+                    <p>Master the complete process of fine-tuning AI models and learn to evaluate whether a fine-tuned model delivers superior performance compared to baseline models.</p>
+                </div>
+
+                <div class="mission-card">
+                    <h3><i class="fas fa-flag"></i> Mission: Polite Chatbot Development</h3>
+                    <p>You've been tasked with developing a customer service chatbot that maintains exceptional politeness while delivering helpful, accurate responses. The current base model sometimes responds with curt or impersonal messages.</p>
+                    
+                    <div class="mission-details">
+                        <div class="detail-row">
+                            <div class="detail-label">Scenario:</div>
+                            <div class="detail-value">Supervised Fine-Tuning Implementation</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Challenge:</div>
+                            <div class="detail-value">Balance politeness with functionality</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Goal:</div>
+                            <div class="detail-value">Evaluate fine-tuning effectiveness</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="start-button">
+                    <i class="fas fa-rocket"></i>
+                    Launch Exercise
+                </button>
+            </div>
+        </div>
+
+        <!-- Phase 1 Example -->
+        <div class="card">
+            <h2><i class="fas fa-search"></i> Evaluate the Base Model</h2>
+            <p>Analyze baseline capabilities and identify areas for improvement</p>
+
+            <div class="form-card">
+                <h3><i class="fas fa-list-check"></i> Requirements Definition</h3>
+                <p>Select all key requirements for our polite chatbot:</p>
+                
+                <div class="checklist">
+                    <label class="checkbox-card">
+                        <input type="checkbox">
+                        <div class="checkbox-custom">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span>Maintain politeness in all customer interactions</span>
+                    </label>
+                    <label class="checkbox-card">
+                        <input type="checkbox">
+                        <div class="checkbox-custom">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span>Provide accurate and helpful information</span>
+                    </label>
+                    <label class="checkbox-card">
+                        <input type="checkbox">
+                        <div class="checkbox-custom">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span>Handle customer complaints with grace and empathy</span>
+                    </label>
+                    <label class="checkbox-card">
+                        <input type="checkbox">
+                        <div class="checkbox-custom">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span>Use appropriate tone and professional language</span>
+                    </label>
+                    <label class="checkbox-card">
+                        <input type="checkbox">
+                        <div class="checkbox-custom">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span>Avoid unnecessary technical jargon</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="chat-card">
+                <div class="chat-header">
+                    <i class="fas fa-comments"></i>
+                    Base Model Testing Simulation
+                </div>
+                <div class="chat-content">
+                    <div class="message-bubble customer">
+                        <div class="message-label">Customer Input</div>
+                        "Your product doesn't work and I'm frustrated!"
+                    </div>
+                    <div class="message-bubble bot">
+                        <div class="message-label">Current AI Response</div>
+                        "Please check the troubleshooting guide in the documentation."
+                    </div>
+                    <div class="issue-badges">
+                        <span class="issue-badge">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Lacks Empathy
+                        </span>
+                        <span class="issue-badge">
+                            <i class="fas fa-times-circle"></i>
+                            Impersonal Tone
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3><i class="fas fa-lightbulb"></i> Analysis & Reflection</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">What's the primary issue with these responses?</label>
+                    <select class="form-select">
+                        <option>Choose your analysis...</option>
+                        <option>Responses lack empathy and politeness</option>
+                        <option>Responses are too lengthy</option>
+                        <option>Technical accuracy is compromised</option>
+                        <option>Response speed is too slow</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">How would you improve these responses?</label>
+                    <textarea class="form-textarea" placeholder="Share your ideas for making the chatbot more polite and helpful..."></textarea>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Previous
+                </button>
+                <button class="btn btn-primary">
+                    Continue to Phase 2
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add interactivity to checkbox cards
+        document.querySelectorAll('.checkbox-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                checkbox.checked = !checkbox.checked;
+                this.classList.toggle('checked', checkbox.checked);
+            });
+        });
+    </script>
+</body>
+</html>
