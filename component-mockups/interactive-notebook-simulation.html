@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Fine-Tuning Exercise - Notebook Simulation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #fafafa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .notebook-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* Notebook Header */
+        .notebook-header {
+            background: linear-gradient(135deg, #034694 0%, #1E8449 50%, #D4AC0D 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .notebook-title {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .notebook-subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .progress-text {
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            background: rgba(255,255,255,0.3);
+            border-radius: 20px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: #4CAF50;
+            height: 100%;
+            border-radius: 20px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Cell Styles */
+        .cell {
+            border-left: 4px solid #E0E0E0;
+            margin: 0;
+            opacity: 0.3;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .cell.active {
+            opacity: 1;
+            border-left-color: #2196F3;
+        }
+
+        .cell.completed {
+            opacity: 1;
+            border-left-color: #4CAF50;
+        }
+
+        .cell-content {
+            padding: 20px 30px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Step Headers */
+        .step-header {
+            background: linear-gradient(90deg, #7873f5 0%, #ff6ec4 100%);
+            color: white;
+            padding: 15px 30px;
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .step-header.current {
+            background: linear-gradient(90deg, #4CAF50 0%, #45a049 100%);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+
+        /* Knowledge Check */
+        .knowledge-check {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .knowledge-check h4 {
+            color: #856404;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .question {
+            color: #856404;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .answer-options {
+            display: grid;
+            gap: 10px;
+            margin: 15px 0;
+            width: 100%;
+        }
+
+        .answer-option {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .answer-option:hover {
+            border-color: #2196F3;
+            background: #f0f8ff;
+        }
+
+        .answer-option.correct {
+            border-color: #4CAF50;
+            background: #e8f5e8;
+        }
+
+        .answer-option.incorrect {
+            border-color: #f44336;
+            background: #ffeaea;
+        }
+
+        .answer-explanation {
+            background: #d4edda;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* Code Cell */
+        .code-cell {
+            background: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            margin: 20px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .code-header {
+            background: #e0e0e0;
+            padding: 8px 12px;
+            font-size: 0.9em;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .code-content {
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            position: relative;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .code-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .run-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .run-button:hover:not(:disabled) {
+            background: #45a049;
+        }
+
+        .run-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .code-output {
+            background: #f0f0f0;
+            border-top: 1px solid #e0e0e0;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            display: none;
+        }
+
+        /* Activity Section */
+        .activity-section {
+            background: #e3f2fd;
+            border: 1px solid #1976d2;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .activity-header {
+            color: #1976d2;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .activity-content {
+            color: #1565c0;
+            width: 100%;
+        }
+
+        .activity-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: inherit;
+        }
+
+        .activity-submit {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .activity-submit:hover:not(:disabled) {
+            background: #1565c0;
+        }
+
+        .activity-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 30px;
+            background: #f5f5f5;
+            margin-top: 20px;
+        }
+
+        .nav-button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            background: #1976d2;
+        }
+
+        .nav-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Success Message */
+        .success-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            color: #155724;
+            display: none;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="notebook-container">
+        <!-- Notebook Header -->
+        <div class="notebook-header">
+            <h1 class="notebook-title">🎓 Interactive Fine-Tuning Exercise</h1>
+            <p class="notebook-subtitle">Learn Azure OpenAI SDK through hands-on practice - Step by step notebook simulation</p>
+            
+            <div class="progress-container">
+                <div class="progress-header">
+                    <span class="progress-text">Progress</span>
+                    <span id="progress-counter">0 / 6 steps completed</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1: Introduction -->
+        <div class="cell" id="step-1">
+            <div class="step-header current">
+                <i class="fas fa-play-circle"></i>
+                Step 1: Environment Setup & Introduction
+            </div>
+            <div class="cell-content">
+                <h3>📋 Learning Objectives</h3>
+                <ul style="margin: 15px 0 15px 20px;">
+                    <li>Understand the Azure OpenAI SDK for fine-tuning</li>
+                    <li>Learn the complete fine-tuning workflow</li>
+                    <li>Practice with training data and configurations</li>
+                    <li>Monitor and evaluate fine-tuning jobs</li>
+                </ul>
+
+                <div class="knowledge-check">
+                    <h4><i class="fas fa-question-circle"></i> Knowledge Check</h4>
+                    <p class="question"><strong>Before we start, what is the primary purpose of fine-tuning an AI model?</strong></p>
+                    <div class="answer-options">
+                        <div class="answer-option" data-correct="false">
+                            A) To make the model run faster during inference
+                        </div>
+                        <div class="answer-option" data-correct="false">
+                            B) To reduce the model's memory requirements
+                        </div>
+                        <div class="answer-option" data-correct="true">
+                            C) To adapt the model's behavior for specific tasks or domains
+                        </div>
+                        <div class="answer-option" data-correct="false">
+                            D) To increase the model's parameter count
+                        </div>
+                    </div>
+                    <div class="answer-explanation">
+                        <strong>Correct!</strong> Fine-tuning adapts a pre-trained model to perform better on specific tasks or domains by training it on domain-specific data. This helps the model understand your particular use case better while maintaining its general capabilities.
+                    </div>
+                </div>
+
+                <div class="success-message" id="step1-success">
+                    ✅ Great! Now you understand the purpose of fine-tuning. Let's set up our environment.
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Environment Setup Code -->
+        <div class="cell" id="step-2">
+            <div class="step-header">
+                <i class="fas fa-cog"></i>
+                Step 2: Check Environment Variables
+            </div>
+            <div class="cell-content">
+                <p>First, let's verify that our Azure OpenAI credentials are properly configured:</p>
+
+                <div class="knowledge-check">
+                    <h4><i class="fas fa-question-circle"></i> Knowledge Check</h4>
+                    <p class="question"><strong>Which environment variables are essential for connecting to Azure OpenAI services?</strong></p>
+                    <div class="answer-options">
+                        <div class="answer-option" data-correct="false">
+                            A) OPENAI_API_KEY and OPENAI_ORG only
+                        </div>
+                        <div class="answer-option" data-correct="true">
+                            B) AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT
+                        </div>
+                        <div class="answer-option" data-correct="false">
+                            C) AZURE_SUBSCRIPTION_ID and AZURE_TENANT_ID
+                        </div>
+                        <div class="answer-option" data-correct="false">
+                            D) API_VERSION and MODEL_NAME only
+                        </div>
+                    </div>
+                    <div class="answer-explanation">
+                        <strong>Correct!</strong> Azure OpenAI requires AZURE_OPENAI_API_KEY for authentication and AZURE_OPENAI_ENDPOINT to specify which Azure OpenAI resource to connect to. These are different from standard OpenAI API credentials.
+                    </div>
+                </div>
+
+                <div class="code-cell">
+                    <div class="code-header">
+                        <span>[1]: <i class="fab fa-python"></i> Python</span>
+                        <button class="run-button" id="run-step2" disabled>
+                            <i class="fas fa-play"></i> Run
+                        </button>
+                    </div>
+                    <div class="code-content">
+                        <div class="code-overlay" id="step2-overlay">
+                            Complete the knowledge check above to unlock this code
+                        </div>
+import os
+
+openai_key = os.getenv("AZURE_OPENAI_API_KEY")
+openai_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+model_name = "gpt-4.1"
+api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2025-02-01-preview")
+
+if not openai_key or not openai_endpoint:
+    print("Error: Missing AZURE_OPENAI_KEY or AZURE_OPENAI_ENDPOINT environment variable.")
+
+print("Using Model:", model_name)
+print("Using API Version:", api_version)
+                    </div>
+                    <div class="code-output" id="step2-output">
+Using Model: gpt-4.1
+Using API Version: 2025-02-01-preview
+✅ Environment variables configured successfully!
+                    </div>
+                </div>
+
+                <div class="activity-section" id="step2-activity" style="display: none;">
+                    <div class="activity-header">
+                        <i class="fas fa-tasks"></i>
+                        Interpret the Output
+                    </div>
+                    <div class="activity-content">
+                        <p><strong>Question:</strong> Based on the output above, why is using API version "2025-02-01-preview" important for fine-tuning?</p>
+                        <div class="answer-options">
+                            <div class="answer-option" data-correct="false" data-step="step2">
+                                A) Preview versions are always faster than stable versions
+                            </div>
+                            <div class="answer-option" data-correct="false" data-step="step2">
+                                B) It's the only version that supports GPT-4 models
+                            </div>
+                            <div class="answer-option" data-correct="true" data-step="step2">
+                                C) It includes the latest fine-tuning capabilities and features
+                            </div>
+                            <div class="answer-option" data-correct="false" data-step="step2">
+                                D) Preview versions have lower costs for fine-tuning
+                            </div>
+                        </div>
+                        <div class="answer-explanation">
+                            <strong>Correct!</strong> API version 2025-02-01-preview includes the latest fine-tuning capabilities, new model support, and enhanced features that may not be available in older stable versions.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Data Preparation -->
+        <div class="cell" id="step-3">
+            <div class="step-header">
+                <i class="fas fa-database"></i>
+                Step 3: Training Data Preparation
+            </div>
+            <div class="cell-content">
+                <div class="knowledge-check">
+                    <h4><i class="fas fa-question-circle"></i> Knowledge Check</h4>
+                    <p class="question"><strong>What format should training data be in for Azure OpenAI fine-tuning?</strong></p>
+                    <div class="answer-options">
+                        <div class="answer-option" data-correct="false">
+                            A) CSV with columns for input and output
+                        </div>
+                        <div class="answer-option" data-correct="true">
+                            B) JSONL (JSON Lines) with message arrays
+                        </div>
+                        <div class="answer-option" data-correct="false">
+                            C) Plain text files with examples
+                        </div>
+                        <div class="answer-option" data-correct="false">
+                            D) XML with structured conversation elements
+                        </div>
+                    </div>
+                    <div class="answer-explanation">
+                        <strong>Correct!</strong> Azure OpenAI fine-tuning requires JSONL format where each line contains a JSON object with a "messages" array. Each message has "role" (system/user/assistant) and "content" properties.
+                    </div>
+                </div>
+
+                <div class="code-cell">
+                    <div class="code-header">
+                        <span>[2]: <i class="fab fa-python"></i> Python</span>
+                        <button class="run-button" id="run-step3" disabled>
+                            <i class="fas fa-play"></i> Run
+                        </button>
+                    </div>
+                    <div class="code-content">
+                        <div class="code-overlay" id="step3-overlay">
+                            Answer the question above to unlock this code
+                        </div>
+import json
+
+print("📂 Loading and validating training data...")
+
+# Define data files
+training_file = "data/basic_sft_training.jsonl" 
+validation_file = "data/basic_sft_validation.jsonl"
+
+# Simulate loading training data
+training_dataset = [
+    {"messages": [
+        {"role": "system", "content": "You are a helpful assistant for Zava Corp."},
+        {"role": "user", "content": "What are your business hours?"},
+        {"role": "assistant", "content": "Zava Corp is open Monday-Friday 9AM-6PM EST."}
+    ]},
+    {"messages": [
+        {"role": "user", "content": "How can I contact support?"},
+        {"role": "assistant", "content": "You can reach Zava support at support@zava.com or call 1-800-ZAVA-HELP."}
+    ]}
+]
+
+print(f"✅ Training set loaded: {len(training_dataset)} examples")
+print(f"\n📋 First training example:")
+for i, message in enumerate(training_dataset[0]["messages"]):
+    role_emoji = {"system": "🤖", "user": "👤", "assistant": "🔮"}
+    emoji = role_emoji.get(message["role"], "💬")
+    print(f"   {emoji} {message['role'].upper()}: {message['content']}")
+
+print(f"\n📊 Data Summary:")
+print(f"   Training examples: {len(training_dataset)}")
+print(f"   Validation examples: 25")
+print(f"   Total examples: {len(training_dataset) + 25}")
+                    </div>
+                    <div class="code-output" id="step3-output">
+📂 Loading and validating training data...
+✅ Training set loaded: 2 examples
+
+📋 First training example:
+   🤖 SYSTEM: You are a helpful assistant for Zava Corp.
+   👤 USER: What are your business hours?
+   🔮 ASSISTANT: Zava Corp is open Monday-Friday 9AM-6PM EST.
+
+📊 Data Summary:
+   Training examples: 2
+   Validation examples: 25
+   Total examples: 27
+                    </div>
+                </div>
+
+                <div class="activity-section" id="step3-activity" style="display: none;">
+                    <div class="activity-header">
+                        <i class="fas fa-search"></i>
+                        Analyze the Training Data
+                    </div>
+                    <div class="activity-content">
+                        <p><strong>Question:</strong> Looking at the training example above, what does the "system" role message accomplish?</p>
+                        <div class="answer-options">
+                            <div class="answer-option" data-correct="false" data-step="step3">
+                                A) It provides an example user question
+                            </div>
+                            <div class="answer-option" data-correct="true" data-step="step3">
+                                B) It sets the context and behavior for the AI assistant
+                            </div>
+                            <div class="answer-option" data-correct="false" data-step="step3">
+                                C) It stores the expected response from the AI
+                            </div>
+                            <div class="answer-option" data-correct="false" data-step="step3">
+                                D) It defines the data format for training
+                            </div>
+                        </div>
+                        <div class="answer-explanation">
+                            <strong>Perfect!</strong> The "system" role sets the behavioral context ("You are a helpful assistant for Zava Corp"), while "user" represents human input and "assistant" is the AI response we want to train.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Upload Training Data -->
+        <div class="cell" id="step-4">
+            <div class="step-header">
+                <i class="fas fa-cloud-upload-alt"></i>
+                Step 4: Upload Training Data to Azure
+            </div>
+            <div class="cell-content">
+                <div class="knowledge-check">
+                    <h4><i class="fas fa-question-circle"></i> Knowledge Check</h4>
+                    <p class="question"><strong>Which Azure OpenAI SDK method is used to upload training files?</strong></p>
+                    <div class="answer-options">
+                        <div class="answer-option" data-correct="false">
+                            A) client.files.create()
+                        </div>
+                        <div class="answer-option" data-correct="true">
+                            B) client.files.create() with purpose="fine-tune"
+                        </div>
+                        <div class="answer-option" data-correct="false">
+                            C) client.training_data.upload()
+                        </div>
+                        <div class="answer-option" data-correct="false">
+                            D) client.fine_tuning.upload_file()
+                        </div>
+                    </div>
+                    <div class="answer-explanation">
+                        <strong>Correct!</strong> The client.files.create() method with purpose="fine-tune" is used to upload training data files to Azure OpenAI for fine-tuning.
+                    </div>
+                </div>
+
+                <div class="code-cell">
+                    <div class="code-header">
+                        <span>[3]: <i class="fab fa-python"></i> Python</span>
+                        <button class="run-button" id="run-step4" disabled>
+                            <i class="fas fa-play"></i> Run
+                        </button>
+                    </div>
+                    <div class="code-content">
+                        <div class="code-overlay" id="step4-overlay">
+                            Answer the question above to unlock this code
+                        </div>
+from openai import AzureOpenAI
+
+# Initialize Azure OpenAI client
+client = AzureOpenAI(
+    api_key=openai_key,
+    api_version=api_version,
+    azure_endpoint=openai_endpoint
+)
+
+print("📤 Uploading training data to Azure OpenAI...")
+
+# Upload training file
+with open(training_file, "rb") as f:
+    training_response = client.files.create(
+        file=f,
+        purpose="fine-tune"
+    )
+
+training_file_id = training_response.id
+print(f"✅ Training file uploaded successfully!")
+print(f"   File ID: {training_file_id}")
+print(f"   Status: {training_response.status}")
+print(f"   Size: {training_response.bytes} bytes")
+
+# Upload validation file  
+with open(validation_file, "rb") as f:
+    validation_response = client.files.create(
+        file=f,
+        purpose="fine-tune"
+    )
+
+validation_file_id = validation_response.id
+print(f"\n✅ Validation file uploaded successfully!")
+print(f"   File ID: {validation_file_id}")
+print(f"   Status: {validation_response.status}")
+                    </div>
+                    <div class="code-output" id="step4-output">
+📤 Uploading training data to Azure OpenAI...
+✅ Training file uploaded successfully!
+   File ID: file-abc123training456
+   Status: processed
+   Size: 2048 bytes
+
+✅ Validation file uploaded successfully!
+   File ID: file-def789validation012
+   Status: processed
+                    </div>
+                </div>
+
+                <div class="activity-section" id="step4-activity" style="display: none;">
+                    <div class="activity-header">
+                        <i class="fas fa-clipboard-check"></i>
+                        Verify Upload Status
+                    </div>
+                    <div class="activity-content">
+                        <p><strong>Question:</strong> What does the "processed" status indicate for uploaded training files?</p>
+                        <div class="answer-options">
+                            <div class="answer-option" data-correct="false" data-step="step4">
+                                A) The file is still being uploaded to Azure
+                            </div>
+                            <div class="answer-option" data-correct="false" data-step="step4">
+                                B) The file upload failed and needs to be retried
+                            </div>
+                            <div class="answer-option" data-correct="true" data-step="step4">
+                                C) The file has been validated and is ready for fine-tuning
+                            </div>
+                            <div class="answer-option" data-correct="false" data-step="step4">
+                                D) The file is being converted to a different format
+                            </div>
+                        </div>
+                        <div class="answer-explanation">
+                            <strong>Excellent!</strong> "Processed" status means Azure has validated the file format, checked for errors, and confirmed the data is ready for fine-tuning. This prevents training failures due to data issues.
+                        </div>
+                    </div>
+                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Create Fine-tuning Job -->
+        <div class="cell" id="step-5">
+            <div class="step-header">
+                <i class="fas fa-rocket"></i>
+                Step 5: Create Fine-tuning Job
+            </div>
+            <div class="cell-content">
+                <div class="knowledge-check">
+                    <h4><i class="fas fa-question-circle"></i> Knowledge Check</h4>
+                    <p class="question"><strong>What are the key parameters needed to create a fine-tuning job?</strong></p>
+                    <div class="answer-options">
+                        <div class="answer-option" data-correct="false">
+                            A) model, training_file only
+                        </div>
+                        <div class="answer-option" data-correct="true">
+                            B) model, training_file, validation_file (optional), hyperparameters
+                        </div>
+                        <div class="answer-option" data-correct="false">
+                            C) training_file, epochs, learning_rate only
+                        </div>
+                        <div class="answer-option" data-correct="false">
+                            D) model, dataset_size, training_time
+                        </div>
+                    </div>
+                    <div class="answer-explanation">
+                        <strong>Correct!</strong> Fine-tuning jobs require the base model, training file ID, optionally a validation file, and can include hyperparameters like learning rate and epochs for optimization.
+                    </div>
+                </div>
+
+                <div class="code-cell">
+                    <div class="code-header">
+                        <span>[4]: <i class="fab fa-python"></i> Python</span>
+                        <button class="run-button" id="run-step5" disabled>
+                            <i class="fas fa-play"></i> Run
+                        </button>
+                    </div>
+                    <div class="code-content">
+                        <div class="code-overlay" id="step5-overlay">
+                            Answer the question above to unlock this code
+                        </div>
+print("🚀 Creating fine-tuning job...")
+
+# Create fine-tuning job
+job_response = client.fine_tuning.jobs.create(
+    model="gpt-4-0613",  # Base model to fine-tune
+    training_file=training_file_id,
+    validation_file=validation_file_id,
+    hyperparameters={
+        "n_epochs": 3,
+        "learning_rate": 0.0001,
+        "batch_size": 1
+    },
+    suffix="zava-support-v1"  # Will be appended to model name
+)
+
+job_id = job_response.id
+print(f"✅ Fine-tuning job created successfully!")
+print(f"   Job ID: {job_id}")
+print(f"   Status: {job_response.status}")
+print(f"   Model: {job_response.model}")
+print(f"   Created: {job_response.created_at}")
+
+print(f"\n📊 Hyperparameters:")
+print(f"   Epochs: {job_response.hyperparameters.n_epochs}")
+print(f"   Learning Rate: {job_response.hyperparameters.learning_rate}")
+print(f"   Batch Size: {job_response.hyperparameters.batch_size}")
+
+print(f"\n🔗 Track your job at: https://oai.azure.com/portal")
+                    </div>
+                    <div class="code-output" id="step5-output">
+🚀 Creating fine-tuning job...
+✅ Fine-tuning job created successfully!
+   Job ID: ftjob-abc123def456ghi789
+   Status: pending
+   Model: gpt-4-0613
+   Created: 2025-09-11T10:30:00Z
+
+📊 Hyperparameters:
+   Epochs: 3
+   Learning Rate: 0.0001
+   Batch Size: 1
+
+🔗 Track your job at: https://oai.azure.com/portal
+                    </div>
+                </div>
+
+                <div class="activity-section" id="step5-activity" style="display: none;">
+                    <div class="activity-header">
+                        <i class="fas fa-cogs"></i>
+                        Understand Hyperparameters
+                    </div>
+                    <div class="activity-content">
+                        <p><strong>Question:</strong> What does the "n_epochs" hyperparameter control in fine-tuning?</p>
+                        <div class="answer-options">
+                            <div class="answer-option" data-correct="false" data-step="step5">
+                                A) The number of models to train simultaneously
+                            </div>
+                            <div class="answer-option" data-correct="true" data-step="step5">
+                                B) How many times the model sees the entire training dataset
+                            </div>
+                            <div class="answer-option" data-correct="false" data-step="step5">
+                                C) The maximum number of tokens per training example
+                            </div>
+                            <div class="answer-option" data-correct="false" data-step="step5">
+                                D) The learning rate decay schedule
+                            </div>
+                        </div>
+                        <div class="answer-explanation">
+                            <strong>Great analysis!</strong> <strong>n_epochs</strong> controls training passes through the dataset. <strong>learning_rate</strong> controls step size for weight updates. <strong>batch_size</strong> determines samples processed simultaneously.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 6: Monitor Progress -->
+        <div class="cell" id="step-6">
+            <div class="step-header">
+                <i class="fas fa-chart-line"></i>
+                Step 6: Monitor Training Progress
+            </div>
+            <div class="cell-content">
+                <div class="knowledge-check">
+                    <h4><i class="fas fa-question-circle"></i> Knowledge Check</h4>
+                    <p class="question"><strong>What method is used to check the status of a fine-tuning job?</strong></p>
+                    <div class="answer-options">
+                        <div class="answer-option" data-correct="false">
+                            A) client.fine_tuning.jobs.status(job_id)
+                        </div>
+                        <div class="answer-option" data-correct="true">
+                            B) client.fine_tuning.jobs.retrieve(job_id)
+                        </div>
+                        <div class="answer-option" data-correct="false">
+                            C) client.jobs.get_status(job_id)
+                        </div>
+                        <div class="answer-option" data-correct="false">
+                            D) client.fine_tuning.check_progress(job_id)
+                        </div>
+                    </div>
+                    <div class="answer-explanation">
+                        <strong>Correct!</strong> The client.fine_tuning.jobs.retrieve() method returns the current status and details of a fine-tuning job, including progress information.
+                    </div>
+                </div>
+
+                <div class="code-cell">
+                    <div class="code-header">
+                        <span>[5]: <i class="fab fa-python"></i> Python</span>
+                        <button class="run-button" id="run-step6" disabled>
+                            <i class="fas fa-play"></i> Run
+                        </button>
+                    </div>
+                    <div class="code-content">
+                        <div class="code-overlay" id="step6-overlay">
+                            Answer the question above to unlock this code
+                        </div>
+import time
+
+print("📊 Monitoring fine-tuning progress...")
+print("=" * 60)
+
+# Check job status
+job_status = client.fine_tuning.jobs.retrieve(job_id)
+
+print(f"📋 Job Status: {job_status.status}")
+print(f"📅 Started: {job_status.created_at}")
+
+if job_status.status == "succeeded":
+    print(f"✅ Training completed successfully!")
+    print(f"🎯 Fine-tuned model: {job_status.fine_tuned_model}")
+    print(f"📈 Training metrics:")
+    print(f"   Final loss: 0.1234")
+    print(f"   Validation loss: 0.1456")
+    print(f"   Training accuracy: 94.2%")
+elif job_status.status == "running":
+    print(f"⏳ Training in progress...")
+    print(f"📊 Current progress: 67% (2/3 epochs)")
+    print(f"⏱️ Estimated time remaining: ~8 minutes")
+elif job_status.status == "failed":
+    print(f"❌ Training failed: {job_status.error}")
+else:
+    print(f"⏳ Status: {job_status.status}")
+
+print(f"\n🔍 Additional Details:")
+print(f"   Training file: {job_status.training_file}")
+print(f"   Validation file: {job_status.validation_file}")
+print(f"   Result files: {len(job_status.result_files or [])} files")
+                    </div>
+                    <div class="code-output" id="step6-output">
+📊 Monitoring fine-tuning progress...
+============================================================
+📋 Job Status: succeeded
+📅 Started: 2025-09-11T10:30:00Z
+✅ Training completed successfully!
+🎯 Fine-tuned model: gpt-4-0613:zava-support-v1
+📈 Training metrics:
+   Final loss: 0.1234
+   Validation loss: 0.1456
+   Training accuracy: 94.2%
+
+🔍 Additional Details:
+   Training file: file-abc123training456
+   Validation file: file-def789validation012
+   Result files: 2 files
+                    </div>
+                </div>
+
+                <div class="activity-section" id="step6-activity" style="display: none;">
+                    <div class="activity-header">
+                        <i class="fas fa-chart-bar"></i>
+                        Evaluate Training Results
+                    </div>
+                    <div class="activity-content">
+                        <p><strong>Question:</strong> Based on the training metrics shown, what indicates this was a successful fine-tuning job?</p>
+                        <div class="answer-options">
+                            <div class="answer-option" data-correct="false" data-step="step6">
+                                A) The job status shows "pending" which means it's still improving
+                            </div>
+                            <div class="answer-option" data-correct="false" data-step="step6">
+                                B) The high loss values show the model learned a lot
+                            </div>
+                            <div class="answer-option" data-correct="true" data-step="step6">
+                                C) Low loss values (0.1234, 0.1456) and high accuracy (94.2%)
+                            </div>
+                            <div class="answer-option" data-correct="false" data-step="step6">
+                                D) The large difference between training and validation loss
+                            </div>
+                        </div>
+                        <div class="answer-explanation">
+                            <strong>Excellent evaluation!</strong> Low loss values (0.1234, 0.1456) and high accuracy (94.2%) indicate successful training. The small gap between training and validation loss suggests good generalization without overfitting.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-buttons">
+            <button class="nav-button" id="prev-button" disabled>
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button class="nav-button" id="next-button" disabled>
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <!-- Completion Message -->
+        <div class="cell hidden" id="completion">
+            <div class="cell-content" style="text-align: center; padding: 40px;">
+                <h2 style="color: #4CAF50; margin-bottom: 20px;">
+                    🎉 Congratulations! You've completed the interactive fine-tuning exercise!
+                </h2>
+                <p style="font-size: 1.2em; margin-bottom: 30px;">
+                    You've successfully learned how to use the Azure OpenAI SDK for fine-tuning models.
+                </p>
+                <div style="background: #f0f8ff; border-radius: 10px; padding: 20px; margin: 20px 0;">
+                    <h3>What you've accomplished:</h3>
+                    <ul style="text-align: left; display: inline-block; margin: 10px 0;">
+                        <li>✅ Set up environment and credentials</li>
+                        <li>✅ Prepared and validated training data</li>
+                        <li>✅ Uploaded files to Azure OpenAI</li>
+                        <li>✅ Created and configured a fine-tuning job</li>
+                        <li>✅ Monitored training progress and evaluated results</li>
+                    </ul>
+                </div>
+                <button class="nav-button" onclick="window.location.reload()">
+                    <i class="fas fa-redo"></i> Start Over
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let currentStep = 1;
+        const totalSteps = 6;
+        let completedSteps = 0;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress();
+            updateNavigation();
+        });
+
+        // Knowledge check handlers
+        document.querySelectorAll('.answer-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const parent = this.closest('.knowledge-check, .activity-section');
+                const options = parent.querySelectorAll('.answer-option');
+                const explanation = parent.querySelector('.answer-explanation');
+                const isCorrect = this.getAttribute('data-correct') === 'true';
+                const stepId = this.getAttribute('data-step');
+
+                // Remove previous selections
+                options.forEach(opt => {
+                    opt.classList.remove('correct', 'incorrect');
+                });
+
+                // Mark this selection
+                this.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+                // Show explanation
+                explanation.style.display = 'block';
+
+                if (isCorrect) {
+                    // Enable next action
+                    setTimeout(() => {
+                        if (parent.classList.contains('knowledge-check')) {
+                            enableNextAction(parent);
+                        } else if (parent.classList.contains('activity-section')) {
+                            // Complete the step for activity sections
+                            const stepNum = parseInt(stepId.replace('step', ''));
+                            setTimeout(() => {
+                                completeStep(stepNum);
+                            }, 1500);
+                        }
+                    }, 1000);
+                }
+            });
+        });
+
+        // Run button handlers
+        document.querySelectorAll('.run-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const stepId = this.id.replace('run-', '');
+                runCode(stepId);
+            });
+        });
+
+        // Activity submit handlers (now handled by multiple choice)
+        // Removed - now using multiple choice format
+
+        // Navigation
+        document.getElementById('next-button').addEventListener('click', nextStep);
+        document.getElementById('prev-button').addEventListener('click', prevStep);
+
+        function enableNextAction(parent) {
+            const cell = parent.closest('.cell');
+            const stepNum = parseInt(cell.id.split('-')[1]);
+            
+            // Enable run button if exists
+            const runButton = cell.querySelector('.run-button');
+            if (runButton) {
+                runButton.disabled = false;
+                const overlay = cell.querySelector('.code-overlay');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                }
+            } else {
+                // If no run button, move to next step
+                completeStep(stepNum);
+            }
+
+            // Show success message
+            const successMsg = cell.querySelector('.success-message');
+            if (successMsg) {
+                successMsg.style.display = 'block';
+            }
+        }
+
+        function runCode(stepId) {
+            const button = document.getElementById(`run-${stepId}`);
+            const output = document.getElementById(`${stepId}-output`);
+            const activity = document.getElementById(`${stepId}-activity`);
+
+            // Show loading
+            button.innerHTML = '<div class="loading"></div> Running...';
+            button.disabled = true;
+
+            // Simulate code execution
+            setTimeout(() => {
+                output.style.display = 'block';
+                button.innerHTML = '<i class="fas fa-check"></i> Completed';
+                
+                // Show activity section
+                if (activity) {
+                    activity.style.display = 'block';
+                } else {
+                    // Complete step if no activity
+                    const stepNum = parseInt(stepId.replace('step', ''));
+                    completeStep(stepNum);
+                }
+            }, 2000);
+        }
+
+        function completeStep(stepNum) {
+            // Mark step as completed
+            const stepElement = document.getElementById(`step-${stepNum}`);
+            stepElement.classList.remove('active');
+            stepElement.classList.add('completed');
+            
+            const header = stepElement.querySelector('.step-header');
+            header.classList.remove('current');
+            header.innerHTML = `<i class="fas fa-check-circle"></i> ${header.textContent.trim()}`;
+
+            completedSteps++;
+            updateProgress();
+
+            // Activate next step
+            if (stepNum < totalSteps) {
+                setTimeout(() => {
+                    activateStep(stepNum + 1);
+                }, 500);
+            } else {
+                // Show completion
+                setTimeout(() => {
+                    showCompletion();
+                }, 1000);
+            }
+        }
+
+        function activateStep(stepNum) {
+            currentStep = stepNum;
+            const stepElement = document.getElementById(`step-${stepNum}`);
+            stepElement.classList.add('active');
+            
+            const header = stepElement.querySelector('.step-header');
+            header.classList.add('current');
+
+            updateNavigation();
+
+            // Scroll to step
+            stepElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function updateProgress() {
+            const percentage = (completedSteps / totalSteps) * 100;
+            document.getElementById('progress-fill').style.width = percentage + '%';
+            document.getElementById('progress-counter').textContent = `${completedSteps} / ${totalSteps} steps completed`;
+        }
+
+        function updateNavigation() {
+            const prevButton = document.getElementById('prev-button');
+            const nextButton = document.getElementById('next-button');
+
+            prevButton.disabled = currentStep <= 1;
+            nextButton.disabled = currentStep >= completedSteps + 1 || currentStep >= totalSteps;
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps && currentStep < completedSteps + 1) {
+                activateStep(currentStep + 1);
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                // Deactivate current step
+                const stepElement = document.getElementById(`step-${currentStep}`);
+                stepElement.classList.remove('active');
+                stepElement.querySelector('.step-header').classList.remove('current');
+
+                activateStep(currentStep - 1);
+            }
+        }
+
+        function showCompletion() {
+            document.getElementById('completion').classList.remove('hidden');
+            document.getElementById('completion').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialize first step
+        activateStep(1);
+    </script>
+</body>
+</html>

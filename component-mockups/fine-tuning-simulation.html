@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fine-Tuning AI Models - Interactive Simulation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #323130;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        .simulation-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #323130;
+            font-size: 28px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon {
+            background: linear-gradient(135deg, #0078d4, #005a9e);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .header p {
+            color: #605e5c;
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+
+        .mission-badge {
+            background: #e3f2fd;
+            border: 1px solid #1976d2;
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #1976d2;
+            font-weight: 600;
+        }
+
+        /* Progress Tracker */
+        .progress-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .progress-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .overall-progress {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 8px;
+            background: #f3f2f1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0078d4, #005a9e);
+            border-radius: 4px;
+            width: 16.67%; /* 1/6 steps completed */
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: #605e5c;
+            font-weight: 600;
+        }
+
+        /* Step Navigation */
+        .steps-container {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .step {
+            flex: 1;
+            min-width: 200px;
+            background: white;
+            border: 2px solid #e1dfdd;
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .step:hover {
+            border-color: #0078d4;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.1);
+        }
+
+        .step.completed {
+            border-color: #107c10;
+            background: #f3f9f4;
+        }
+
+        .step.active {
+            border-color: #0078d4;
+            background: #f8fbff;
+            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.2);
+        }
+
+        .step.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f3f2f1;
+            color: #605e5c;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .step.completed .step-number {
+            background: #107c10;
+            color: white;
+        }
+
+        .step.active .step-number {
+            background: #0078d4;
+            color: white;
+        }
+
+        .step-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #323130;
+        }
+
+        .step-description {
+            font-size: 14px;
+            color: #605e5c;
+            line-height: 1.4;
+        }
+
+        .step-status {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .step.completed .step-status {
+            background: #107c10;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .content-panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-header {
+            padding: 24px 24px 0;
+            border-bottom: 1px solid #e1dfdd;
+            margin-bottom: 0;
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #323130;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .panel-subtitle {
+            color: #605e5c;
+            margin-bottom: 24px;
+        }
+
+        .panel-content {
+            padding: 24px;
+        }
+
+        /* Step 1: Data Collection */
+        .data-upload-area {
+            border: 2px dashed #e1dfdd;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .data-upload-area:hover {
+            border-color: #0078d4;
+            background: #f8fbff;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #605e5c;
+            margin-bottom: 16px;
+        }
+
+        .upload-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #323130;
+        }
+
+        .upload-subtext {
+            color: #605e5c;
+            margin-bottom: 24px;
+        }
+
+        .upload-button {
+            background: #0078d4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .upload-button:hover {
+            background: #005a9e;
+        }
+
+        .data-format-info {
+            background: #fff8e1;
+            border: 1px solid #ffcc02;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 24px;
+        }
+
+        .format-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ff8f00;
+        }
+
+        .format-example {
+            background: #f5f5f5;
+            border-radius: 4px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        /* Dataset Preview */
+        .dataset-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .dataset-table th,
+        .dataset-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e1dfdd;
+        }
+
+        .dataset-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .dataset-table td {
+            color: #605e5c;
+        }
+
+        /* Right Panel */
+        .guidance-panel {
+            padding: 24px;
+        }
+
+        .guidance-card {
+            background: #f8fbff;
+            border: 1px solid #d1e7fd;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .guidance-icon {
+            color: #0078d4;
+            margin-right: 8px;
+        }
+
+        .guidance-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #323130;
+        }
+
+        .guidance-text {
+            color: #605e5c;
+            font-size: 14px;
+        }
+
+        .checklist {
+            list-style: none;
+            margin-top: 16px;
+        }
+
+        .checklist li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checklist li::before {
+            content: '☐';
+            color: #605e5c;
+        }
+
+        .checklist li.checked::before {
+            content: '☑';
+            color: #107c10;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            padding: 24px;
+            border-top: 1px solid #e1dfdd;
+            background: #faf9f8;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: #f3f2f1;
+            color: #323130;
+            border: 1px solid #e1dfdd;
+        }
+
+        .btn-secondary:hover {
+            background: #e1dfdd;
+        }
+
+        .btn-primary {
+            background: #0078d4;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #005a9e;
+        }
+
+        .btn-primary:disabled {
+            background: #e1dfdd;
+            color: #a19f9d;
+            cursor: not-allowed;
+        }
+
+        /* Screenshot Display */
+        .screenshot-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .screenshot-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e1dfdd;
+        }
+
+        .screenshot-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .azure-badge {
+            background: #0078d4;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .screenshot-display {
+            position: relative;
+            border: 2px solid #e1dfdd;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f8f9fa;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .screenshot-placeholder {
+            text-align: center;
+            color: #605e5c;
+        }
+
+        .screenshot-placeholder i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #0078d4;
+        }
+
+        .screenshot-img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .screenshot-caption {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #605e5c;
+            border-left: 4px solid #0078d4;
+        }
+
+        .interface-callout {
+            position: absolute;
+            background: #0078d4;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 120, 212, 0.3);
+            pointer-events: none;
+        }
+
+        .interface-callout::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #0078d4;
+        }
+
+        /* Azure-themed elements */
+        .azure-navigation {
+            background: #f8f9fa;
+            border: 1px solid #e1dfdd;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .azure-breadcrumb {
+            font-size: 14px;
+            color: #0078d4;
+            margin-bottom: 8px;
+        }
+
+        .azure-page-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #323130;
+        }
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .steps-container {
+                flex-direction: column;
+            }
+            
+            .step {
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .simulation-container {
+                padding: 16px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .progress-header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-panel {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Status Indicators */
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-waiting {
+            background: #fff8e1;
+            color: #ff8f00;
+        }
+
+        .status-processing {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-completed {
+            background: #f3f9f4;
+            color: #107c10;
+        }
+
+        .status-error {
+            background: #fdf2f2;
+            color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="simulation-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <div class="header-icon">
+                    <i class="fas fa-cloud"></i>
+                </div>
+                Azure AI Foundry - Fine-Tuning Walkthrough
+            </h1>
+            <p>Get familiar with the Azure AI Foundry interface by following the complete fine-tuning workflow. This simulation shows you each step in the Azure portal to help you navigate the platform confidently.</p>
+            <div class="mission-badge">
+                <i class="fas fa-microsoft"></i>
+                Azure AI Foundry Tutorial
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="progress-section">
+            <div class="progress-header">
+                <h2 class="progress-title">Azure AI Foundry Fine-Tuning Workflow</h2>
+                <div class="overall-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="overallProgress"></div>
+                    </div>
+                    <span class="progress-text" id="progressText">Step 1 of 6</span>
+                </div>
+            </div>
+
+            <!-- Steps Navigation -->
+            <div class="steps-container">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Create Fine-Tuning Job</div>
+                    <div class="step-description">Navigate to Azure AI Foundry and start a new fine-tuning job</div>
+                    <div class="step-status"></div>
+                </div>
+                
+                <div class="step disabled" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Select Base Model</div>
+                    <div class="step-description">Choose the foundation model to fine-tune</div>
+                    <div class="step-status"></div>
+                </div>
+                
+                <div class="step disabled" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Configure Training</div>
+                    <div class="step-description">Set training parameters and upload data</div>
+                    <div class="step-status"></div>
+                </div>
+                
+                <div class="step disabled" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-title">Review & Submit</div>
+                    <div class="step-description">Review configuration and submit the training job</div>
+                    <div class="step-status"></div>
+                </div>
+                
+                <div class="step disabled" data-step="5">
+                    <div class="step-number">5</div>
+                    <div class="step-title">Monitor Training</div>
+                    <div class="step-description">Track training progress and metrics</div>
+                    <div class="step-status"></div>
+                </div>
+                
+                <div class="step disabled" data-step="6">
+                    <div class="step-number">6</div>
+                    <div class="step-title">Deploy Model</div>
+                    <div class="step-description">Deploy and test your fine-tuned model</div>
+                    <div class="step-status"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel - Step Content -->
+            <div class="content-panel">
+                <div class="panel-header">
+                    <h3 class="panel-title">
+                        <i class="fas fa-plus-circle"></i>
+                        Step 1: Create Fine-Tuning Job
+                    </h3>
+                    <p class="panel-subtitle">Navigate to Azure AI Foundry and initiate a new fine-tuning job for your model.</p>
+                </div>
+                
+                <div class="panel-content" id="stepContent">
+                    <!-- Azure Navigation Context -->
+                    <div class="azure-navigation">
+                        <div class="azure-breadcrumb">
+                            <i class="fas fa-home"></i> Azure AI Foundry > Model Catalog > Fine-tuning
+                        </div>
+                        <div class="azure-page-title">Create fine-tuning job</div>
+                    </div>
+
+                    <!-- Step 1 Content -->
+                    <div class="step-instructions">
+                        <h4 style="margin-bottom: 16px; color: #323130;">What you'll see in Azure AI Foundry:</h4>
+                        <ul style="margin-left: 20px; margin-bottom: 24px; color: #605e5c;">
+                            <li>Navigate to the <strong>Model Catalog</strong> section</li>
+                            <li>Click on <strong>"Fine-tuning"</strong> in the left navigation</li>
+                            <li>Select <strong>"+ Create fine-tuning job"</strong> button</li>
+                            <li>You'll see the job creation wizard interface</li>
+                        </ul>
+                    </div>
+
+                    <!-- Screenshot Display Area -->
+                    <div class="screenshot-display" id="screenshotArea">
+                        <div class="screenshot-placeholder">
+                            <i class="fas fa-image"></i>
+                            <h4>Azure AI Foundry Interface</h4>
+                            <p>Click "View Screenshot" to see the actual Azure interface for this step</p>
+                            <button class="upload-button" onclick="showScreenshot(1)" style="margin-top: 16px;">
+                                <i class="fas fa-eye"></i> View Screenshot
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="screenshot-caption" id="screenshotCaption" style="display: none;">
+                        <strong>Step 1:</strong> This screenshot shows the Azure AI Foundry fine-tuning interface where you'll create a new fine-tuning job. Notice the navigation structure and the "Create fine-tuning job" button.
+                    </div>
+
+                    <!-- Interface Learning Points -->
+                    <div class="guidance-card" style="margin-top: 24px;">
+                        <div class="guidance-title">
+                            <i class="fas fa-map guidance-icon"></i>
+                            Key Interface Elements to Notice
+                        </div>
+                        <div class="guidance-text">
+                            <ul style="margin-left: 20px; margin-top: 8px;">
+                                <li><strong>Left Navigation:</strong> Model Catalog, Fine-tuning, Deployments</li>
+                                <li><strong>Main Content Area:</strong> Job creation wizard and configuration options</li>
+                                <li><strong>Action Buttons:</strong> Create, Cancel, and navigation controls</li>
+                                <li><strong>Breadcrumb Navigation:</strong> Shows your current location in the portal</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" disabled>
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button class="btn btn-primary" id="nextButton" onclick="nextStep()">
+                        Next Step <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Panel - Guidance -->
+            <div class="content-panel">
+                <div class="guidance-panel">
+                    <h3 style="margin-bottom: 20px; color: #323130;">
+                        <i class="fas fa-compass guidance-icon"></i>
+                        Azure AI Foundry Guide
+                    </h3>
+
+                    <div class="guidance-card">
+                        <div class="guidance-title">
+                            <i class="fas fa-cloud guidance-icon"></i>
+                            About Azure AI Foundry
+                        </div>
+                        <div class="guidance-text">
+                            Azure AI Foundry is Microsoft's comprehensive platform for building, training, and deploying AI models. The fine-tuning feature allows you to customize foundation models for your specific use cases.
+                        </div>
+                    </div>
+
+                    <div class="guidance-card">
+                        <div class="guidance-title">
+                            <i class="fas fa-route guidance-icon"></i>
+                            Navigation Tips
+                        </div>
+                        <div class="guidance-text">
+                            The left navigation panel is your main way to move between different Azure AI Foundry features. Key sections include Model Catalog, Fine-tuning, Deployments, and Monitoring.
+                        </div>
+                    </div>
+
+                    <div class="guidance-card">
+                        <div class="guidance-title">
+                            <i class="fas fa-user-graduate guidance-icon"></i>
+                            Learning Objective
+                        </div>
+                        <div class="guidance-text">
+                            By following these steps, you'll become familiar with the Azure AI Foundry interface and understand how to navigate the fine-tuning workflow.
+                        </div>
+                    </div>
+
+                    <h4 style="margin: 24px 0 12px; color: #323130;">Interface Checklist</h4>
+                    <ul class="checklist">
+                        <li id="check1">Located the Model Catalog section</li>
+                        <li id="check2">Found the Fine-tuning option</li>
+                        <li id="check3">Identified the Create job button</li>
+                        <li id="check4">Understood the navigation structure</li>
+                        <li id="check5">Ready to proceed to model selection</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let dataUploaded = false;
+        
+        // Step content for each phase
+        const stepContent = {
+            1: {
+                title: "Step 1: Create Fine-Tuning Job",
+                subtitle: "Navigate to Azure AI Foundry and initiate a new fine-tuning job for your model.",
+                icon: "fas fa-plus-circle",
+                screenshot: "step1.png",
+                navigation: "Azure AI Foundry > Model Catalog > Fine-tuning",
+                pageTitle: "Create fine-tuning job"
+            },
+            2: {
+                title: "Step 2: Select Base Model",
+                subtitle: "Choose the foundation model that you want to fine-tune for your specific use case.",
+                icon: "fas fa-brain",
+                screenshot: "step2.png",
+                navigation: "Azure AI Foundry > Model Catalog > Fine-tuning > Create job",
+                pageTitle: "Select base model"
+            },
+            3: {
+                title: "Step 3: Configure Training",
+                subtitle: "Upload your training data and configure the fine-tuning parameters.",
+                icon: "fas fa-cogs",
+                screenshot: "step3.png",
+                navigation: "Azure AI Foundry > Fine-tuning > Training configuration",
+                pageTitle: "Training data and parameters"
+            },
+            4: {
+                title: "Step 4: Review & Submit",
+                subtitle: "Review your configuration settings and submit the fine-tuning job.",
+                icon: "fas fa-check-circle",
+                screenshot: "step4.png",
+                navigation: "Azure AI Foundry > Fine-tuning > Review configuration",
+                pageTitle: "Review and create"
+            },
+            5: {
+                title: "Step 5: Monitor Training",
+                subtitle: "Track the progress of your fine-tuning job and view training metrics.",
+                icon: "fas fa-chart-line",
+                screenshot: "step5.png",
+                navigation: "Azure AI Foundry > Fine-tuning > Job monitoring",
+                pageTitle: "Fine-tuning job status"
+            },
+            6: {
+                title: "Step 6: Deploy Model",
+                subtitle: "Deploy your fine-tuned model and test it in the Azure AI Foundry playground.",
+                icon: "fas fa-rocket",
+                screenshot: "step6.png",
+                navigation: "Azure AI Foundry > Model deployments",
+                pageTitle: "Deploy fine-tuned model"
+            }
+        };
+
+        function showScreenshot(step) {
+            const screenshotArea = document.getElementById('screenshotArea');
+            const screenshotCaption = document.getElementById('screenshotCaption');
+            const content = stepContent[step];
+            
+            screenshotArea.innerHTML = `
+                <img src="screenshots/${content.screenshot}" alt="Azure AI Foundry - ${content.title}" class="screenshot-img">
+                <div class="interface-callout" style="top: 20px; right: 20px;">
+                    Azure AI Foundry
+                </div>
+            `;
+            
+            screenshotCaption.style.display = 'block';
+            screenshotCaption.innerHTML = `
+                <strong>${content.title}:</strong> This screenshot shows the Azure AI Foundry interface for ${content.pageTitle.toLowerCase()}. Pay attention to the navigation structure and key UI elements highlighted in the interface.
+            `;
+            
+            // Update checklist
+            ['check1', 'check2', 'check3', 'check4', 'check5'].forEach(id => {
+                document.getElementById(id).classList.add('checked');
+            });
+            
+            // Enable next button
+            document.getElementById('nextButton').disabled = false;
+        }
+
+        function simulateUpload() {
+            showScreenshot(currentStep);
+        }
+
+        function goToStep(step) {
+            if (step < 1 || step > 6) return;
+            if (step > currentStep + 1) return; // Don't allow skipping ahead
+            
+            currentStep = step;
+            updateProgress();
+            updateStepContent(step);
+            updateStepNavigation();
+        }
+
+        function nextStep() {
+            if (currentStep < 6) {
+                // Mark current step as completed
+                const currentStepEl = document.querySelector(`[data-step="${currentStep}"]`);
+                currentStepEl.classList.remove('active');
+                currentStepEl.classList.add('completed');
+                currentStepEl.querySelector('.step-status').innerHTML = '<i class="fas fa-check"></i>';
+                
+                // Move to next step
+                currentStep++;
+                
+                // Enable next step
+                const nextStepEl = document.querySelector(`[data-step="${currentStep}"]`);
+                nextStepEl.classList.remove('disabled');
+                nextStepEl.classList.add('active');
+                
+                updateProgress();
+                updateStepContent(currentStep);
+            }
+        }
+
+        function updateProgress() {
+            const progressFill = document.getElementById('overallProgress');
+            const progressText = document.getElementById('progressText');
+            const completedSteps = currentStep - 1;
+            
+            progressFill.style.width = `${(completedSteps / 6) * 100}%`;
+            progressText.textContent = `Step ${currentStep} of 6`;
+        }
+
+        function updateStepContent(step) {
+            const content = stepContent[step];
+            const panelHeader = document.querySelector('.panel-header');
+            const stepContentArea = document.getElementById('stepContent');
+            const nextButton = document.getElementById('nextButton');
+            
+            panelHeader.innerHTML = `
+                <h3 class="panel-title">
+                    <i class="${content.icon}"></i>
+                    ${content.title}
+                </h3>
+                <p class="panel-subtitle">${content.subtitle}</p>
+            `;
+            
+            // Generate step-specific content
+            let stepHTML = `
+                <div class="azure-navigation">
+                    <div class="azure-breadcrumb">
+                        <i class="fas fa-home"></i> ${content.navigation}
+                    </div>
+                    <div class="azure-page-title">${content.pageTitle}</div>
+                </div>
+                
+                <div class="step-instructions">
+                    <h4 style="margin-bottom: 16px; color: #323130;">What you'll see in Azure AI Foundry:</h4>
+                    ${getStepInstructions(step)}
+                </div>
+
+                <div class="screenshot-display" id="screenshotArea">
+                    <div class="screenshot-placeholder">
+                        <i class="fas fa-image"></i>
+                        <h4>Azure AI Foundry Interface</h4>
+                        <p>Click "View Screenshot" to see the actual Azure interface for this step</p>
+                        <button class="upload-button" onclick="showScreenshot(${step})" style="margin-top: 16px;">
+                            <i class="fas fa-eye"></i> View Screenshot
+                        </button>
+                    </div>
+                </div>
+
+                <div class="screenshot-caption" id="screenshotCaption" style="display: none;">
+                    <strong>${content.title}:</strong> This screenshot shows the Azure AI Foundry interface for ${content.pageTitle.toLowerCase()}. Pay attention to the navigation structure and key UI elements.
+                </div>
+
+                <div class="guidance-card" style="margin-top: 24px;">
+                    <div class="guidance-title">
+                        <i class="fas fa-map guidance-icon"></i>
+                        Key Interface Elements to Notice
+                    </div>
+                    <div class="guidance-text">
+                        ${getInterfaceElements(step)}
+                    </div>
+                </div>
+            `;
+            
+            stepContentArea.innerHTML = stepHTML;
+            
+            // Reset next button state
+            nextButton.disabled = true;
+            
+            if (step === 6) {
+                nextButton.innerHTML = '<i class="fas fa-check"></i> Complete Tutorial';
+            } else {
+                nextButton.innerHTML = 'Next Step <i class="fas fa-arrow-right"></i>';
+            }
+        }
+
+        function getStepInstructions(step) {
+            const instructions = {
+                1: `<ul style="margin-left: 20px; margin-bottom: 24px; color: #605e5c;">
+                    <li>Navigate to the <strong>Model Catalog</strong> section</li>
+                    <li>Click on <strong>"Fine-tuning"</strong> in the left navigation</li>
+                    <li>Select <strong>"+ Create fine-tuning job"</strong> button</li>
+                    <li>You'll see the job creation wizard interface</li>
+                </ul>`,
+                2: `<ul style="margin-left: 20px; margin-bottom: 24px; color: #605e5c;">
+                    <li>Browse available <strong>foundation models</strong></li>
+                    <li>Select a model suitable for your use case (e.g., GPT-3.5-turbo)</li>
+                    <li>Review model capabilities and limitations</li>
+                    <li>Click <strong>"Select"</strong> to proceed</li>
+                </ul>`,
+                3: `<ul style="margin-left: 20px; margin-bottom: 24px; color: #605e5c;">
+                    <li>Upload your <strong>training dataset</strong> (JSONL format)</li>
+                    <li>Configure <strong>training parameters</strong> (epochs, learning rate)</li>
+                    <li>Set <strong>validation split</strong> and other options</li>
+                    <li>Review data preview and validation results</li>
+                </ul>`,
+                4: `<ul style="margin-left: 20px; margin-bottom: 24px; color: #605e5c;">
+                    <li>Review your <strong>model selection</strong> and configuration</li>
+                    <li>Verify <strong>training parameters</strong> and dataset</li>
+                    <li>Set job name and description</li>
+                    <li>Click <strong>"Create"</strong> to submit the job</li>
+                </ul>`,
+                5: `<ul style="margin-left: 20px; margin-bottom: 24px; color: #605e5c;">
+                    <li>Monitor <strong>training progress</strong> in real-time</li>
+                    <li>View <strong>loss metrics</strong> and training curves</li>
+                    <li>Check job status and estimated completion time</li>
+                    <li>Review any errors or warnings</li>
+                </ul>`,
+                6: `<ul style="margin-left: 20px; margin-bottom: 24px; color: #605e5c;">
+                    <li>Navigate to <strong>Model deployments</strong></li>
+                    <li>Deploy your fine-tuned model to an endpoint</li>
+                    <li>Test the model in the <strong>Chat playground</strong></li>
+                    <li>Configure deployment settings and scaling</li>
+                </ul>`
+            };
+            return instructions[step] || '';
+        }
+
+        function getInterfaceElements(step) {
+            const elements = {
+                1: `<ul style="margin-left: 20px; margin-top: 8px;">
+                    <li><strong>Left Navigation:</strong> Model Catalog, Fine-tuning, Deployments</li>
+                    <li><strong>Main Content Area:</strong> Job creation wizard and configuration options</li>
+                    <li><strong>Action Buttons:</strong> Create, Cancel, and navigation controls</li>
+                    <li><strong>Breadcrumb Navigation:</strong> Shows your current location in the portal</li>
+                </ul>`,
+                2: `<ul style="margin-left: 20px; margin-top: 8px;">
+                    <li><strong>Model Grid:</strong> Available foundation models with descriptions</li>
+                    <li><strong>Model Details:</strong> Capabilities, token limits, and pricing info</li>
+                    <li><strong>Filter Options:</strong> Model type, provider, and capability filters</li>
+                    <li><strong>Selection State:</strong> Highlighted selected model and confirmation</li>
+                </ul>`,
+                3: `<ul style="margin-left: 20px; margin-top: 8px;">
+                    <li><strong>File Upload Area:</strong> Drag-and-drop or browse for training data</li>
+                    <li><strong>Parameter Controls:</strong> Sliders and inputs for training settings</li>
+                    <li><strong>Data Preview:</strong> Sample of uploaded training examples</li>
+                    <li><strong>Validation Results:</strong> Data quality checks and warnings</li>
+                </ul>`,
+                4: `<ul style="margin-left: 20px; margin-top: 8px;">
+                    <li><strong>Configuration Summary:</strong> Review of all selected options</li>
+                    <li><strong>Cost Estimation:</strong> Expected training time and costs</li>
+                    <li><strong>Job Settings:</strong> Name, description, and notification preferences</li>
+                    <li><strong>Submit Button:</strong> Final confirmation to start training</li>
+                </ul>`,
+                5: `<ul style="margin-left: 20px; margin-top: 8px;">
+                    <li><strong>Progress Bar:</strong> Visual indicator of training completion</li>
+                    <li><strong>Metrics Charts:</strong> Loss curves and performance indicators</li>
+                    <li><strong>Job Details:</strong> Status, duration, and resource usage</li>
+                    <li><strong>Logs Panel:</strong> Detailed training logs and error messages</li>
+                </ul>`,
+                6: `<ul style="margin-left: 20px; margin-top: 8px;">
+                    <li><strong>Deployment Options:</strong> Endpoint types and configuration</li>
+                    <li><strong>Playground Interface:</strong> Chat interface for testing the model</li>
+                    <li><strong>Performance Metrics:</strong> Latency, throughput, and usage statistics</li>
+                    <li><strong>Management Controls:</strong> Scaling, monitoring, and maintenance options</li>
+                </ul>`
+            };
+            return elements[step] || '';
+        }
+
+        function updateStepNavigation() {
+            // This would update the navigation based on current step
+            // Implementation depends on specific step requirements
+        }
+
+        // Add click handlers for steps
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.step').forEach(step => {
+                step.addEventListener('click', function() {
+                    const stepNum = parseInt(this.dataset.step);
+                    if (!this.classList.contains('disabled')) {
+                        goToStep(stepNum);
+                    }
+                });
+            });
+            
+            document.getElementById('nextButton').addEventListener('click', nextStep);
+        });
+    </script>
+</body>
+</html>
