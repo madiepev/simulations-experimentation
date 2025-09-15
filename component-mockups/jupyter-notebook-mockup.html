@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Notebook Mockup — Component Mockups</title>
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#0f1724; --muted:#9aa4b2; --accent:#7c5cff; --cell-bg:#0b1220; --output-bg:#071024;
+      --radius:10px; --glass: rgba(255,255,255,0.03);
+    }
+    body{font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: linear-gradient(180deg,#040611 0%, #081028 60%); color:#e6eef8; margin:0; padding:24px;}
+    .shell{max-width:1100px; margin:0 auto}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+    header h1{font-size:18px;margin:0}
+    .toolbar{margin-left:auto;display:flex;gap:8px}
+    button{background:var(--glass);border:1px solid rgba(255,255,255,0.03);color:var(--muted);padding:8px 12px;border-radius:8px;cursor:pointer}
+    button.primary{background:linear-gradient(90deg,var(--accent),#5fa2ff);color:white;border:none}
+    .notebook{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:18px;border-radius:12px;box-shadow: 0 6px 30px rgba(10,12,20,0.6)}
+    .cell{background:var(--cell-bg); border-radius:8px;padding:12px;margin-bottom:14px;border:1px solid rgba(255,255,255,0.02)}
+    .cell-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+    .cell-type{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
+    .in-prompt{width:64px;color:#bfe3ff;background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent);padding:6px;border-radius:6px;text-align:center}
+    textarea.code{width:100%;min-height:120px;background:#061020;border-radius:8px;color:#e6eef8;padding:12px;border:none;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;resize:vertical}
+    .markdown-editor{min-height:36px;padding:8px;border-radius:6px;background:transparent;border:1px dashed rgba(255,255,255,0.02);color:var(--muted)}
+    .output{background:var(--output-bg);margin-top:10px;border-radius:8px;padding:10px;border:1px solid rgba(255,255,255,0.02)}
+    pre.output-text{white-space:pre-wrap;color:#bfe3ff;margin:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+    .cell-controls{margin-left:auto;display:flex;gap:8px}
+    .small{padding:6px 8px;font-size:13px}
+    .add-row{display:flex;gap:8px;align-items:center;margin:16px 0}
+    .muted{color:var(--muted);font-size:13px}
+    .empty-note{opacity:.7;padding:16px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border:1px dashed rgba(255,255,255,0.02);text-align:center}
+    canvas.plot{width:100%;height:160px;border-radius:6px;display:block}
+    .cell-toolbar{display:flex;gap:8px}
+    .preview{background:transparent;padding:8px;border-radius:6px}
+    .ghost{opacity:.6}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <h1>Notebook Mockup</h1>
+      <div class="muted">A lightweight simulated Jupyter notebook for mockups and prototype flows</div>
+      <div class="toolbar" role="toolbar">
+        <button id="add-code" class="small">+ Code</button>
+        <button id="add-md" class="small">+ Markdown</button>
+        <button id="run-all" class="primary small">Run All</button>
+      </div>
+    </header>
+
+    <section class="notebook" id="notebook"></section>
+
+    <div class="add-row">
+      <button id="add-sample" class="small">Insert Sample Cells</button>
+      <div class="muted">Tip: Click a cell's Run to execute. Code execution is simulated (supports simple print(...) and basic arithmetic).</div>
+    </div>
+  </div>
+
+  <template id="template-code">
+    <div class="cell" data-type="code">
+      <div class="cell-header">
+        <div class="in-prompt">In [ ]</div>
+        <div class="cell-type">Code</div>
+        <div class="cell-controls">
+          <button class="run small">Run</button>
+          <button class="toggle small">Toggle Preview</button>
+          <button class="delete small">Delete</button>
+        </div>
+      </div>
+      <textarea class="code" spellcheck="false"># Example: Use print('hello') or print(1+2)
+print('Hello from mock notebook')
+</textarea>
+      <div class="output" aria-live="polite" style="display:none"></div>
+    </div>
+  </template>
+
+  <template id="template-md">
+    <div class="cell" data-type="markdown">
+      <div class="cell-header">
+        <div class="in-prompt"> </div>
+        <div class="cell-type">Markdown</div>
+        <div class="cell-controls">
+          <button class="run small">Render</button>
+          <button class="toggle small">Toggle Editor</button>
+          <button class="delete small">Delete</button>
+        </div>
+      </div>
+      <div class="markdown-editor" contenteditable="true"># Welcome
+This is a markdown cell. Use headings, **bold**, *italic*, and `inline code`.</div>
+      <div class="output preview" style="display:none"></div>
+    </div>
+  </template>
+
+  <script>
+    const notebook = document.getElementById('notebook');
+    const tplCode = document.getElementById('template-code');
+    const tplMd = document.getElementById('template-md');
+    let execCount = 1;
+
+    function addCell(type='code', insertAtEnd=true, content=null){
+      const tpl = type === 'code' ? tplCode.content.cloneNode(true) : tplMd.content.cloneNode(true);
+      const el = tpl.children[0];
+      if(content){
+        if(type==='code') el.querySelector('textarea.code').value = content;
+        else el.querySelector('.markdown-editor').innerText = content;
+      }
+      attachCellEvents(el);
+      if(insertAtEnd) notebook.appendChild(el);
+      else notebook.insertBefore(el, notebook.firstChild);
+      return el;
+    }
+
+    function attachCellEvents(cell){
+      const runBtn = cell.querySelector('.run');
+      const delBtn = cell.querySelector('.delete');
+      const toggleBtn = cell.querySelector('.toggle');
+      const type = cell.dataset.type;
+      const prompt = cell.querySelector('.in-prompt');
+
+      if(type === 'code'){
+        const ta = cell.querySelector('textarea.code');
+        const out = cell.querySelector('.output');
+        runBtn.addEventListener('click', ()=> runCodeCell(cell));
+        toggleBtn.addEventListener('click', ()=> {
+          out.style.display = out.style.display === 'none' ? 'block' : 'none';
+        });
+        // Quick exec on Ctrl+Enter
+        ta.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' && (e.ctrlKey||e.metaKey)){ runCodeCell(cell); e.preventDefault(); }});
+      } else {
+        const editor = cell.querySelector('.markdown-editor');
+        const out = cell.querySelector('.output');
+        runBtn.addEventListener('click', ()=> renderMarkdownCell(cell));
+        toggleBtn.addEventListener('click', ()=> {
+          const visible = editor.style.display !== 'none';
+          editor.style.display = visible ? 'none' : 'block';
+          out.style.display = visible ? 'block' : 'none';
+        });
+      }
+
+      delBtn.addEventListener('click', ()=> cell.remove());
+    }
+
+    function runCodeCell(cell){
+      const ta = cell.querySelector('textarea.code');
+      const out = cell.querySelector('.output');
+      const prompt = cell.querySelector('.in-prompt');
+      out.style.display = 'block';
+      prompt.textContent = `In [${execCount}]`;
+      execCount += 1;
+      out.innerHTML = '';
+
+      const code = ta.value.trim();
+      if(!code){ out.innerHTML = '<div class="muted">No code to run.</div>'; return; }
+
+      // Simple simulated python execution:
+      // - Handles print('text') and print(1+2)
+      // - If code contains the word "plot" a fake plot canvas will be shown
+      const lines = code.split('\n');
+      const results = [];
+      for(const line of lines){
+        const l = line.trim();
+        if(l.startsWith('#')) continue;
+        const printMatch = l.match(/^print\((.+)\)\s*$/);
+        if(printMatch){
+          const expr = printMatch[1].trim();
+          // If string literal
+          const strMatch = expr.match(/^['"](.*)['"]$/);
+          if(strMatch){ results.push(escapeHtml(strMatch[1])); continue; }
+          // otherwise attempt to evaluate simple arithmetic safely
+          if(/^[0-9\s\+\-\*\/\(\)\.]+$/.test(expr)){
+            try{ const val = Function('return '+expr)(); results.push(String(val)); }catch(e){ results.push('<error>error evaluating expression</error>'); }
+            continue;
+          }
+          // otherwise echo the expression as-is
+          results.push(escapeHtml(expr));
+          continue;
+        }
+        if(l.includes('plot(') || l.includes('plt.plot') || l.includes('matplotlib')){
+          // create a fake plot
+          const canvas = document.createElement('canvas'); canvas.className = 'plot'; canvas.width = 800; canvas.height = 160; drawFakePlot(canvas);
+          out.appendChild(canvas);
+          continue;
+        }
+        if(l){ results.push('<unknown>... (simulated)</unknown>'); }
+      }
+
+      if(results.length){
+        const pre = document.createElement('pre'); pre.className = 'output-text'; pre.innerHTML = results.map(s=>s).join('\n'); out.appendChild(pre);
+      } else if(!out.querySelector('.plot')){
+        out.innerHTML = '<div class="muted">No visible output (simulated).</div>';
+      }
+    }
+
+    function renderMarkdownCell(cell){
+      const editor = cell.querySelector('.markdown-editor');
+      const out = cell.querySelector('.output');
+      out.style.display = 'block';
+      const raw = editor.innerText || '';
+      out.innerHTML = markdownToHtml(raw);
+    }
+
+    function markdownToHtml(md){
+      // Very small markdown renderer for headings, bold, italic, inline code, lists
+      let html = escapeHtml(md);
+      // headings
+      html = html.replace(/^######\s?(.*)$/gm, '<h6>$1</h6>');
+      html = html.replace(/^#####\s?(.*)$/gm, '<h5>$1</h5>');
+      html = html.replace(/^####\s?(.*)$/gm, '<h4>$1</h4>');
+      html = html.replace(/^###\s?(.*)$/gm, '<h3>$1</h3>');
+      html = html.replace(/^##\s?(.*)$/gm, '<h2>$1</h2>');
+      html = html.replace(/^#\s?(.*)$/gm, '<h1>$1</h1>');
+      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+      // unordered lists
+      html = html.replace(/(^|\n)\s*[-\*]\s+(.*)(?=(\n|$))/g, '$1<ul><li>$2</li></ul>');
+      // paragraphs
+      html = html.replace(/(?:\n\n+)/g, '</p><p>');
+      html = '<p>' + html + '</p>';
+      // fix multiple <p> from list replacer
+      html = html.replace(/<p>\s*<ul>/g, '<ul>');
+      html = html.replace(/<\/ul>\s*<\/p>/g, '</ul>');
+      return html;
+    }
+
+    function escapeHtml(s){
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\"/g, '&quot;')
+        .replace(/\'/g, '&#39;');
+    }
+
+    function drawFakePlot(canvas){
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width, h = canvas.height;
+      // background
+      ctx.fillStyle = '#061222'; ctx.fillRect(0,0,w,h);
+      // grid
+      ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth=1; for(let i=0;i<6;i++){ const y = (i+1)*h/7; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+      // draw sample line
+      ctx.strokeStyle = '#7c5cff'; ctx.lineWidth = 2; ctx.beginPath();
+      for(let x=0;x<w;x+=4){ const t = x/w*6.28; const y = h/2 + Math.sin(t)* (h*0.28); if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+      ctx.stroke();
+      // scatter
+      ctx.fillStyle = '#5fa2ff'; for(let i=0;i<12;i++){ const x = Math.random()*w; const y = h/2 + (Math.random()-0.5)*h*0.5; ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill(); }
+    }
+
+    document.getElementById('add-code').addEventListener('click', ()=> addCell('code'));
+    document.getElementById('add-md').addEventListener('click', ()=> addCell('markdown'));
+
+    document.getElementById('run-all').addEventListener('click', ()=>{
+      const cells = Array.from(notebook.children);
+      for(const c of cells){ if(c.dataset.type === 'code') runCodeCell(c); else renderMarkdownCell(c); }
+    });
+
+    document.getElementById('add-sample').addEventListener('click', ()=>{
+      // Insert a small sample notebook
+      addCell('markdown', true, '# Example Notebook\nThis notebook is for prototyping interactions.');
+      addCell('code', true, "# compute a number\nprint(1+2+3)");
+      addCell('code', true, "# show a plot\n# plot(...) simulated\nplot([1,2,3],[4,1,5])");
+    });
+
+    // initial sample content to show how it looks
+    (function init(){
+      addCell('markdown', true, '# Simulated Notebook\nCreate and run cells with the buttons above.');
+      addCell('code', true, "# try this:\nprint('Hello world')");
+    })();
+  </script>
+</body>
+</html>
