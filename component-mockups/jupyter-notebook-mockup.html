@@ -6,30 +6,30 @@
   <title>Notebook Mockup — Component Mockups</title>
   <style>
     :root{
-      --bg:#0b1020; --panel:#0f1724; --muted:#9aa4b2; --accent:#7c5cff; --cell-bg:#0b1220; --output-bg:#071024;
-      --radius:10px; --glass: rgba(255,255,255,0.03);
+      --bg: #f6f8fb; --panel: #ffffff; --muted: #52606d; --accent: #2563eb; --cell-bg: #ffffff; --output-bg: #f6f8fa;
+      --radius:10px; --glass: rgba(2,6,23,0.04); --text: #0b1220; --editor-bg: #fbfdff; --prompt-text: #0b1220;
     }
-    body{font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: linear-gradient(180deg,#040611 0%, #081028 60%); color:#e6eef8; margin:0; padding:24px;}
+    body{font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: linear-gradient(180deg,var(--bg) 0%, #eef3f8 60%); color:var(--text); margin:0; padding:24px;}
     .shell{max-width:1100px; margin:0 auto}
     header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
     header h1{font-size:18px;margin:0}
     .toolbar{margin-left:auto;display:flex;gap:8px}
-    button{background:var(--glass);border:1px solid rgba(255,255,255,0.03);color:var(--muted);padding:8px 12px;border-radius:8px;cursor:pointer}
+    button{background:var(--glass);border:1px solid rgba(2,6,23,0.06);color:var(--muted);padding:8px 12px;border-radius:8px;cursor:pointer}
     button.primary{background:linear-gradient(90deg,var(--accent),#5fa2ff);color:white;border:none}
-    .notebook{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:18px;border-radius:12px;box-shadow: 0 6px 30px rgba(10,12,20,0.6)}
-    .cell{background:var(--cell-bg); border-radius:8px;padding:12px;margin-bottom:14px;border:1px solid rgba(255,255,255,0.02)}
+    .notebook{background:linear-gradient(180deg, rgba(2,6,23,0.02), transparent); padding:18px;border-radius:12px;box-shadow: 0 6px 30px rgba(2,6,23,0.06)}
+    .cell{background:var(--cell-bg); border-radius:8px;padding:12px;margin-bottom:14px;border:1px solid rgba(2,6,23,0.06)}
     .cell-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
     .cell-type{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
-    .in-prompt{width:64px;color:#bfe3ff;background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent);padding:6px;border-radius:6px;text-align:center}
-    textarea.code{width:100%;min-height:120px;background:#061020;border-radius:8px;color:#e6eef8;padding:12px;border:none;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;resize:vertical}
-    .markdown-editor{min-height:36px;padding:8px;border-radius:6px;background:transparent;border:1px dashed rgba(255,255,255,0.02);color:var(--muted)}
-    .output{background:var(--output-bg);margin-top:10px;border-radius:8px;padding:10px;border:1px solid rgba(255,255,255,0.02)}
-    pre.output-text{white-space:pre-wrap;color:#bfe3ff;margin:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+    .in-prompt{width:64px;color:var(--prompt-text);background:linear-gradient(90deg, rgba(2,6,23,0.03), transparent);padding:6px;border-radius:6px;text-align:center}
+    textarea.code{width:100%;min-height:120px;background:var(--editor-bg);border-radius:8px;color:var(--text);padding:12px;border:1px solid rgba(2,6,23,0.04);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;resize:vertical}
+    .markdown-editor{min-height:36px;padding:8px;border-radius:6px;background:transparent;border:1px dashed rgba(2,6,23,0.06);color:var(--text)}
+    .output{background:var(--output-bg);margin-top:10px;border-radius:8px;padding:10px;border:1px solid rgba(2,6,23,0.06)}
+    pre.output-text{white-space:pre-wrap;color:var(--text);margin:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
     .cell-controls{margin-left:auto;display:flex;gap:8px}
     .small{padding:6px 8px;font-size:13px}
     .add-row{display:flex;gap:8px;align-items:center;margin:16px 0}
     .muted{color:var(--muted);font-size:13px}
-    .empty-note{opacity:.7;padding:16px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border:1px dashed rgba(255,255,255,0.02);text-align:center}
+    .empty-note{opacity:.9;padding:16px;border-radius:8px;background:linear-gradient(180deg, rgba(2,6,23,0.01), transparent);border:1px dashed rgba(2,6,23,0.04);text-align:center}
     canvas.plot{width:100%;height:160px;border-radius:6px;display:block}
     .cell-toolbar{display:flex;gap:8px}
     .preview{background:transparent;padding:8px;border-radius:6px}
@@ -236,15 +236,15 @@ This is a markdown cell. Use headings, **bold**, *italic*, and `inline code`.</d
       const ctx = canvas.getContext('2d');
       const w = canvas.width, h = canvas.height;
       // background
-      ctx.fillStyle = '#061222'; ctx.fillRect(0,0,w,h);
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,w,h);
       // grid
-      ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth=1; for(let i=0;i<6;i++){ const y = (i+1)*h/7; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+      ctx.strokeStyle = 'rgba(2,6,23,0.06)'; ctx.lineWidth=1; for(let i=0;i<6;i++){ const y = (i+1)*h/7; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
       // draw sample line
-      ctx.strokeStyle = '#7c5cff'; ctx.lineWidth = 2; ctx.beginPath();
+      ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2; ctx.beginPath();
       for(let x=0;x<w;x+=4){ const t = x/w*6.28; const y = h/2 + Math.sin(t)* (h*0.28); if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
       ctx.stroke();
       // scatter
-      ctx.fillStyle = '#5fa2ff'; for(let i=0;i<12;i++){ const x = Math.random()*w; const y = h/2 + (Math.random()-0.5)*h*0.5; ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill(); }
+      ctx.fillStyle = '#7c5cff'; for(let i=0;i<12;i++){ const x = Math.random()*w; const y = h/2 + (Math.random()-0.5)*h*0.5; ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill(); }
     }
 
     document.getElementById('add-code').addEventListener('click', ()=> addCell('code'));

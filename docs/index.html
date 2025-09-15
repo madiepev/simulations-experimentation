@@ -9,479 +9,102 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- Progress Bar -->
-    <div class="progress-container">
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-        <div class="phase-indicators">
-            <div class="phase-indicator active" data-phase="0">Start</div>
-            <div class="phase-indicator" data-phase="1">Phase 1</div>
-            <div class="phase-indicator" data-phase="2">Phase 2</div>
-            <div class="phase-indicator" data-phase="3">Phase 3</div>
-            <div class="phase-indicator" data-phase="4">Phase 4</div>
-        </div>
-    </div>
-
-    <!-- Main Container -->
     <div class="container">
-        <!-- Start Screen -->
-        <div class="phase active" id="phase-0">
-            <div class="start-screen">
-                <div class="header-section">
-                    <div class="ai-icon">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <h1>Fine-Tuning AI Models</h1>
-                    <h2>A Practical Simulation</h2>
-                    <p class="subtitle">Learn to enhance model performance for specific use cases</p>
-                </div>
+        <header class="site-header">
+            <h1>Component Mockups</h1>
+            <p class="subtitle">A curated index of interactive component mockups and prototype pages from this repository.</p>
+        </header>
 
-                <div class="learning-objective">
-                    <h3><i class="fas fa-target"></i> Learning Objective</h3>
-                    <p>Understand the process to fine-tune a model and evaluate whether a fine-tuned model performs better than a base model</p>
-                </div>
+        <p class="lead muted">Click any card to open the mockup. If links return 404 when served from GitHub Pages, move the <code>component-mockups/</code> folder into <code>docs/</code> or adjust your Pages source settings.</p>
 
-                <div class="use-case-box">
-                    <h3>🎯 Your Challenge: Polite Chatbot Development</h3>
-                    <div class="use-case-content">
-                        <p>You work for a customer service company that needs a chatbot capable of handling customer inquiries with exceptional politeness and helpfulness. The base model sometimes responds in ways that could be perceived as curt or impersonal.</p>
-                        
-                        <div class="challenge-details">
-                            <div class="detail-item">
-                                <strong>Scenario:</strong> Building a polite chatbot with Supervised Fine-Tuning (SFT)
-                            </div>
-                            <div class="detail-item">
-                                <strong>Challenge:</strong> Creating a chatbot that maintains politeness while being helpful
-                            </div>
-                            <div class="detail-item">
-                                <strong>Your Task:</strong> Determine if fine-tuning can improve the model's politeness while maintaining accuracy and helpfulness
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <section class="mockups-grid" aria-label="Component mockups">
+            <article class="card">
+                <a href="../component-mockups/chat-playground.html">Chat Playground</a>
+                <p>Interactive chat UI for testing prompt/response behavior.</p>
+            </article>
 
-                <button class="start-button" onclick="startExercise()">
-                    <i class="fas fa-play"></i>
-                    Begin Exercise
-                </button>
-            </div>
-        </div>
+            <article class="card">
+                <a href="../component-mockups/configuration-comparison-branded.html">Configuration Comparison (Branded)</a>
+                <p>Branded comparison view to present model configuration differences.</p>
+            </article>
 
-        <!-- Phase 1: Base Model Exploration -->
-        <div class="phase" id="phase-1">
-            <div class="phase-header">
-                <h2>Phase 1: Evaluate the Base Model</h2>
-                <p>Understand baseline model capabilities and identify specific limitations</p>
-            </div>
+            <article class="card">
+                <a href="../component-mockups/configuration-comparison.html">Configuration Comparison</a>
+                <p>Neutral-themed configuration comparison UI.</p>
+            </article>
 
-            <div class="activity-section">
-                <h3>Requirements Definition</h3>
-                <p>Based on the use case, what are the key requirements for our polite chatbot?</p>
-                
-                <div class="checklist" id="requirements-checklist">
-                    <label class="checkbox-item">
-                        <input type="checkbox" value="politeness">
-                        <span class="checkmark"></span>
-                        Maintain politeness in all responses
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" value="accuracy">
-                        <span class="checkmark"></span>
-                        Provide accurate information
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" value="complaints">
-                        <span class="checkmark"></span>
-                        Handle customer complaints gracefully
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" value="tone">
-                        <span class="checkmark"></span>
-                        Use appropriate tone and language
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" value="jargon">
-                        <span class="checkmark"></span>
-                        Avoid technical jargon
-                    </label>
-                </div>
-            </div>
+            <article class="card">
+                <a href="../component-mockups/conversation-evaluation.html">Conversation Evaluation</a>
+                <p>Components for manual evaluation and scoring of conversation pairs.</p>
+            </article>
 
-            <div class="activity-section">
-                <h3>Base Model Testing Simulation</h3>
-                <div class="chat-simulation">
-                    <div class="chat-example">
-                        <div class="customer-message">
-                            <strong>Customer:</strong> "Your product doesn't work and I'm frustrated!"
-                        </div>
-                        <div class="base-model-response">
-                            <strong>Base Model:</strong> "Please check the troubleshooting guide in the documentation."
-                        </div>
-                        <div class="response-analysis">
-                            <span class="issue-tag">❌ Lacks empathy</span>
-                            <span class="issue-tag">❌ Impersonal tone</span>
-                        </div>
-                    </div>
+            <article class="card">
+                <a href="../component-mockups/fine-tuning-selection.html">Fine-Tuning Selection</a>
+                <p>UI for selecting fine-tuning options and data subsets.</p>
+            </article>
 
-                    <div class="chat-example">
-                        <div class="customer-message">
-                            <strong>Customer:</strong> "I need help with my account settings."
-                        </div>
-                        <div class="base-model-response">
-                            <strong>Base Model:</strong> "Navigate to Settings > Account > Preferences."
-                        </div>
-                        <div class="response-analysis">
-                            <span class="issue-tag">❌ Too brief</span>
-                            <span class="issue-tag">❌ No politeness markers</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <article class="card">
+                <a href="../component-mockups/fine-tuning-simulation.html">Fine-Tuning Simulation</a>
+                <p>Simulated workflow to demonstrate fine-tuning stages.</p>
+            </article>
 
-            <div class="activity-section">
-                <h3>Reflection Questions</h3>
-                <div class="question-group">
-                    <label>What issues do you notice with the base model responses?</label>
-                    <select id="issues-question" class="form-select">
-                        <option value="">Select an answer...</option>
-                        <option value="correct">Responses lack empathy and politeness</option>
-                        <option value="wrong1">Responses are too long</option>
-                        <option value="wrong2">Responses are technically incorrect</option>
-                        <option value="wrong3">Responses are too fast</option>
-                    </select>
-                </div>
+            <article class="card">
+                <a href="../component-mockups/interactive-notebook-simulation.html">Interactive Notebook Simulation</a>
+                <p>Notebook-like interactive simulation for exercises.</p>
+            </article>
 
-                <div class="question-group">
-                    <label>How could these responses be improved?</label>
-                    <textarea id="improvement-text" placeholder="Enter your thoughts on how to improve the responses..." rows="4"></textarea>
-                </div>
-            </div>
+            <article class="card">
+                <a href="../component-mockups/manual-evaluation.html">Manual Evaluation</a>
+                <p>Manual evaluation UI for annotators and reviewers.</p>
+            </article>
 
-            <div class="phase-navigation">
-                <button class="nav-button secondary" onclick="goToPhase(0)">Back</button>
-                <button class="nav-button primary" onclick="completePhase1()" id="phase1-next" disabled>Next Phase</button>
-            </div>
-        </div>
+            <article class="card">
+                <a href="../component-mockups/manual-evaluation-business-case.html">Manual Evaluation (Business Case)</a>
+                <p>Business-focused evaluation scenario and walkthrough.</p>
+            </article>
 
-        <!-- Phase 2: Dataset Preparation -->
-        <div class="phase" id="phase-2">
-            <div class="phase-header">
-                <h2>Phase 2: Prepare Training Data</h2>
-                <p>Understand data requirements and learn JSONL format structure</p>
-            </div>
+            <article class="card">
+                <a href="../component-mockups/ranking-components.html">Ranking Components</a>
+                <p>Ranking UI components for ordering or scoring alternatives.</p>
+            </article>
 
-            <div class="activity-section">
-                <h3>Data Selection Activity</h3>
-                <p>Drag good training examples into the "Training Set" box:</p>
-                
-                <div class="data-selection-container">
-                    <div class="available-examples">
-                        <h4>Available Examples</h4>
-                        <div class="example-item draggable" draggable="true" data-quality="good">
-                            <div class="example-conversation">
-                                <div class="customer-msg">Customer: "Your product doesn't work and I'm frustrated!"</div>
-                                <div class="improved-msg">Response: "I understand how frustrating that must be! Let me help you resolve this issue right away."</div>
-                            </div>
-                        </div>
-                        <div class="example-item draggable" draggable="true" data-quality="bad">
-                            <div class="example-conversation">
-                                <div class="customer-msg">Customer: "I need help."</div>
-                                <div class="improved-msg">Response: "OK."</div>
-                            </div>
-                        </div>
-                        <div class="example-item draggable" draggable="true" data-quality="good">
-                            <div class="example-conversation">
-                                <div class="customer-msg">Customer: "Can you help me with my order?"</div>
-                                <div class="improved-msg">Response: "I'd be happy to help you with your order! Could you please provide your order number?"</div>
-                            </div>
-                        </div>
-                        <div class="example-item draggable" draggable="true" data-quality="bad">
-                            <div class="example-conversation">
-                                <div class="customer-msg">Customer: "This is confusing."</div>
-                                <div class="improved-msg">Response: "Read the manual."</div>
-                            </div>
-                        </div>
-                    </div>
+            <article class="card">
+                <a href="../component-mockups/terminal-quest.html">Terminal Quest</a>
+                <p>Gamified terminal-style interaction for guided tasks.</p>
+            </article>
 
-                    <div class="training-set dropzone" id="training-set">
-                        <h4>Training Set</h4>
-                        <p class="drop-instruction">Drop good examples here</p>
-                    </div>
-                </div>
+            <article class="card">
+                <a href="../component-mockups/jupyter-notebook-mockup.html">Jupyter Notebook Mockup</a>
+                <p>A lightweight, simulated notebook experience for prototyping.</p>
+            </article>
 
-                <div id="selection-feedback" class="feedback-message"></div>
-            </div>
+            <article class="card">
+                <a href="../component-mockups/notebook/01-basic-fine-tuning.ipynb">Notebook: Basic Fine-Tuning</a>
+                <p>Jupyter notebook with step-by-step fine-tuning examples (IPYNB).</p>
+            </article>
 
-            <div class="activity-section">
-                <h3>JSONL Format Education</h3>
-                <p>Learn how conversations are converted to the JSONL format required for fine-tuning:</p>
-                
-                <div class="format-example">
-                    <div class="before-after">
-                        <div class="before">
-                            <h4>Before (Conversation)</h4>
-                            <div class="conversation-display">
-                                <div class="msg customer">Customer: "Your product doesn't work and I'm frustrated!"</div>
-                                <div class="msg assistant">Assistant: "I understand how frustrating that must be! Let me help you resolve this issue right away."</div>
-                            </div>
-                        </div>
-                        <div class="arrow">→</div>
-                        <div class="after">
-                            <h4>After (JSONL)</h4>
-                            <pre class="json-display"><code>{
-  "messages": [
-    {
-      "role": "user",
-      "content": "Your product doesn't work and I'm frustrated!"
-    },
-    {
-      "role": "assistant", 
-      "content": "I understand how frustrating that must be! Let me help you resolve this issue right away."
-    }
-  ]
-}</code></pre>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <article class="card">
+                <a href="../component-mockups/notebook/02-interactive-fine-tuning-exercise.ipynb">Notebook: Interactive Fine-Tuning Exercise</a>
+                <p>Interactive notebook exercise for hands-on fine-tuning practice.</p>
+            </article>
+        </section>
 
-            <div class="activity-section">
-                <h3>Data Quality Checklist</h3>
-                <div class="checklist" id="quality-checklist">
-                    <label class="checkbox-item">
-                        <input type="checkbox" value="tone">
-                        <span class="checkmark"></span>
-                        Consistent tone across examples
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" value="topics">
-                        <span class="checkmark"></span>
-                        Diverse conversation topics
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" value="pairs">
-                        <span class="checkmark"></span>
-                        Clear input/output pairs
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" value="format">
-                        <span class="checkmark"></span>
-                        Proper JSON formatting
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" value="quantity">
-                        <span class="checkmark"></span>
-                        Sufficient quantity (typically 50+ examples)
-                    </label>
-                </div>
-            </div>
-
-            <div class="phase-navigation">
-                <button class="nav-button secondary" onclick="goToPhase(1)">Back</button>
-                <button class="nav-button primary" onclick="completePhase2()" id="phase2-next" disabled>Next Phase</button>
-            </div>
-        </div>
-
-        <!-- Phase 3: Fine-Tuning Process -->
-        <div class="phase" id="phase-3">
-            <div class="phase-header">
-                <h2>Phase 3: Execute Fine-Tuning Workflow</h2>
-                <p>Understand the sequence of fine-tuning steps and navigate the Azure AI Foundry interface</p>
-            </div>
-
-            <div class="activity-section">
-                <h3>Step Ordering Challenge</h3>
-                <p>Arrange the fine-tuning steps in the correct order. Drag steps from "Available Steps" to "Correct Order":</p>
-                <div class="instruction-tips">
-                    <p><strong>💡 Tips:</strong></p>
-                    <ul>
-                        <li>Drag steps to the numbered slots in the correct order</li>
-                        <li>Click on a filled slot to remove the step</li>
-                        <li>Drag filled steps back to "Available Steps" to reorder</li>
-                        <li>Think about the logical workflow from preparation to deployment</li>
-                    </ul>
-                </div>
-                
-                <div class="step-ordering-container">
-                    <div class="available-steps">
-                        <h4>Available Steps</h4>
-                        <div class="steps-list" id="available-steps">
-                            <div class="step-item draggable" draggable="true" data-step="1">Select base model</div>
-                            <div class="step-item draggable" draggable="true" data-step="5">Create fine-tuning job</div>
-                            <div class="step-item draggable" draggable="true" data-step="2">Upload training dataset</div>
-                            <div class="step-item draggable" draggable="true" data-step="8">Deploy fine-tuned model</div>
-                            <div class="step-item draggable" draggable="true" data-step="4">Configure training parameters</div>
-                            <div class="step-item draggable" draggable="true" data-step="7">Evaluate model performance</div>
-                            <div class="step-item draggable" draggable="true" data-step="3">Validate dataset format</div>
-                            <div class="step-item draggable" draggable="true" data-step="6">Monitor training progress</div>
-                        </div>
-                    </div>
-
-                    <div class="correct-order dropzone" id="correct-order">
-                        <h4>Correct Order</h4>
-                        <div class="order-slots">
-                            <div class="order-slot" data-position="1">1.</div>
-                            <div class="order-slot" data-position="2">2.</div>
-                            <div class="order-slot" data-position="3">3.</div>
-                            <div class="order-slot" data-position="4">4.</div>
-                            <div class="order-slot" data-position="5">5.</div>
-                            <div class="order-slot" data-position="6">6.</div>
-                            <div class="order-slot" data-position="7">7.</div>
-                            <div class="order-slot" data-position="8">8.</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="ordering-feedback" class="feedback-message"></div>
-                <button class="check-button" onclick="checkStepOrder()" id="check-order">Check Order</button>
-            </div>
-
-            <div class="activity-section" id="ui-walkthrough" style="display: none;">
-                <h3>Azure AI Foundry Interface Walkthrough</h3>
-                <div class="ui-preview">
-                    <div class="ui-screenshot-placeholder">
-                        <i class="fas fa-image"></i>
-                        <p>Azure AI Foundry Model Catalog Screenshot</p>
-                        <small>Model selection interface will be displayed here</small>
-                    </div>
-                    <p>In Azure AI Foundry, you would start by selecting your base model from the model catalog. Look for models that align with your use case requirements.</p>
-                </div>
-            </div>
-
-            <div class="phase-navigation">
-                <button class="nav-button secondary" onclick="goToPhase(2)">Back</button>
-                <button class="nav-button primary" onclick="completePhase3()" id="phase3-next" disabled>Next Phase</button>
-            </div>
-        </div>
-
-        <!-- Phase 4: Model Comparison -->
-        <div class="phase" id="phase-4">
-            <div class="phase-header">
-                <h2>Phase 4: Compare Base vs Fine-Tuned Performance</h2>
-                <p>Evaluate model improvements and make deployment decisions</p>
-            </div>
-
-            <div class="activity-section">
-                <h3>Side-by-Side Comparison</h3>
-                <div class="model-comparison">
-                    <div class="comparison-example">
-                        <div class="query">
-                            <strong>Query:</strong> "I'm having trouble with my order and need immediate help!"
-                        </div>
-                        
-                        <div class="model-responses">
-                            <div class="base-model">
-                                <h4>Base Model Response</h4>
-                                <div class="response">"Check your order status in your account dashboard."</div>
-                                <div class="scores">
-                                    <span class="score politeness">Politeness: 2/5</span>
-                                    <span class="score helpfulness">Helpfulness: 3/5</span>
-                                </div>
-                            </div>
-                            
-                            <div class="fine-tuned-model">
-                                <h4>Fine-Tuned Model Response</h4>
-                                <div class="response">"I completely understand your concern about your order! I'm here to help you resolve this immediately. Let me look into your order status right away. Could you please provide your order number so I can give you specific updates?"</div>
-                                <div class="scores">
-                                    <span class="score politeness high">Politeness: 5/5</span>
-                                    <span class="score helpfulness high">Helpfulness: 5/5</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="activity-section">
-                <h3>Evaluation Metrics Dashboard</h3>
-                <div class="metrics-dashboard">
-                    <div class="metric-card">
-                        <h4>Response Politeness</h4>
-                        <div class="metric-value">+150%</div>
-                        <div class="metric-description">Improvement in politeness ratings</div>
-                    </div>
-                    <div class="metric-card">
-                        <h4>Customer Satisfaction</h4>
-                        <div class="metric-value">+85%</div>
-                        <div class="metric-description">Increase in satisfaction scores</div>
-                    </div>
-                    <div class="metric-card">
-                        <h4>Response Quality</h4>
-                        <div class="metric-value">+120%</div>
-                        <div class="metric-description">Overall quality improvement</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="activity-section">
-                <h3>Decision Making</h3>
-                <div class="decision-question">
-                    <label>Based on these results, what should be the next step?</label>
-                    <select id="decision-question" class="form-select">
-                        <option value="">Select your recommendation...</option>
-                        <option value="correct">Deploy fine-tuned model immediately</option>
-                        <option value="wrong1">Collect more training data</option>
-                        <option value="wrong2">Adjust training parameters</option>
-                        <option value="wrong3">Continue with base model</option>
-                    </select>
-                </div>
-
-                <div class="question-group">
-                    <label>Justify your decision:</label>
-                    <textarea id="decision-justification" placeholder="Explain why you chose this option..." rows="4"></textarea>
-                </div>
-            </div>
-
-            <div class="phase-navigation">
-                <button class="nav-button secondary" onclick="goToPhase(3)">Back</button>
-                <button class="nav-button primary" onclick="completeExercise()" id="phase4-complete" disabled>Complete Exercise</button>
-            </div>
-        </div>
-
-        <!-- Completion Screen -->
-        <div class="phase" id="completion">
-            <div class="completion-screen">
-                <div class="success-icon">
-                    <i class="fas fa-trophy"></i>
-                </div>
-                <h1>Congratulations!</h1>
-                <h2>You've completed the Fine-Tuning Exercise</h2>
-                
-                <div class="completion-summary">
-                    <h3>What you've learned:</h3>
-                    <ul>
-                        <li>How to evaluate base model capabilities and limitations</li>
-                        <li>The importance of high-quality training data in JSONL format</li>
-                        <li>The step-by-step process of fine-tuning in Azure AI Foundry</li>
-                        <li>How to compare and evaluate model performance improvements</li>
-                    </ul>
-                </div>
-
-                <div class="next-steps">
-                    <h3>Next Steps:</h3>
-                    <p>Now that you understand the fine-tuning process, you can apply these concepts in Azure AI Foundry with real datasets and models.</p>
-                    
-                    <div class="resource-links">
-                        <a href="#" class="resource-link">
-                            <i class="fas fa-book"></i>
-                            Azure AI Foundry Documentation
-                        </a>
-                        <a href="#" class="resource-link">
-                            <i class="fas fa-play"></i>
-                            Try Another Exercise
-                        </a>
-                    </div>
-                </div>
-
-                <button class="restart-button" onclick="restartExercise()">
-                    <i class="fas fa-redo"></i>
-                    Restart Exercise
-                </button>
-            </div>
-        </div>
+        <footer class="page-footer">
+            <p class="muted">If you want this to be the published GH Pages root, ensure your Pages source includes the mockup files or move them into <code>docs/component-mockups/</code>.</p>
+        </footer>
     </div>
 
-    <script src="script.js"></script>
+    <style>
+        .site-header{padding:28px 0 8px}
+        .site-header h1{margin:0;font-size:28px}
+        .subtitle{margin:6px 0 18px;color:#39404a}
+        .lead{margin-bottom:12px}
+        .mockups-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+        .card{background:#fff;border:1px solid #e6eef8;padding:14px;border-radius:8px;box-shadow:0 6px 18px rgba(16,24,40,0.04)}
+        .card a{font-weight:600;color:#0b5bff;text-decoration:none;font-size:16px}
+        .card p{margin:8px 0 0;color:#51606a;font-size:14px}
+        .page-footer{margin-top:20px;color:#6b7280;font-size:13px}
+        code{background:#f3f4f6;padding:2px 6px;border-radius:4px}
+    </style>
 </body>
 </html>
