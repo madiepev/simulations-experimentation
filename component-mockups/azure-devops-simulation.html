@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure DevOps Board Simulation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #323130;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .devops-header {
+            background: #0078d4;
+            color: white;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .devops-logo {
+            font-size: 20px;
+        }
+
+        .devops-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .devops-nav {
+            margin-left: auto;
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-item {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: white;
+        }
+
+        /* Sub-header */
+        .sub-header {
+            background: white;
+            border-bottom: 1px solid #e1dfdd;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .breadcrumb {
+            color: #605e5c;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: #0078d4;
+            text-decoration: none;
+        }
+
+        .board-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #323130;
+            margin: 0 20px;
+        }
+
+        .board-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .view-toggle {
+            background: #f3f2f1;
+            border: 1px solid #e1dfdd;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-toggle.active {
+            background: #0078d4;
+            color: white;
+            border-color: #0078d4;
+        }
+
+        /* Main Container */
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+            position: relative;
+        }
+
+        /* Board Container */
+        .board-container {
+            flex: 1;
+            padding: 20px;
+            overflow-x: auto;
+            transition: margin-right 0.3s ease;
+        }
+
+        .board-container.detail-open {
+            margin-right: 600px;
+        }
+
+        /* Kanban Board */
+        .kanban-board {
+            display: flex;
+            gap: 20px;
+            min-width: 1200px;
+            height: 100%;
+        }
+
+        .kanban-column {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            min-height: 600px;
+            max-height: 100%;
+            overflow-y: auto;
+        }
+
+        .column-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e1dfdd;
+        }
+
+        .column-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .column-count {
+            background: #605e5c;
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Task Cards */
+        .task-card {
+            background: white;
+            border: 1px solid #e1dfdd;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-card:hover {
+            border-color: #0078d4;
+            box-shadow: 0 2px 8px rgba(0, 120, 212, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .task-id {
+            background: #0078d4;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .task-type {
+            background: #f3f2f1;
+            color: #605e5c;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .task-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #323130;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .task-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #605e5c;
+        }
+
+        .task-assignee {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .assignee-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #0078d4;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .task-date {
+            font-size: 11px;
+        }
+
+        /* Detail Panel */
+        .detail-panel {
+            position: fixed;
+            right: 0;
+            top: 120px;
+            width: 600px;
+            height: calc(100vh - 120px);
+            background: white;
+            border-left: 1px solid #e1dfdd;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .detail-panel.open {
+            transform: translateX(0);
+        }
+
+        .detail-header {
+            padding: 20px;
+            border-bottom: 1px solid #e1dfdd;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .detail-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .close-detail {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #605e5c;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .close-detail:hover {
+            background: #e1dfdd;
+        }
+
+        .detail-content {
+            padding: 20px;
+        }
+
+        .detail-section {
+            margin-bottom: 24px;
+        }
+
+        .detail-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #323130;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-section .icon {
+            color: #0078d4;
+            font-size: 14px;
+        }
+
+        .detail-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #605e5c;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #323130;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-new {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .status-active {
+            background: #e8f5e8;
+            color: #2e7d2e;
+        }
+
+        .priority-high {
+            color: #d13438;
+        }
+
+        .priority-medium {
+            color: #ff8c00;
+        }
+
+        .description-text {
+            background: #f8f9fa;
+            border: 1px solid #e1dfdd;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #323130;
+        }
+
+        .acceptance-criteria {
+            background: #f0f9ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .acceptance-criteria ul {
+            margin-left: 16px;
+        }
+
+        .acceptance-criteria li {
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #323130;
+        }
+
+        .comments-section {
+            border-top: 1px solid #e1dfdd;
+            padding-top: 20px;
+        }
+
+        .comment {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .comment-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #0078d4;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .comment-author {
+            font-size: 14px;
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .comment-date {
+            font-size: 12px;
+            color: #605e5c;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            color: #323130;
+            line-height: 1.4;
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .detail-panel {
+                width: 500px;
+            }
+            
+            .board-container.detail-open {
+                margin-right: 500px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .detail-panel {
+                width: 100%;
+                top: 0;
+                height: 100vh;
+            }
+            
+            .board-container.detail-open {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Azure DevOps Header -->
+    <div class="devops-header">
+        <i class="fab fa-microsoft devops-logo"></i>
+        <span class="devops-title">Azure DevOps</span>
+        <div class="devops-nav">
+            <a href="#" class="nav-item">Overview</a>
+            <a href="#" class="nav-item active">Boards</a>
+            <a href="#" class="nav-item">Repos</a>
+            <a href="#" class="nav-item">Pipelines</a>
+            <a href="#" class="nav-item">Test Plans</a>
+        </div>
+    </div>
+
+    <!-- Sub Header -->
+    <div class="sub-header">
+        <div class="breadcrumb">
+            <a href="#">Courseware</a> / <a href="#">Boards</a> / Boards
+        </div>
+        <h1 class="board-title">AI Planning</h1>
+        <div class="board-controls">
+            <button class="view-toggle active">Board</button>
+            <button class="view-toggle">Analytics</button>
+            <select class="view-toggle">
+                <option>User Story</option>
+                <option>Sprint</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Board Container -->
+        <div class="board-container" id="boardContainer">
+            <div class="kanban-board">
+                <!-- New Column -->
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <span class="column-title">New</span>
+                        <span class="column-count">3</span>
+                    </div>
+                    
+                    <div class="task-card" onclick="openTaskDetail('119170')">
+                        <div class="task-header">
+                            <span class="task-id">119170</span>
+                            <span class="task-type">User Story</span>
+                        </div>
+                        <div class="task-title">Metadata creation for YAML files - definition and exploration</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">HR</div>
+                                <span>Hassan Rasheed</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="task-card" onclick="openTaskDetail('121354')">
+                        <div class="task-header">
+                            <span class="task-id">121354</span>
+                            <span class="task-type">User Story</span>
+                        </div>
+                        <div class="task-title">Rewrite/Paraphrase a section of text - definition and exploration</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">HR</div>
+                                <span>Hassan Rasheed</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="task-card" onclick="openTaskDetail('126565')">
+                        <div class="task-header">
+                            <span class="task-id">126565</span>
+                            <span class="task-type">Feature</span>
+                        </div>
+                        <div class="task-title">Sustained engineering - small automated update PRs</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">HR</div>
+                                <span>Hassan Rasheed</span>
+                            </div>
+                            <div class="task-date">May-2024</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Planned Column -->
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <span class="column-title">Planned</span>
+                        <span class="column-count">0</span>
+                    </div>
+                </div>
+
+                <!-- Active Column -->
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <span class="column-title">Active</span>
+                        <span class="column-count">5</span>
+                    </div>
+
+                    <div class="task-card" onclick="openTaskDetail('126556')">
+                        <div class="task-header">
+                            <span class="task-id">126556</span>
+                            <span class="task-type">Feature</span>
+                        </div>
+                        <div class="task-title">Avatar-Led Video Training</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">HR</div>
+                                <span>Hassan Rasheed</span>
+                            </div>
+                            <div class="task-date">October-2024</div>
+                        </div>
+                    </div>
+
+                    <div class="task-card" onclick="openTaskDetail('126584')">
+                        <div class="task-header">
+                            <span class="task-id">126584</span>
+                            <span class="task-type">Epic</span>
+                        </div>
+                        <div class="task-title">Full module creation</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">HR</div>
+                                <span>Hassan Rasheed</span>
+                            </div>
+                            <div class="task-date">October-2024</div>
+                        </div>
+                    </div>
+
+                    <div class="task-card" onclick="openTaskDetail('126560')">
+                        <div class="task-header">
+                            <span class="task-id">126560</span>
+                            <span class="task-type">Feature</span>
+                        </div>
+                        <div class="task-title">Merging Playbook, JTA and 2023 Hackathon projects</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">HR</div>
+                                <span>Hassan Rasheed</span>
+                            </div>
+                            <div class="task-date">October-2024</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resolved Column -->
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <span class="column-title">Resolved</span>
+                        <span class="column-count">0</span>
+                    </div>
+                </div>
+
+                <!-- Under Development Column -->
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <span class="column-title">Under Development</span>
+                        <span class="column-count">0</span>
+                    </div>
+                </div>
+
+                <!-- In Production Column -->
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <span class="column-title">In Production</span>
+                        <span class="column-count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail Panel -->
+        <div class="detail-panel" id="detailPanel">
+            <div class="detail-header">
+                <div class="detail-title" id="detailTitle">Task Details</div>
+                <button class="close-detail" onclick="closeTaskDetail()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="detail-content" id="detailContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Task data
+        const tasks = {
+            '119170': {
+                id: '119170',
+                title: 'Metadata creation for YAML files - definition and exploration',
+                type: 'User Story',
+                state: 'New',
+                assignee: 'Hassan Rasheed',
+                area: 'Courseware\\AI Planning',
+                iteration: 'Courseware\\GCC FY24\\FY24Q3',
+                priority: 'Medium',
+                storyPoints: '2',
+                tags: 'Business',
+                description: `This feature will enable users of the VSCode Extension to insert appropriate metadata into their YAML files:
+
+INDEX.YML
+• updated ms.date
+• list of products
+• list of roles
+• list of subjects
+• abstract
+
+UNIT-NAME.yml
+• durationInMinutes
+• updated ms.date`,
+                acceptanceCriteria: [
+                    'Users can generate metadata for INDEX.YML files including ms.date, products, roles, subjects, and abstract',
+                    'Users can generate metadata for UNIT-NAME.yml files including durationInMinutes and ms.date',
+                    'Metadata generation should be context-aware based on existing content',
+                    'Integration with VSCode Extension should be seamless'
+                ],
+                comments: [
+                    {
+                        author: 'Hassan Rasheed',
+                        date: 'Jan 14',
+                        text: 'Initial requirements gathering completed. Need to define specific metadata schemas for different YAML file types.'
+                    }
+                ]
+            },
+            '121354': {
+                id: '121354',
+                title: 'Rewrite/Paraphrase a section of text - definition and exploration',
+                type: 'User Story',
+                state: 'New',
+                assignee: 'Hassan Rasheed',
+                area: 'Courseware\\AI Planning',
+                iteration: 'Courseware\\GCC FY24\\FY24Q3',
+                priority: 'Medium',
+                storyPoints: '3',
+                tags: 'Feature',
+                description: 'Enable content creators to rewrite or paraphrase sections of text while maintaining the original meaning and context. This feature should provide multiple variations and allow users to select the most appropriate version.',
+                acceptanceCriteria: [
+                    'Users can select text and request paraphrasing',
+                    'System provides 3-5 alternative versions',
+                    'Maintains original meaning and context',
+                    'Preserves technical accuracy for educational content',
+                    'Supports different writing styles (formal, casual, technical)'
+                ],
+                comments: [
+                    {
+                        author: 'Hassan Rasheed',
+                        date: 'Jan 12',
+                        text: 'Exploring different AI models for text rewriting. Need to ensure consistency with learning objectives.'
+                    }
+                ]
+            },
+            '126565': {
+                id: '126565',
+                title: 'Sustained engineering - small automated update PRs',
+                type: 'Feature',
+                state: 'New',
+                assignee: 'Hassan Rasheed',
+                area: 'Courseware\\AI Planning',
+                iteration: 'Courseware\\GCC FY24\\FY24Q3',
+                priority: 'Low',
+                storyPoints: '5',
+                tags: 'Automation',
+                description: 'Implement automated system for creating small, incremental updates through pull requests. This will help maintain content freshness and accuracy with minimal manual intervention.',
+                acceptanceCriteria: [
+                    'Automated detection of content that needs updates',
+                    'Generation of appropriate pull requests',
+                    'Integration with existing review workflows',
+                    'Configurable update frequency and scope',
+                    'Rollback capabilities for problematic updates'
+                ],
+                comments: []
+            },
+            '126556': {
+                id: '126556',
+                title: 'Avatar-Led Video Training',
+                type: 'Feature',
+                state: 'Active',
+                assignee: 'Hassan Rasheed',
+                area: 'Courseware\\AI Planning',
+                iteration: 'Courseware\\GCC FY24\\FY24Q4',
+                priority: 'High',
+                storyPoints: '8',
+                tags: 'Video, AI',
+                description: 'Create engaging video training content using AI-generated avatars. This feature will enable personalized and scalable video content creation for various learning scenarios.',
+                acceptanceCriteria: [
+                    'Avatar generation with realistic speech synthesis',
+                    'Support for multiple languages and accents',
+                    'Integration with existing course content',
+                    'Video quality suitable for professional training',
+                    'Customizable avatar appearance and voice'
+                ],
+                comments: [
+                    {
+                        author: 'Hassan Rasheed',
+                        date: 'Sep 10',
+                        text: 'Initial prototype showing promising results. Working on voice quality improvements.'
+                    },
+                    {
+                        author: 'Sarah Johnson',
+                        date: 'Sep 12',
+                        text: 'Great progress! The avatar movements look very natural. Can we add gesture support?'
+                    }
+                ]
+            },
+            '126584': {
+                id: '126584',
+                title: 'Full module creation',
+                type: 'Epic',
+                state: 'Active',
+                assignee: 'Hassan Rasheed',
+                area: 'Courseware\\AI Planning',
+                iteration: 'Courseware\\GCC FY24\\FY24Q4',
+                priority: 'High',
+                storyPoints: '13',
+                tags: 'Epic, Module',
+                description: 'Comprehensive feature for creating complete learning modules from outline to finished content, including assessments, labs, and supplementary materials.',
+                acceptanceCriteria: [
+                    'Module structure generation from learning objectives',
+                    'Automatic content creation for each module section',
+                    'Assessment and quiz generation',
+                    'Lab exercise creation with step-by-step instructions',
+                    'Integration with learning management systems',
+                    'Quality review and approval workflows'
+                ],
+                comments: [
+                    {
+                        author: 'Hassan Rasheed',
+                        date: 'Sep 15',
+                        text: 'Breaking this epic down into smaller user stories. Initial framework is in place.'
+                    }
+                ]
+            },
+            '126560': {
+                id: '126560',
+                title: 'Merging Playbook, JTA and 2023 Hackathon projects',
+                type: 'Feature',
+                state: 'Active',
+                assignee: 'Hassan Rasheed',
+                area: 'Courseware\\AI Planning',
+                iteration: 'Courseware\\GCC FY24\\FY24Q4',
+                priority: 'Medium',
+                storyPoints: '5',
+                tags: 'Integration',
+                description: 'Consolidate learnings and features from multiple previous projects into a unified solution. This includes the Training Playbook, Job Task Analysis (JTA) system, and innovations from the 2023 Hackathon.',
+                acceptanceCriteria: [
+                    'Identify common features across all three projects',
+                    'Create unified architecture and codebase',
+                    'Migrate valuable features without breaking existing functionality',
+                    'Comprehensive testing of merged functionality',
+                    'Documentation of new combined system'
+                ],
+                comments: [
+                    {
+                        author: 'Hassan Rasheed',
+                        date: 'Sep 8',
+                        text: 'Started analysis of overlapping features. The JTA integration looks straightforward.'
+                    },
+                    {
+                        author: 'Mike Chen',
+                        date: 'Sep 11',
+                        text: 'The hackathon project had some experimental APIs that might need refactoring before merge.'
+                    }
+                ]
+            }
+        };
+
+        function openTaskDetail(taskId) {
+            const task = tasks[taskId];
+            if (!task) return;
+
+            const detailPanel = document.getElementById('detailPanel');
+            const detailTitle = document.getElementById('detailTitle');
+            const detailContent = document.getElementById('detailContent');
+            const boardContainer = document.getElementById('boardContainer');
+
+            // Update title
+            detailTitle.textContent = `${task.id} - ${task.title}`;
+
+            // Generate detail content
+            detailContent.innerHTML = `
+                <div class="detail-section">
+                    <h3><i class="fas fa-info-circle icon"></i>Details</h3>
+                    <div class="detail-info-grid">
+                        <div class="info-item">
+                            <div class="info-label">State</div>
+                            <div class="info-value">
+                                <span class="status-badge status-${task.state.toLowerCase().replace(' ', '')}">${task.state}</span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Reason</div>
+                            <div class="info-value">${task.state}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Area</div>
+                            <div class="info-value">${task.area}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Iteration</div>
+                            <div class="info-value">${task.iteration}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3><i class="fas fa-clipboard-list icon"></i>Planning</h3>
+                    <div class="detail-info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Story Points</div>
+                            <div class="info-value">${task.storyPoints}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Priority</div>
+                            <div class="info-value priority-${task.priority.toLowerCase()}">${task.priority}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3><i class="fas fa-user icon"></i>Development</h3>
+                    <div class="detail-info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Assigned To</div>
+                            <div class="info-value">${task.assignee}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Classification</div>
+                            <div class="info-value">${task.tags}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3><i class="fas fa-file-text icon"></i>Description</h3>
+                    <div class="description-text">${task.description}</div>
+                </div>
+
+                ${task.acceptanceCriteria && task.acceptanceCriteria.length > 0 ? `
+                <div class="detail-section">
+                    <h3><i class="fas fa-check-square icon"></i>Acceptance Criteria</h3>
+                    <div class="acceptance-criteria">
+                        <ul>
+                            ${task.acceptanceCriteria.map(criteria => `<li>${criteria}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                ` : ''}
+
+                ${task.comments && task.comments.length > 0 ? `
+                <div class="detail-section comments-section">
+                    <h3><i class="fas fa-comments icon"></i>Discussion</h3>
+                    ${task.comments.map(comment => `
+                        <div class="comment">
+                            <div class="comment-avatar">${comment.author.split(' ').map(n => n[0]).join('')}</div>
+                            <div class="comment-content">
+                                <div class="comment-header">
+                                    <span class="comment-author">${comment.author}</span>
+                                    <span class="comment-date">${comment.date}</span>
+                                </div>
+                                <div class="comment-text">${comment.text}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+            `;
+
+            // Show detail panel
+            detailPanel.classList.add('open');
+            boardContainer.classList.add('detail-open');
+        }
+
+        function closeTaskDetail() {
+            const detailPanel = document.getElementById('detailPanel');
+            const boardContainer = document.getElementById('boardContainer');
+            
+            detailPanel.classList.remove('open');
+            boardContainer.classList.remove('detail-open');
+        }
+
+        // Close detail panel when clicking outside (optional)
+        document.addEventListener('click', function(event) {
+            const detailPanel = document.getElementById('detailPanel');
+            const boardContainer = document.getElementById('boardContainer');
+            
+            if (detailPanel.classList.contains('open') && 
+                !detailPanel.contains(event.target) && 
+                !event.target.closest('.task-card')) {
+                closeTaskDetail();
+            }
+        });
+    </script>
+</body>
+</html>

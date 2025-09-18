@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="notebook-title">Notebook Simulation</title>
+    <link rel="stylesheet" href="../styles/notebook-simulation.css">
+</head>
+<body>
+    <div class="notebook-header">
+        <div class="notebook-title" id="header-title">Loading...</div>
+        <div class="notebook-subtitle" id="header-subtitle">Azure AI Lab • Interactive Notebook Simulation</div>
+    </div>
+
+    <div class="notebook-status">
+        <span class="status-dot"></span>
+        <span id="status-text">Kernel Ready</span>
+    </div>
+
+    <div class="notebook-container" id="notebook-container">
+        <!-- Content will be loaded here dynamically -->
+    </div>
+
+    <script src="../js/notebook-simulation.js"></script>
+    <script>
+        // Initialize the notebook with content from URL parameter or default
+        const urlParams = new URLSearchParams(window.location.search);
+        const contentFile = urlParams.get('content') || 'basic-fine-tuning.md';
+        
+        // Load the notebook content
+        loadNotebookContent(`../content/notebooks/${contentFile}`);
+    </script>
+</body>
+</html>

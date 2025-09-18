@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notebook Simulation Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .test-button {
+            display: inline-block;
+            background: #0078d4;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            margin: 8px 8px 8px 0;
+            transition: background 0.2s ease;
+        }
+        
+        .test-button:hover {
+            background: #106ebe;
+        }
+        
+        .code {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            margin: 8px 0;
+            overflow-x: auto;
+        }
+        
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 12px 0;
+        }
+        
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #0078d4;
+            padding-bottom: 8px;
+        }
+        
+        h2 {
+            color: #0078d4;
+            margin-top: 24px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📓 Notebook Simulation Template System</h1>
+    
+    <div class="test-card">
+        <h2>🎯 What You've Created</h2>
+        <p>You now have a complete template system that separates style from content, allowing you to easily convert notebooks into simulated experiences with multiple choice reflection questions.</p>
+        
+        <p><strong>Key Features:</strong></p>
+        <ul>
+            <li>✅ Template HTML that loads content dynamically</li>
+            <li>✅ Comprehensive CSS styling for all cell types</li>
+            <li>✅ JavaScript parser for markdown-based content</li>
+            <li>✅ Multiple choice reflection questions with instant feedback</li>
+            <li>✅ Conversion script for existing .ipynb files</li>
+            <li>✅ Example content with complete fine-tuning workflow</li>
+        </ul>
+    </div>
+
+    <div class="test-card">
+        <h2>🚀 Test Your Templates</h2>
+        
+        <p>Click these links to test the different notebook simulations:</p>
+        
+        <a href="templates/notebook-simulation-template.html?content=basic-fine-tuning.md" class="test-button">
+            Manual Example (Multiple Choice Questions)
+        </a>
+        
+        <a href="templates/notebook-simulation-template.html?content=converted-fine-tuning.md" class="test-button">
+            Auto-Converted Example (Needs Editing)
+        </a>
+        
+        <div class="note">
+            <strong>Note:</strong> The auto-converted example has placeholder reflection questions that need to be edited with proper choices and feedback.
+        </div>
+    </div>
+
+    <div class="test-card">
+        <h2>🔧 Quick Usage Guide</h2>
+        
+        <h3>Method 1: Convert Existing Notebook</h3>
+        <div class="code">
+python3 scripts/convert_notebook.py your-notebook.ipynb content/notebooks/your-content.md --title "Your Title"
+        </div>
+        
+        <h3>Method 2: Create Content Manually</h3>
+        <p>Create a new .md file in <code>content/notebooks/</code> following this structure:</p>
+        
+        <div class="code">
+---
+title: "Your Notebook"
+subtitle: "Learning Simulation"
+---
+
+## [MARKDOWN]
+Introduction content here
+
+## [CODE]
+```python
+print("Hello, world!")
+```
+
+**Output:**
+```
+Hello, world!
+```
+
+**Reflection:**
+```json
+{
+  "question": "What does this code do?",
+  "type": "multiple-choice",
+  "choices": [
+    {
+      "text": "Prints a greeting",
+      "correct": true,
+      "feedback": "Correct! This prints 'Hello, world!' to the console."
+    },
+    {
+      "text": "Creates a file",
+      "correct": false,
+      "feedback": "Incorrect. This only prints text."
+    }
+  ]
+}
+```
+        </div>
+        
+        <h3>Method 3: View Your Content</h3>
+        <div class="code">
+templates/notebook-simulation-template.html?content=your-content.md
+        </div>
+    </div>
+
+    <div class="test-card">
+        <h2>🎨 Customization Options</h2>
+        
+        <p><strong>Styling:</strong> Edit <code>styles/notebook-simulation.css</code> to change colors, fonts, and layout.</p>
+        
+        <p><strong>Behavior:</strong> Edit <code>js/notebook-simulation.js</code> to add new cell types or question formats.</p>
+        
+        <p><strong>Content:</strong> All content is in markdown files in <code>content/notebooks/</code> - no HTML knowledge needed!</p>
+    </div>
+
+    <div class="test-card">
+        <h2>📁 File Structure Created</h2>
+        <div class="code">
+├── templates/
+│   └── notebook-simulation-template.html
+├── styles/
+│   └── notebook-simulation.css
+├── js/
+│   └── notebook-simulation.js
+├── content/
+│   └── notebooks/
+│       ├── basic-fine-tuning.md
+│       └── converted-fine-tuning.md
+├── scripts/
+│   └── convert_notebook.py
+└── docs/
+    ├── content-format.md
+    └── README-template-system.md
+        </div>
+    </div>
+
+    <div class="test-card">
+        <h2>✅ Next Steps</h2>
+        <ol>
+            <li><strong>Test the examples above</strong> to see the system in action</li>
+            <li><strong>Edit reflection questions</strong> in the auto-converted file to add proper choices</li>
+            <li><strong>Try converting your own notebooks</strong> using the conversion script</li>
+            <li><strong>Customize the styling</strong> to match your branding or preferences</li>
+            <li><strong>Create new content</strong> by writing markdown files directly</li>
+        </ol>
+        
+        <p>You now have a complete, reusable system for creating interactive notebook simulations!</p>
+    </div>
+</body>
+</html>

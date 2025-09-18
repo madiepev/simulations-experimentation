@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure DevOps - Munson's Farm AI Meal Planner</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #323130;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .devops-header {
+            background: #0078d4;
+            color: white;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .devops-logo {
+            font-size: 20px;
+        }
+
+        .devops-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .devops-nav {
+            margin-left: auto;
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-item {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Project Header */
+        .project-header {
+            background: linear-gradient(135deg, #2e7d2e, #4a9b4a);
+            color: white;
+            padding: 24px;
+            border-bottom: 1px solid #e1dfdd;
+        }
+
+        .project-info {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .project-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .project-icon {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 24px;
+        }
+
+        .project-description {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 16px;
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 24px;
+            font-size: 14px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Sub Header */
+        .sub-header {
+            background: white;
+            border-bottom: 1px solid #e1dfdd;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .breadcrumb {
+            color: #605e5c;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: #0078d4;
+            text-decoration: none;
+        }
+
+        .board-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #323130;
+            margin: 0 20px;
+        }
+
+        .board-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .view-toggle {
+            background: #f3f2f1;
+            border: 1px solid #e1dfdd;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-toggle.active {
+            background: #0078d4;
+            color: white;
+            border-color: #0078d4;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            min-height: calc(100vh - 200px);
+            position: relative;
+        }
+
+        /* Board Container */
+        .board-container {
+            flex: 1;
+            padding: 20px;
+            overflow-x: auto;
+            transition: margin-right 0.3s ease;
+        }
+
+        .board-container.detail-open {
+            margin-right: 600px;
+        }
+
+        /* Kanban Board */
+        .kanban-board {
+            display: flex;
+            gap: 20px;
+            min-width: 1000px;
+            height: 100%;
+        }
+
+        .kanban-column {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            min-height: 600px;
+            max-height: 100%;
+            overflow-y: auto;
+            border: 1px solid #e1dfdd;
+            position: relative;
+        }
+
+        .kanban-column.drag-over {
+            background: #e3f2fd;
+            border-color: #0078d4;
+        }
+
+        .column-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e1dfdd;
+        }
+
+        .column-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .column-count {
+            background: #605e5c;
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Task Cards */
+        .task-card {
+            background: white;
+            border: 1px solid #e1dfdd;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+            cursor: grab;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: relative;
+            user-select: none;
+        }
+
+        .task-card:hover {
+            border-color: #0078d4;
+            box-shadow: 0 2px 8px rgba(0, 120, 212, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .task-card.dragging {
+            opacity: 0.7;
+            transform: rotate(5deg);
+            z-index: 1000;
+            cursor: grabbing;
+        }
+
+        .task-card.lab-task {
+            border-left: 4px solid #ff6b35;
+            background: linear-gradient(135deg, #fff 0%, #fff7f4 100%);
+        }
+
+        .task-card.lab-task::before {
+            content: "⭐ LAB";
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #ff6b35;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .task-id {
+            background: #0078d4;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .task-type {
+            background: #f3f2f1;
+            color: #605e5c;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .task-type.epic {
+            background: #e8f5e8;
+            color: #2e7d2e;
+        }
+
+        .task-type.feature {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .task-type.story {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .task-type.task {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .task-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #323130;
+            margin-bottom: 8px;
+            line-height: 1.3;
+            padding-right: 60px;
+        }
+
+        .task-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #605e5c;
+        }
+
+        .task-assignee {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .assignee-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #0078d4;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .task-points {
+            background: #e1dfdd;
+            color: #323130;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Detail Panel */
+        .detail-panel {
+            position: fixed;
+            right: 0;
+            top: 140px;
+            width: 600px;
+            height: calc(100vh - 140px);
+            background: white;
+            border-left: 1px solid #e1dfdd;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+        }
+
+        .detail-panel.open {
+            transform: translateX(0);
+        }
+
+        .detail-header {
+            padding: 20px;
+            border-bottom: 1px solid #e1dfdd;
+            background: #f8f9fa;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .detail-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #323130;
+            line-height: 1.3;
+            margin-right: 20px;
+        }
+
+        .close-detail {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #605e5c;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .close-detail:hover {
+            background: #e1dfdd;
+        }
+
+        .detail-content {
+            padding: 20px;
+        }
+
+        .detail-section {
+            margin-bottom: 24px;
+        }
+
+        .detail-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #323130;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-section .icon {
+            color: #0078d4;
+            font-size: 14px;
+        }
+
+        .detail-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #605e5c;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #323130;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-new {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .status-active {
+            background: #e8f5e8;
+            color: #2e7d2e;
+        }
+
+        .status-done {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .priority-high {
+            color: #d13438;
+        }
+
+        .priority-medium {
+            color: #ff8c00;
+        }
+
+        .priority-low {
+            color: #2e7d2e;
+        }
+
+        .description-text {
+            background: #f8f9fa;
+            border: 1px solid #e1dfdd;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #323130;
+            white-space: pre-wrap;
+        }
+
+        .acceptance-criteria {
+            background: #f0f9ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .acceptance-criteria ul {
+            margin-left: 16px;
+        }
+
+        .acceptance-criteria li {
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #323130;
+        }
+
+        .lab-highlight {
+            background: #fff7f4;
+            border: 1px solid #ff6b35;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .lab-highlight h4 {
+            color: #ff6b35;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lab-highlight p {
+            font-size: 13px;
+            color: #323130;
+            line-height: 1.4;
+        }
+
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .task-list li {
+            background: #f8f9fa;
+            border: 1px solid #e1dfdd;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .task-list li.completed {
+            background: #e8f5e8;
+            border-color: #c8e6c9;
+            text-decoration: line-through;
+            color: #605e5c;
+        }
+
+        .task-list li.completed::before {
+            content: "✅";
+            font-size: 12px;
+        }
+
+        .task-list li:not(.completed)::before {
+            content: "⏳";
+            font-size: 12px;
+        }
+
+        /* View Toggle Styles */
+        .view-selector {
+            background: #f3f2f1;
+            border: 1px solid #e1dfdd;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-selector:focus {
+            outline: none;
+            border-color: #0078d4;
+        }
+
+        .notification {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 2000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .detail-panel {
+                width: 500px;
+            }
+            
+            .board-container.detail-open {
+                margin-right: 500px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .detail-panel {
+                width: 100%;
+                top: 0;
+                height: 100vh;
+            }
+            
+            .board-container.detail-open {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Azure DevOps Header -->
+    <div class="devops-header">
+        <i class="fab fa-microsoft devops-logo"></i>
+        <span class="devops-title">Azure DevOps</span>
+        <div class="devops-nav">
+            <a href="#" class="nav-item">Overview</a>
+            <a href="#" class="nav-item active">Boards</a>
+            <a href="#" class="nav-item">Repos</a>
+            <a href="#" class="nav-item">Pipelines</a>
+            <a href="#" class="nav-item">Test Plans</a>
+        </div>
+    </div>
+
+    <!-- Project Header -->
+    <div class="project-header">
+        <div class="project-info">
+            <div class="project-title">
+                <div class="project-icon">🥒</div>
+                Munson's Farm AI Meal Planner
+            </div>
+            <div class="project-description">
+                Seasonal meal planning AI agent using Azure AI Foundry, designed for Munson's Pickles and Preserves farm customers
+            </div>
+            <div class="project-meta">
+                <div class="meta-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Sprint 3 - AI Agent Development</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-users"></i>
+                    <span>4 Team Members</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>8-12 weeks duration</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-star"></i>
+                    <span>Lab Focus Week</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sub Header -->
+    <div class="sub-header">
+        <div class="breadcrumb">
+            <a href="#">Munson's Farm</a> / <a href="#">Boards</a> / Sprint 3 Board
+        </div>
+        <h1 class="board-title">AI Agent Development Sprint</h1>
+        <div class="board-controls">
+            <button class="view-toggle active" onclick="switchView('board')">Board</button>
+            <button class="view-toggle" onclick="switchView('analytics')">Analytics</button>
+            <select class="view-selector" onchange="filterTasks(this.value)">
+                <option value="all">All Work Items</option>
+                <option value="lab">Lab Tasks Only</option>
+                <option value="epic">Epics Only</option>
+                <option value="feature">Features Only</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Board Container -->
+        <div class="board-container" id="boardContainer">
+            <div class="kanban-board" id="kanbanBoard">
+                <!-- New Column -->
+                <div class="kanban-column" data-column="new" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <div class="column-header">
+                        <span class="column-title">New</span>
+                        <span class="column-count" id="new-count">2</span>
+                    </div>
+                    
+                    <div class="task-card" draggable="true" ondragstart="drag(event)" data-task="152784" onclick="openTaskDetail('152784')">
+                        <div class="task-header">
+                            <span class="task-id">152784</span>
+                            <span class="task-type epic">Epic</span>
+                        </div>
+                        <div class="task-title">Foundation & Infrastructure Setup</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">MR</div>
+                                <span>Marcus Rodriguez</span>
+                            </div>
+                            <span class="task-points">21 pts</span>
+                        </div>
+                    </div>
+
+                    <div class="task-card" draggable="true" ondragstart="drag(event)" data-task="152790" onclick="openTaskDetail('152790')">
+                        <div class="task-header">
+                            <span class="task-id">152790</span>
+                            <span class="task-type feature">Feature</span>
+                        </div>
+                        <div class="task-title">Azure Environment Setup</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">MR</div>
+                                <span>Marcus Rodriguez</span>
+                            </div>
+                            <span class="task-points">8 pts</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Column -->
+                <div class="kanban-column" data-column="active" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <div class="column-header">
+                        <span class="column-title">Active</span>
+                        <span class="column-count" id="active-count">6</span>
+                    </div>
+
+                    <div class="task-card lab-task" draggable="true" ondragstart="drag(event)" data-task="152785" onclick="openTaskDetail('152785')">
+                        <div class="task-header">
+                            <span class="task-id">152785</span>
+                            <span class="task-type epic">Epic</span>
+                        </div>
+                        <div class="task-title">Core AI Agent Development</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">AL</div>
+                                <span>Alex Liu</span>
+                            </div>
+                            <span class="task-points">34 pts</span>
+                        </div>
+                    </div>
+
+                    <div class="task-card lab-task" draggable="true" ondragstart="drag(event)" data-task="152786" onclick="openTaskDetail('152786')">
+                        <div class="task-header">
+                            <span class="task-id">152786</span>
+                            <span class="task-type feature">Feature</span>
+                        </div>
+                        <div class="task-title">Custom Function Development</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">AL</div>
+                                <span>Alex Liu</span>
+                            </div>
+                            <span class="task-points">13 pts</span>
+                        </div>
+                    </div>
+
+                    <div class="task-card lab-task" draggable="true" ondragstart="drag(event)" data-task="152787" onclick="openTaskDetail('152787')">
+                        <div class="task-header">
+                            <span class="task-id">152787</span>
+                            <span class="task-type story">User Story</span>
+                        </div>
+                        <div class="task-title">Seasonal meal plan generation</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">AL</div>
+                                <span>Alex Liu</span>
+                            </div>
+                            <span class="task-points">8 pts</span>
+                        </div>
+                    </div>
+
+                    <div class="task-card lab-task" draggable="true" ondragstart="drag(event)" data-task="152788" onclick="openTaskDetail('152788')">
+                        <div class="task-header">
+                            <span class="task-id">152788</span>
+                            <span class="task-type task">Task</span>
+                        </div>
+                        <div class="task-title">Create create_seasonal_meal_plan function</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">AL</div>
+                                <span>Alex Liu</span>
+                            </div>
+                            <span class="task-points">3 pts</span>
+                        </div>
+                    </div>
+
+                    <div class="task-card lab-task" draggable="true" ondragstart="drag(event)" data-task="152789" onclick="openTaskDetail('152789')">
+                        <div class="task-header">
+                            <span class="task-id">152789</span>
+                            <span class="task-type task">Task</span>
+                        </div>
+                        <div class="task-title">Configure Azure AI Foundry agent</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">AL</div>
+                                <span>Alex Liu</span>
+                            </div>
+                            <span class="task-points">5 pts</span>
+                        </div>
+                    </div>
+
+                    <div class="task-card" draggable="true" ondragstart="drag(event)" data-task="152791" onclick="openTaskDetail('152791')">
+                        <div class="task-header">
+                            <span class="task-id">152791</span>
+                            <span class="task-type feature">Feature</span>
+                        </div>
+                        <div class="task-title">Frontend Development</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">EP</div>
+                                <span>Emma Parker</span>
+                            </div>
+                            <span class="task-points">21 pts</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Done Column -->
+                <div class="kanban-column" data-column="done" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <div class="column-header">
+                        <span class="column-title">Done</span>
+                        <span class="column-count" id="done-count">3</span>
+                    </div>
+
+                    <div class="task-card lab-task" draggable="true" ondragstart="drag(event)" data-task="152792" onclick="openTaskDetail('152792')">
+                        <div class="task-header">
+                            <span class="task-id">152792</span>
+                            <span class="task-type task">Task</span>
+                        </div>
+                        <div class="task-title">Deploy GPT-4o model</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">AL</div>
+                                <span>Alex Liu</span>
+                            </div>
+                            <span class="task-points">2 pts</span>
+                        </div>
+                    </div>
+
+                    <div class="task-card lab-task" draggable="true" ondragstart="drag(event)" data-task="152793" onclick="openTaskDetail('152793')">
+                        <div class="task-header">
+                            <span class="task-id">152793</span>
+                            <span class="task-type task">Task</span>
+                        </div>
+                        <div class="task-title">Test fall meal planning scenario</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">AL</div>
+                                <span>Alex Liu</span>
+                            </div>
+                            <span class="task-points">3 pts</span>
+                        </div>
+                    </div>
+
+                    <div class="task-card" draggable="true" ondragstart="drag(event)" data-task="152794" onclick="openTaskDetail('152794')">
+                        <div class="task-header">
+                            <span class="task-id">152794</span>
+                            <span class="task-type task">Task</span>
+                        </div>
+                        <div class="task-title">Create Azure DevOps project and repositories</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">MR</div>
+                                <span>Marcus Rodriguez</span>
+                            </div>
+                            <span class="task-points">2 pts</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Released Column -->
+                <div class="kanban-column" data-column="released" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <div class="column-header">
+                        <span class="column-title">Released</span>
+                        <span class="column-count" id="released-count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail Panel -->
+        <div class="detail-panel" id="detailPanel">
+            <div class="detail-header">
+                <div class="detail-title" id="detailTitle">Task Details</div>
+                <button class="close-detail" onclick="closeTaskDetail()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="detail-content" id="detailContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        Task moved successfully!
+    </div>
+
+    <script>
+        // Task data with fictional names
+        const tasks = {
+            '152784': {
+                id: '152784',
+                title: 'Foundation & Infrastructure Setup',
+                type: 'Epic',
+                state: 'New',
+                assignee: 'Marcus Rodriguez',
+                area: 'Munson Farm\\Infrastructure',
+                iteration: 'Sprint 1-2',
+                priority: 'High',
+                storyPoints: '21',
+                tags: 'Infrastructure, Foundation',
+                isLabTask: false,
+                description: `Establish development environment and Azure infrastructure for the Munson's Farm AI Meal Planner project.
+
+This epic covers all foundational work needed to support the AI agent development, including:
+- Azure resource setup and configuration
+- Development environment standardization  
+- CI/CD pipeline establishment
+- Security and governance framework`,
+                acceptanceCriteria: [
+                    'Azure AI Foundry project is created and configured',
+                    'All required Azure services are provisioned',
+                    'Development environment is standardized across team',
+                    'CI/CD pipelines are functional',
+                    'Security and access controls are properly configured'
+                ],
+                childTasks: [
+                    'Azure Environment Setup',
+                    'Development Environment Configuration',
+                    'CI/CD Pipeline Setup',
+                    'Security Configuration'
+                ]
+            },
+            '152790': {
+                id: '152790',
+                title: 'Azure Environment Setup',
+                type: 'Feature',
+                state: 'New',
+                assignee: 'Marcus Rodriguez',
+                area: 'Munson Farm\\Infrastructure',
+                iteration: 'Sprint 1',
+                priority: 'High',
+                storyPoints: '8',
+                tags: 'Azure, Infrastructure',
+                isLabTask: false,
+                description: `Set up the complete Azure environment for the meal planning AI system.
+
+Components to be configured:
+- Azure AI Foundry project
+- GPT-4o model deployment
+- Resource groups and networking
+- Key Vault for secrets management
+- Storage accounts for data persistence`,
+                acceptanceCriteria: [
+                    'Azure AI Foundry project is operational',
+                    'GPT-4o model is deployed and accessible',
+                    'All networking and security configurations are in place',
+                    'Key Vault is configured with proper access policies',
+                    'Storage accounts are created with appropriate permissions'
+                ]
+            },
+            '152785': {
+                id: '152785',
+                title: 'Core AI Agent Development',
+                type: 'Epic',
+                state: 'Active',
+                assignee: 'Alex Liu',
+                area: 'Munson Farm\\AI Agent',
+                iteration: 'Sprint 3',
+                priority: 'High',
+                storyPoints: '34',
+                tags: 'AI, Agent, Lab',
+                isLabTask: true,
+                description: `Build the seasonal meal planning AI agent with custom functions.
+
+This is the core lab deliverable that includes:
+- Custom function development for meal planning
+- AI agent implementation using Azure AI Foundry
+- Integration of seasonal menus and dietary preferences
+- Testing and validation of agent functionality`,
+                acceptanceCriteria: [
+                    'AI agent responds appropriately to meal planning requests',
+                    'Custom functions are properly integrated',
+                    'Seasonal meal plans are generated with correct format',
+                    'Agent handles various dietary preferences',
+                    'All lab validation tests pass'
+                ],
+                childTasks: [
+                    'Custom Function Development',
+                    'AI Agent Implementation',
+                    'Testing & Validation'
+                ]
+            },
+            '152786': {
+                id: '152786',
+                title: 'Custom Function Development',
+                type: 'Feature',
+                state: 'Active',
+                assignee: 'Alex Liu',
+                area: 'Munson Farm\\AI Agent',
+                iteration: 'Sprint 3',
+                priority: 'High',
+                storyPoints: '13',
+                tags: 'Functions, Lab, Core',
+                isLabTask: true,
+                description: `Implement custom functions for seasonal meal planning.
+
+Lab deliverables include:
+- create_seasonal_meal_plan function
+- Seasonal menu data structures
+- Dietary preference handling
+- Meal plan file generation
+- Integration with AI agent`,
+                acceptanceCriteria: [
+                    'create_seasonal_meal_plan function is implemented',
+                    'Function accepts season and dietary preferences',
+                    'Returns properly formatted meal plans',
+                    'Generates files in correct format',
+                    'Integrates seamlessly with AI agent'
+                ],
+                labDetails: {
+                    objective: 'Implement the core meal planning functionality',
+                    duration: '2-3 hours',
+                    deliverables: [
+                        'Working create_seasonal_meal_plan function',
+                        'Seasonal menu data structures',
+                        'File generation capability'
+                    ]
+                }
+            },
+            '152787': {
+                id: '152787',
+                title: 'Seasonal meal plan generation',
+                type: 'User Story',
+                state: 'Active',
+                assignee: 'Alex Liu',
+                area: 'Munson Farm\\AI Agent',
+                iteration: 'Sprint 3',
+                priority: 'High',
+                storyPoints: '8',
+                tags: 'User Story, Meal Planning, Lab',
+                isLabTask: true,
+                description: `As a customer of Munson's Farm, I want to get personalized seasonal meal plans so that I can enjoy fresh, seasonal produce in my meals.
+
+User Story Details:
+- Customer requests meal plan for specific season
+- System considers dietary preferences
+- Generates meal plan using farm's seasonal produce
+- Provides recipes and shopping list
+- Saves meal plan to file for future reference`,
+                acceptanceCriteria: [
+                    'Customer can request meal plan for any season',
+                    'System handles dietary restrictions (vegetarian, vegan, gluten-free)',
+                    'Meal plan includes farm-fresh seasonal ingredients',
+                    'Generated meal plan is saved as a file',
+                    'Customer receives confirmation of meal plan creation'
+                ],
+                labDetails: {
+                    objective: 'Create end-to-end meal planning user experience',
+                    scenario: 'Customer wants fall meal plan with vegetarian options',
+                    validation: 'Verify meal plan file contains seasonal vegetables'
+                }
+            },
+            '152788': {
+                id: '152788',
+                title: 'Create create_seasonal_meal_plan function',
+                type: 'Task',
+                state: 'Active',
+                assignee: 'Alex Liu',
+                area: 'Munson Farm\\AI Agent',
+                iteration: 'Sprint 3',
+                priority: 'High',
+                storyPoints: '3',
+                tags: 'Implementation, Function, Lab',
+                isLabTask: true,
+                description: `Implement the core function that generates seasonal meal plans.
+
+Function Requirements:
+- Accept season parameter (spring, summer, fall, winter)
+- Accept dietary preferences array
+- Return structured meal plan data
+- Include seasonal produce recommendations
+- Generate shopping list
+
+Implementation Notes:
+- Use Python dictionaries for meal data
+- Include error handling for invalid inputs
+- Log function calls for debugging
+- Format output for file generation`,
+                acceptanceCriteria: [
+                    'Function accepts season and dietary_preferences parameters',
+                    'Returns properly structured meal plan dictionary',
+                    'Includes seasonal ingredients appropriate for the season',
+                    'Handles invalid input gracefully',
+                    'Integrates with file generation system'
+                ],
+                labDetails: {
+                    implementation: 'Python function in user_functions.py',
+                    testCases: [
+                        'Test fall meal plan generation',
+                        'Test vegetarian dietary preference',
+                        'Test invalid season handling'
+                    ],
+                    codeStructure: 'Function should return dictionary with meals, ingredients, and recipes'
+                }
+            },
+            '152789': {
+                id: '152789',
+                title: 'Configure Azure AI Foundry agent',
+                type: 'Task',
+                state: 'Active',
+                assignee: 'Alex Liu',
+                area: 'Munson Farm\\AI Agent',
+                iteration: 'Sprint 3',
+                priority: 'High',
+                storyPoints: '5',
+                tags: 'Azure AI, Configuration, Lab',
+                isLabTask: true,
+                description: `Configure the Azure AI Foundry agent to use custom meal planning functions.
+
+Configuration includes:
+- Agent setup with GPT-4o model
+- Function tool integration
+- System instructions for meal planning context
+- Conversation flow management
+- Error handling and fallbacks
+
+Lab Steps:
+1. Create AgentsClient connection
+2. Configure FunctionTool with custom functions
+3. Set agent instructions for Munson's Farm context
+4. Test agent responses to meal planning requests
+5. Validate function calls work correctly`,
+                acceptanceCriteria: [
+                    'Agent successfully connects to Azure AI Foundry',
+                    'Custom functions are registered with FunctionTool',
+                    'Agent instructions reflect Munson\'s Farm brand',
+                    'Agent responds appropriately to meal planning requests',
+                    'Function calls execute without errors'
+                ],
+                labDetails: {
+                    azureSetup: 'Requires Azure AI Foundry project and GPT-4o deployment',
+                    mainFiles: ['agent.py', 'user_functions.py'],
+                    testScenarios: [
+                        'Request fall meal plan',
+                        'Ask about seasonal ingredients',
+                        'Request dietary restriction accommodation'
+                    ]
+                }
+            },
+            '152791': {
+                id: '152791',
+                title: 'Frontend Development',
+                type: 'Feature',
+                state: 'Active',
+                assignee: 'Emma Parker',
+                area: 'Munson Farm\\UI',
+                iteration: 'Sprint 4-5',
+                priority: 'Medium',
+                storyPoints: '21',
+                tags: 'Frontend, React, UI',
+                isLabTask: false,
+                description: `Create customer-facing web interface for the meal planning system.
+
+Components to develop:
+- React.js meal planning interface
+- Chat interface for AI agent interaction
+- Meal plan visualization and display
+- Mobile-responsive design
+- Integration with backend APIs`,
+                acceptanceCriteria: [
+                    'Web interface is fully functional',
+                    'Chat interface provides smooth user experience',
+                    'Meal plans are clearly displayed',
+                    'Interface works on mobile devices',
+                    'All backend integrations function properly'
+                ]
+            },
+            '152792': {
+                id: '152792',
+                title: 'Deploy GPT-4o model',
+                type: 'Task',
+                state: 'Done',
+                assignee: 'Alex Liu',
+                area: 'Munson Farm\\AI Agent',
+                iteration: 'Sprint 3',
+                priority: 'High',
+                storyPoints: '2',
+                tags: 'Azure AI, Deployment, Lab',
+                isLabTask: true,
+                description: `Deploy GPT-4o model in Azure AI Foundry for the meal planning agent.
+
+Deployment completed:
+✅ Model successfully deployed to Azure AI Foundry
+✅ Endpoint configured and accessible
+✅ Connection tested and validated
+✅ Model responding to test queries
+✅ Performance metrics within acceptable range`,
+                acceptanceCriteria: [
+                    'GPT-4o model is deployed and accessible',
+                    'Model endpoint is properly configured',
+                    'Connection tests pass successfully',
+                    'Model responses are within expected latency',
+                    'Deployment documentation is updated'
+                ],
+                labDetails: {
+                    completedOn: 'September 16, 2025',
+                    deploymentTime: '15 minutes',
+                    testResults: 'All connection tests passed',
+                    nextSteps: 'Ready for agent configuration'
+                }
+            },
+            '152793': {
+                id: '152793',
+                title: 'Test fall meal planning scenario',
+                type: 'Task',
+                state: 'Done',
+                assignee: 'Alex Liu',
+                area: 'Munson Farm\\AI Agent',
+                iteration: 'Sprint 3',
+                priority: 'High',
+                storyPoints: '3',
+                tags: 'Testing, Validation, Lab',
+                isLabTask: true,
+                description: `Validate the AI agent can successfully generate fall meal plans.
+
+Testing completed:
+✅ Agent responds to fall meal plan requests
+✅ Seasonal ingredients properly included
+✅ Dietary preferences handled correctly
+✅ Meal plan file generated successfully
+✅ Content quality meets requirements`,
+                acceptanceCriteria: [
+                    'Agent successfully processes fall meal plan requests',
+                    'Generated meal plans include appropriate fall ingredients',
+                    'Dietary restrictions are properly handled',
+                    'Meal plan files are created with correct format',
+                    'Customer conversation flow is natural'
+                ],
+                labDetails: {
+                    completedOn: 'September 17, 2025',
+                    testScenarios: [
+                        'Fall meal plan for family of 4',
+                        'Vegetarian fall meal plan',
+                        'Gluten-free fall meal plan'
+                    ],
+                    results: 'All test scenarios passed validation',
+                    fileGenerated: 'fall_meal_plan_vegetarian.md'
+                }
+            },
+            '152794': {
+                id: '152794',
+                title: 'Create Azure DevOps project and repositories',
+                type: 'Task',
+                state: 'Done',
+                assignee: 'Marcus Rodriguez',
+                area: 'Munson Farm\\Infrastructure',
+                iteration: 'Sprint 1',
+                priority: 'High',
+                storyPoints: '2',
+                tags: 'DevOps, Setup, Infrastructure',
+                isLabTask: false,
+                description: `Set up Azure DevOps project structure and code repositories.
+
+Setup completed:
+✅ Azure DevOps project created
+✅ Git repositories configured
+✅ Branch policies established
+✅ Team permissions configured
+✅ Work item templates created`,
+                acceptanceCriteria: [
+                    'Azure DevOps project is operational',
+                    'All required repositories are created',
+                    'Team has appropriate access permissions',
+                    'Branch policies are configured',
+                    'Work item tracking is functional'
+                ]
+            }
+        };
+
+        // Current view state
+        let currentView = 'board';
+        let currentFilter = 'all';
+
+        // Drag and drop functionality
+        function allowDrop(ev) {
+            ev.preventDefault();
+            const column = ev.currentTarget;
+            column.classList.add('drag-over');
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.dataset.task);
+            ev.target.classList.add('dragging');
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            const taskId = ev.dataTransfer.getData("text");
+            const targetColumn = ev.currentTarget.dataset.column;
+            const taskElement = document.querySelector(`[data-task="${taskId}"]`);
+            
+            if (taskElement && targetColumn) {
+                // Update task state in data
+                if (tasks[taskId]) {
+                    const stateMap = {
+                        'new': 'New',
+                        'active': 'Active',
+                        'done': 'Done',
+                        'released': 'Released'
+                    };
+                    tasks[taskId].state = stateMap[targetColumn];
+                }
+
+                // Move the element
+                ev.currentTarget.appendChild(taskElement);
+                taskElement.classList.remove('dragging');
+                
+                // Update column counts
+                updateColumnCounts();
+                
+                // Show notification
+                showNotification(`Task ${taskId} moved to ${targetColumn.charAt(0).toUpperCase() + targetColumn.slice(1)}`);
+            }
+
+            // Remove drag-over styling
+            document.querySelectorAll('.kanban-column').forEach(col => {
+                col.classList.remove('drag-over');
+            });
+        }
+
+        function updateColumnCounts() {
+            const columns = ['new', 'active', 'done', 'released'];
+            columns.forEach(column => {
+                const columnElement = document.querySelector(`[data-column="${column}"]`);
+                const taskCount = columnElement.querySelectorAll('.task-card').length;
+                document.getElementById(`${column}-count`).textContent = taskCount;
+            });
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // View switching
+        function switchView(view) {
+            currentView = view;
+            
+            // Update active button
+            document.querySelectorAll('.view-toggle').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            if (view === 'analytics') {
+                // Simulate analytics view
+                showNotification('Analytics view - Feature coming soon!');
+            }
+        }
+
+        // Task filtering
+        function filterTasks(filter) {
+            currentFilter = filter;
+            const allTasks = document.querySelectorAll('.task-card');
+            
+            allTasks.forEach(task => {
+                const taskId = task.dataset.task;
+                const taskData = tasks[taskId];
+                let show = true;
+                
+                switch(filter) {
+                    case 'lab':
+                        show = taskData && taskData.isLabTask;
+                        break;
+                    case 'epic':
+                        show = taskData && taskData.type === 'Epic';
+                        break;
+                    case 'feature':
+                        show = taskData && taskData.type === 'Feature';
+                        break;
+                    case 'all':
+                    default:
+                        show = true;
+                        break;
+                }
+                
+                task.style.display = show ? 'block' : 'none';
+            });
+            
+            updateColumnCounts();
+            showNotification(`Filtered to show: ${filter === 'all' ? 'all work items' : filter + ' items'}`);
+        }
+
+        function openTaskDetail(taskId) {
+            const task = tasks[taskId];
+            if (!task) return;
+
+            const detailPanel = document.getElementById('detailPanel');
+            const detailTitle = document.getElementById('detailTitle');
+            const detailContent = document.getElementById('detailContent');
+            const boardContainer = document.getElementById('boardContainer');
+
+            // Update title
+            detailTitle.textContent = `${task.id} - ${task.title}`;
+
+            // Generate lab highlight if this is a lab task
+            const labHighlight = task.isLabTask ? `
+                <div class="lab-highlight">
+                    <h4><i class="fas fa-star"></i> Lab Task</h4>
+                    <p>This is a key lab deliverable for the AI agent development. Complete this task to demonstrate Azure AI Foundry functionality.</p>
+                </div>
+            ` : '';
+
+            // Generate detail content
+            detailContent.innerHTML = `
+                ${labHighlight}
+
+                <div class="detail-section">
+                    <h3><i class="fas fa-info-circle icon"></i>Details</h3>
+                    <div class="detail-info-grid">
+                        <div class="info-item">
+                            <div class="info-label">State</div>
+                            <div class="info-value">
+                                <span class="status-badge status-${task.state.toLowerCase().replace(' ', '')}">${task.state}</span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Work Item Type</div>
+                            <div class="info-value">${task.type}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Area</div>
+                            <div class="info-value">${task.area}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Iteration</div>
+                            <div class="info-value">${task.iteration}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3><i class="fas fa-clipboard-list icon"></i>Planning</h3>
+                    <div class="detail-info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Story Points</div>
+                            <div class="info-value">${task.storyPoints}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Priority</div>
+                            <div class="info-value priority-${task.priority.toLowerCase()}">${task.priority}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3><i class="fas fa-user icon"></i>Assignment</h3>
+                    <div class="detail-info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Assigned To</div>
+                            <div class="info-value">${task.assignee}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Tags</div>
+                            <div class="info-value">${task.tags}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3><i class="fas fa-file-text icon"></i>Description</h3>
+                    <div class="description-text">${task.description}</div>
+                </div>
+
+                ${task.acceptanceCriteria && task.acceptanceCriteria.length > 0 ? `
+                <div class="detail-section">
+                    <h3><i class="fas fa-check-square icon"></i>Acceptance Criteria</h3>
+                    <div class="acceptance-criteria">
+                        <ul>
+                            ${task.acceptanceCriteria.map(criteria => `<li>${criteria}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                ` : ''}
+
+                ${task.childTasks && task.childTasks.length > 0 ? `
+                <div class="detail-section">
+                    <h3><i class="fas fa-tasks icon"></i>Child Work Items</h3>
+                    <ul class="task-list">
+                        ${task.childTasks.map(childTask => `<li>${childTask}</li>`).join('')}
+                    </ul>
+                </div>
+                ` : ''}
+
+                ${task.labDetails ? `
+                <div class="detail-section">
+                    <h3><i class="fas fa-flask icon"></i>Lab Implementation Details</h3>
+                    <div class="acceptance-criteria">
+                        ${task.labDetails.objective ? `<p><strong>Objective:</strong> ${task.labDetails.objective}</p>` : ''}
+                        ${task.labDetails.duration ? `<p><strong>Duration:</strong> ${task.labDetails.duration}</p>` : ''}
+                        ${task.labDetails.scenario ? `<p><strong>Test Scenario:</strong> ${task.labDetails.scenario}</p>` : ''}
+                        ${task.labDetails.validation ? `<p><strong>Validation:</strong> ${task.labDetails.validation}</p>` : ''}
+                        ${task.labDetails.implementation ? `<p><strong>Implementation:</strong> ${task.labDetails.implementation}</p>` : ''}
+                        ${task.labDetails.azureSetup ? `<p><strong>Azure Setup:</strong> ${task.labDetails.azureSetup}</p>` : ''}
+                        ${task.labDetails.completedOn ? `<p><strong>Completed:</strong> ${task.labDetails.completedOn}</p>` : ''}
+                        ${task.labDetails.results ? `<p><strong>Results:</strong> ${task.labDetails.results}</p>` : ''}
+                        ${task.labDetails.deliverables ? `
+                            <div style="margin-top: 12px;">
+                                <strong>Deliverables:</strong>
+                                <ul style="margin-left: 16px; margin-top: 4px;">
+                                    ${task.labDetails.deliverables.map(deliverable => `<li>${deliverable}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        ${task.labDetails.testCases ? `
+                            <div style="margin-top: 12px;">
+                                <strong>Test Cases:</strong>
+                                <ul style="margin-left: 16px; margin-top: 4px;">
+                                    ${task.labDetails.testCases.map(testCase => `<li>${testCase}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                ` : ''}
+            `;
+
+            // Show detail panel
+            detailPanel.classList.add('open');
+            boardContainer.classList.add('detail-open');
+        }
+
+        function closeTaskDetail() {
+            const detailPanel = document.getElementById('detailPanel');
+            const boardContainer = document.getElementById('boardContainer');
+            
+            detailPanel.classList.remove('open');
+            boardContainer.classList.remove('detail-open');
+        }
+
+        // Event listeners for cleanup
+        document.addEventListener('dragend', function(ev) {
+            ev.target.classList.remove('dragging');
+            document.querySelectorAll('.kanban-column').forEach(col => {
+                col.classList.remove('drag-over');
+            });
+        });
+
+        // Close detail panel when clicking outside
+        document.addEventListener('click', function(event) {
+            const detailPanel = document.getElementById('detailPanel');
+            
+            if (detailPanel.classList.contains('open') && 
+                !detailPanel.contains(event.target) && 
+                !event.target.closest('.task-card')) {
+                closeTaskDetail();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeTaskDetail();
+            }
+        });
+
+        // Initialize column counts
+        updateColumnCounts();
+    </script>
+</body>
+</html>
